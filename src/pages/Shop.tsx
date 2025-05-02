@@ -5,7 +5,7 @@ import Layout from "@/components/layout/Layout";
 import ProductCard, { ProductType } from "@/components/shop/ProductCard";
 import ProductFilters from "@/components/shop/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid2X2, List } from "lucide-react";
+import { Filter, Grid2X2, List, ShoppingCart } from "lucide-react"; // Added ShoppingCart import here
 import { useCart } from "@/context/CartContext";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 
@@ -310,3 +310,4 @@ const Shop: React.FC = () => {
 };
 
 export default Shop;
+
