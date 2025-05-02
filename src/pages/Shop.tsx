@@ -1,11 +1,10 @@
-
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard, { ProductType } from "@/components/shop/ProductCard";
 import ProductFilters from "@/components/shop/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid2X2, List } from "lucide-react";
+import { Filter, Grid2X2, List, ShoppingCart } from "lucide-react";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 
 // Mock product data - in a real app, this would come from an API
