@@ -5,6 +5,7 @@ import { Minus, Plus, X, ShoppingCart, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Layout from "@/components/layout/Layout";
 import { useCart } from "@/context/CartContext";
+import ProductRecommendations from "@/components/shop/ProductRecommendations";
 
 const Cart: React.FC = () => {
   const { items, totalItems, totalPrice, removeItem, updateQuantity } = useCart();
@@ -38,124 +39,136 @@ const Cart: React.FC = () => {
             </Button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            {/* Cart Items */}
-            <div className="lg:col-span-2">
-              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="p-4 border-b">
-                  <div className="flex justify-between items-center">
-                    <h2 className="font-medium">
-                      Cart ({totalItems} {totalItems === 1 ? "item" : "items"})
-                    </h2>
+          <>
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+              {/* Cart Items */}
+              <div className="lg:col-span-2">
+                <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                  <div className="p-4 border-b">
+                    <div className="flex justify-between items-center">
+                      <h2 className="font-medium">
+                        Cart ({totalItems} {totalItems === 1 ? "item" : "items"})
+                      </h2>
+                    </div>
                   </div>
-                </div>
-                <div className="divide-y">
-                  {items.map((item) => (
-                    <div key={`${item.id}-${item.color}-${item.length}`} className="p-4 flex">
-                      <div className="w-20 h-20 rounded overflow-hidden flex-shrink-0">
-                        <img
-                          src={item.image}
-                          alt={item.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                      <div className="ml-4 flex-grow">
-                        <div className="flex justify-between">
-                          <div>
-                            <h3 className="font-medium">{item.name}</h3>
-                            <div className="text-sm text-gray-600 mt-1">
-                              {item.color} {item.length && `/ ${item.length}`}
+                  <div className="divide-y">
+                    {items.map((item) => (
+                      <div key={`${item.id}-${item.color}-${item.length}`} className="p-4 flex">
+                        <div className="w-20 h-20 rounded overflow-hidden flex-shrink-0">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                        <div className="ml-4 flex-grow">
+                          <div className="flex justify-between">
+                            <div>
+                              <h3 className="font-medium">{item.name}</h3>
+                              <div className="text-sm text-gray-600 mt-1">
+                                {item.color} {item.length && `/ ${item.length}`}
+                              </div>
+                            </div>
+                            <button
+                              onClick={() => removeItem(item.id)}
+                              className="text-gray-400 hover:text-gray-600"
+                              aria-label="Remove item"
+                            >
+                              <X size={18} />
+                            </button>
+                          </div>
+                          <div className="flex justify-between items-center mt-4">
+                            <div className="flex items-center border rounded-md">
+                              <button
+                                className="px-2 py-1"
+                                onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
+                                disabled={item.quantity <= 1}
+                                aria-label="Decrease quantity"
+                              >
+                                <Minus size={14} />
+                              </button>
+                              <span className="px-3 py-1 border-l border-r">{item.quantity}</span>
+                              <button
+                                className="px-2 py-1"
+                                onClick={() => handleQuantityChange(item.id, item.quantity, 1)}
+                                disabled={item.quantity >= 10}
+                                aria-label="Increase quantity"
+                              >
+                                <Plus size={14} />
+                              </button>
+                            </div>
+                            <div className="font-semibold">
+                              ${(item.price * item.quantity).toFixed(2)}
                             </div>
                           </div>
-                          <button
-                            onClick={() => removeItem(item.id)}
-                            className="text-gray-400 hover:text-gray-600"
-                            aria-label="Remove item"
-                          >
-                            <X size={18} />
-                          </button>
-                        </div>
-                        <div className="flex justify-between items-center mt-4">
-                          <div className="flex items-center border rounded-md">
-                            <button
-                              className="px-2 py-1"
-                              onClick={() => handleQuantityChange(item.id, item.quantity, -1)}
-                              disabled={item.quantity <= 1}
-                              aria-label="Decrease quantity"
-                            >
-                              <Minus size={14} />
-                            </button>
-                            <span className="px-3 py-1 border-l border-r">{item.quantity}</span>
-                            <button
-                              className="px-2 py-1"
-                              onClick={() => handleQuantityChange(item.id, item.quantity, 1)}
-                              disabled={item.quantity >= 10}
-                              aria-label="Increase quantity"
-                            >
-                              <Plus size={14} />
-                            </button>
-                          </div>
-                          <div className="font-semibold">
-                            ${(item.price * item.quantity).toFixed(2)}
-                          </div>
                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-                <div className="p-4 bg-soltana-light">
-                  <Link
-                    to="/shop"
-                    className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
-                  >
-                    <ArrowRight size={14} className="mr-1 rotate-180" /> Continue Shopping
-                  </Link>
+                    ))}
+                  </div>
+                  <div className="p-4 bg-soltana-light">
+                    <Link
+                      to="/shop"
+                      className="flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
+                    >
+                      <ArrowRight size={14} className="mr-1 rotate-180" /> Continue Shopping
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
 
-            {/* Order Summary */}
-            <div className="lg:col-span-1">
-              <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
-                <div className="p-4 border-b">
-                  <h2 className="font-medium">Order Summary</h2>
-                </div>
-                <div className="p-4 space-y-4">
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Subtotal</span>
-                    <span>${totalPrice.toFixed(2)}</span>
+              {/* Order Summary */}
+              <div className="lg:col-span-1">
+                <div className="bg-white rounded-lg shadow-sm border overflow-hidden">
+                  <div className="p-4 border-b">
+                    <h2 className="font-medium">Order Summary</h2>
                   </div>
-                  <div className="flex justify-between">
-                    <span className="text-gray-600">Shipping</span>
-                    <span>
+                  <div className="p-4 space-y-4">
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Subtotal</span>
+                      <span>${totalPrice.toFixed(2)}</span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span className="text-gray-600">Shipping</span>
+                      <span>
+                        {shippingPrice === 0 ? (
+                          <span className="text-green-600">Free</span>
+                        ) : (
+                          `$${shippingPrice.toFixed(2)}`
+                        )}
+                      </span>
+                    </div>
+                    {/* Discount would go here if applicable */}
+                    <div className="border-t pt-4 flex justify-between font-semibold">
+                      <span>Total</span>
+                      <span>${finalTotal.toFixed(2)}</span>
+                    </div>
+                    <div className="text-xs text-gray-500">
                       {shippingPrice === 0 ? (
-                        <span className="text-green-600">Free</span>
+                        <span>✓ Free shipping applied</span>
                       ) : (
-                        `$${shippingPrice.toFixed(2)}`
+                        <span>Free shipping on orders over $100</span>
                       )}
-                    </span>
+                    </div>
                   </div>
-                  {/* Discount would go here if applicable */}
-                  <div className="border-t pt-4 flex justify-between font-semibold">
-                    <span>Total</span>
-                    <span>${finalTotal.toFixed(2)}</span>
+                  <div className="p-4">
+                    <Button asChild className="w-full bg-soltana-dark text-white hover:bg-black">
+                      <Link to="/checkout">Proceed to Checkout</Link>
+                    </Button>
                   </div>
-                  <div className="text-xs text-gray-500">
-                    {shippingPrice === 0 ? (
-                      <span>✓ Free shipping applied</span>
-                    ) : (
-                      <span>Free shipping on orders over $100</span>
-                    )}
-                  </div>
-                </div>
-                <div className="p-4">
-                  <Button asChild className="w-full bg-soltana-dark text-white hover:bg-black">
-                    <Link to="/checkout">Proceed to Checkout</Link>
-                  </Button>
                 </div>
               </div>
             </div>
-          </div>
+            
+            {/* Frequently Bought Together */}
+            {items.length > 0 && (
+              <div className="mt-12">
+                <ProductRecommendations 
+                  currentProductId={items[0].id} 
+                  title="Frequently Bought Together"
+                />
+              </div>
+            )}
+          </>
         )}
       </div>
     </Layout>

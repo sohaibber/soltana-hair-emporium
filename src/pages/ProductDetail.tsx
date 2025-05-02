@@ -11,7 +11,9 @@ import {
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
+import ProductRecommendations from "@/components/shop/ProductRecommendations";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 // Temporary mock product data - this would come from your API
 const mockProducts = [
@@ -67,6 +69,7 @@ const mockProducts = [
         verified: true,
       },
     ],
+    category: "Clip-ins",
   },
   // More products would be here
 ];
@@ -79,7 +82,10 @@ const ProductDetail = () => {
   const [selectedLength, setSelectedLength] = useState(product.lengths[0]);
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
   
+  const inWishlist = isInWishlist(parseInt(product.id));
+
   const handleAddToCart = () => {
     addItem({
       id: parseInt(product.id),
@@ -95,6 +101,20 @@ const ProductDetail = () => {
   const handleQuantityChange = (newQuantity: number) => {
     if (newQuantity >= 1 && newQuantity <= 10) {
       setQuantity(newQuantity);
+    }
+  };
+
+  const handleWishlistToggle = () => {
+    if (inWishlist) {
+      removeFromWishlist(parseInt(product.id));
+    } else {
+      addToWishlist({
+        id: parseInt(product.id),
+        name: product.name,
+        price: product.price,
+        image: product.images[0],
+        category: product.category
+      });
     }
   };
 
@@ -233,8 +253,13 @@ const ProductDetail = () => {
               >
                 <ShoppingCart className="mr-2" size={16} /> Add to Cart
               </Button>
-              <Button variant="outline" size="icon" className="rounded-full">
-                <Heart size={16} />
+              <Button 
+                variant="outline" 
+                size="icon" 
+                className={`rounded-full ${inWishlist ? 'text-red-500' : ''}`}
+                onClick={handleWishlistToggle}
+              >
+                <Heart size={16} fill={inWishlist ? "currentColor" : "none"} />
               </Button>
               <Button variant="outline" size="icon" className="rounded-full">
                 <Share2 size={16} />
@@ -330,6 +355,9 @@ const ProductDetail = () => {
             </TabsContent>
           </Tabs>
         </div>
+
+        {/* Product Recommendations */}
+        <ProductRecommendations currentProductId={parseInt(product.id)} />
       </div>
     </Layout>
   );

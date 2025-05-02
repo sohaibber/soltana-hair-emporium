@@ -1,10 +1,12 @@
+
 import React, { useState, useEffect } from "react";
 import { useSearchParams } from "react-router-dom";
 import Layout from "@/components/layout/Layout";
 import ProductCard, { ProductType } from "@/components/shop/ProductCard";
 import ProductFilters from "@/components/shop/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid2X2, List, ShoppingCart } from "lucide-react";
+import { Filter, Grid2X2, List } from "lucide-react";
+import { useCart } from "@/context/CartContext";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 
 // Mock product data - in a real app, this would come from an API
@@ -89,6 +91,7 @@ const mockProducts: ProductType[] = [
 const Shop: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
+  const { addItem } = useCart();
 
   const [products, setProducts] = useState<ProductType[]>(mockProducts);
   const [filteredProducts, setFilteredProducts] = useState<ProductType[]>(mockProducts);
@@ -108,6 +111,17 @@ const Shop: React.FC = () => {
     lengths: [],
     priceRange: [0, maxPrice] as [number, number],
   });
+
+  const handleAddToCart = (product: ProductType) => {
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      color: product.colors?.[0] || "Default",
+      quantity: 1
+    });
+  };
 
   // Apply filters
   useEffect(() => {
@@ -279,6 +293,7 @@ const Shop: React.FC = () => {
                         size="sm"
                         variant="outline" 
                         className="mt-2 text-sm"
+                        onClick={() => handleAddToCart(product)}
                       >
                         <ShoppingCart size={14} className="mr-1" /> Add to Cart
                       </Button>

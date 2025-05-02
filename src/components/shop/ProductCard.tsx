@@ -2,9 +2,10 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart } from "lucide-react";
+import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 export interface ProductType {
   id: number;
@@ -24,6 +25,7 @@ interface ProductCardProps {
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = false }) => {
   const { addItem } = useCart();
+  const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
 
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,6 +41,25 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
       quantity: 1
     });
   };
+  
+  const handleWishlistToggle = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
+    } else {
+      addToWishlist({
+        id: product.id,
+        name: product.name,
+        price: product.price,
+        image: product.image,
+        category: product.category
+      });
+    }
+  };
+
+  const inWishlist = isInWishlist(product.id);
 
   return (
     <Link to={`/product/${product.id}`} className="group">
@@ -54,6 +75,16 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
               {product.badge}
             </div>
           )}
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className={`absolute top-2 left-2 rounded-full bg-white/70 hover:bg-white ${
+              inWishlist ? 'text-red-500 hover:text-red-600' : 'text-gray-500 hover:text-gray-700'
+            }`}
+            onClick={handleWishlistToggle}
+          >
+            <Heart size={18} fill={inWishlist ? "currentColor" : "none"} />
+          </Button>
         </div>
         <div className="p-4">
           <div className="text-xs text-gray-500 mb-1">{product.category}</div>
