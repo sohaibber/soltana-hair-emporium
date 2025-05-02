@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { ShoppingCart } from "lucide-react";
 import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
 
 export interface ProductType {
   id: number;
@@ -22,11 +23,21 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = false }) => {
+  const { addItem } = useCart();
+
   const handleAddToCart = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    // In a real app, this would dispatch to your cart state
-    toast.success(`Added ${product.name} to cart`);
+    
+    // Add the product to cart with default color
+    addItem({
+      id: product.id,
+      name: product.name,
+      price: product.price,
+      image: product.image,
+      color: product.colors?.[0] || "Default",
+      quantity: 1
+    });
   };
 
   return (

@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { useParams } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -12,7 +11,7 @@ import {
 } from "@/components/ui/carousel";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
-import { toast } from "sonner";
+import { useCart } from "@/context/CartContext";
 
 // Temporary mock product data - this would come from your API
 const mockProducts = [
@@ -79,10 +78,17 @@ const ProductDetail = () => {
   const [selectedColor, setSelectedColor] = useState(product.colors[0]);
   const [selectedLength, setSelectedLength] = useState(product.lengths[0]);
   const [quantity, setQuantity] = useState(1);
+  const { addItem } = useCart();
   
   const handleAddToCart = () => {
-    toast.success(`Added ${quantity} ${product.name} to your cart!`, {
-      description: `Color: ${selectedColor}, Length: ${selectedLength}`
+    addItem({
+      id: parseInt(product.id),
+      name: product.name,
+      price: product.price,
+      image: product.images[0],
+      color: selectedColor,
+      length: selectedLength,
+      quantity: quantity
     });
   };
   

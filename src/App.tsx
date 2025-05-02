@@ -19,6 +19,8 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Account from "./pages/Account";
+import About from "./pages/About";
+import Contact from "./pages/Contact";
 
 // Admin pages
 import AdminLogin from "./pages/admin/AdminLogin";
@@ -49,6 +51,8 @@ const App = () => (
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/account" element={<Account />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
               
               {/* Admin Routes */}
               <Route path="/admin/login" element={<AdminLogin />} />
