@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, CreditCard, Info } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -9,10 +9,13 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import Layout from "@/components/layout/Layout";
+import { supabase } from "@/integrations/supabase/client";
 
 const Checkout: React.FC = () => {
   const { items, totalItems, totalPrice, clearCart } = useCart();
+  const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -35,6 +38,36 @@ const Checkout: React.FC = () => {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   
+  // Load user data if authenticated
+  useEffect(() => {
+    const loadUserData = async () => {
+      if (!isAuthenticated || !user) return;
+      
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('id', user.id)
+          .single();
+          
+        if (error) throw error;
+        
+        if (data) {
+          setFormData(prev => ({
+            ...prev,
+            firstName: data.first_name || '',
+            lastName: data.last_name || '',
+            email: data.email || user.email || '',
+          }));
+        }
+      } catch (error) {
+        console.error("Error loading user data:", error);
+      }
+    };
+    
+    loadUserData();
+  }, [user, isAuthenticated]);
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -44,16 +77,59 @@ const Checkout: React.FC = () => {
     setFormData(prev => ({ ...prev, paymentMethod: value }));
   };
   
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     // Form validation would go here
     
     setIsSubmitting(true);
     
-    // Simulate order processing
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      // Create the shipping address JSON
+      const shippingAddress = {
+        firstName: formData.firstName,
+        lastName: formData.lastName,
+        address: formData.address,
+        city: formData.city,
+        state: formData.state,
+        zipCode: formData.zipCode,
+        country: formData.country,
+        phone: formData.phone,
+      };
+      
+      if (isAuthenticated && user) {
+        // Create order in database
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            total_amount: totalPrice + (totalPrice > 100 ? 0 : 10),
+            shipping_address: shippingAddress,
+            status: 'pending',
+            // In a real app, you would create a payment intent with Stripe
+            payment_intent_id: `pi_${Math.random().toString(36).substr(2, 9)}`,
+          })
+          .select();
+        
+        if (orderError) throw orderError;
+        
+        // Create order items
+        const orderItems = items.map(item => ({
+          order_id: orderData[0].id,
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+        }));
+        
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItems);
+        
+        if (itemsError) throw itemsError;
+      }
+      
+      // Clear the cart
       clearCart();
       
       toast({
@@ -61,8 +137,18 @@ const Checkout: React.FC = () => {
         description: "Thank you for your purchase. You will receive a confirmation email shortly.",
       });
       
+      // Redirect to confirmation page
       navigate("/order-confirmation");
-    }, 1500);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      toast({
+        title: "Order Failed",
+        description: "There was an error processing your order. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
   
   const shippingPrice = totalPrice > 100 ? 0 : 10;

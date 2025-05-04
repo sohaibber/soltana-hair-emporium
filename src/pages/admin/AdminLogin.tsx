@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -12,12 +12,19 @@ const AdminLogin: React.FC = () => {
   const [error, setError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
   
-  const { login } = useAuth();
+  const { login, isAuthenticated, isAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get redirect location from query params or use default
   const from = location.state?.from?.pathname || "/admin";
+  
+  // If user is already authenticated and an admin, redirect
+  useEffect(() => {
+    if (isAuthenticated && isAdmin) {
+      navigate(from);
+    }
+  }, [isAuthenticated, isAdmin, navigate, from]);
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,7 +33,15 @@ const AdminLogin: React.FC = () => {
     
     try {
       await login(email, password);
-      navigate(from);
+      
+      // We need to check if the user is an admin after login
+      setTimeout(() => {
+        if (!isAdmin) {
+          setError("Access denied. You don't have admin privileges.");
+          return;
+        }
+        navigate(from);
+      }, 500);
     } catch (err) {
       setError("Invalid email or password. Please try again.");
     } finally {

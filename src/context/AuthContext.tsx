@@ -1,134 +1,182 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { User, Session } from "@supabase/supabase-js";
+import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-
-interface User {
-  id: string;
-  name: string;
-  email: string;
-  isAdmin?: boolean;
-}
 
 interface AuthContextType {
   user: User | null;
+  session: Session | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (name: string, email: string, password: string) => Promise<void>;
-  logout: () => void;
   isAuthenticated: boolean;
   isAdmin: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (formData: RegisterFormData) => Promise<void>;
+  logout: () => Promise<void>;
 }
 
-// Mock users for demo purposes
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "Admin User",
-    email: "admin@soltanahair.com",
-    isAdmin: true,
-  },
-  {
-    id: "2",
-    name: "Test User",
-    email: "user@example.com",
-    isAdmin: false,
-  },
-];
+interface RegisterFormData {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+}
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // Check if user is logged in on initial load
+  const [isAdmin, setIsAdmin] = useState(false);
+  
+  // Initialize the auth state
   useEffect(() => {
-    const storedUser = localStorage.getItem("soltanaUser");
-    if (storedUser) {
-      setUser(JSON.parse(storedUser));
+    async function setupAuth() {
+      // Set up auth state listener FIRST
+      const { data: { subscription } } = supabase.auth.onAuthStateChange(
+        (event, currentSession) => {
+          setSession(currentSession);
+          setUser(currentSession?.user ?? null);
+          
+          if (currentSession?.user) {
+            // Defer role check to prevent Supabase auth deadlocks
+            setTimeout(async () => {
+              await checkUserRole(currentSession.user.id);
+            }, 0);
+          } else {
+            setIsAdmin(false);
+          }
+        }
+      );
+      
+      // THEN check for existing session
+      const { data } = await supabase.auth.getSession();
+      setSession(data.session);
+      setUser(data.session?.user ?? null);
+      
+      if (data.session?.user) {
+        await checkUserRole(data.session.user.id);
+      }
+      
+      setLoading(false);
+      
+      return () => {
+        subscription.unsubscribe();
+      };
     }
-    setLoading(false);
+    
+    setupAuth();
   }, []);
-
+  
+  // Check if user has admin role
+  const checkUserRole = async (userId: string) => {
+    try {
+      const { data, error } = await supabase
+        .rpc('has_role', { role_to_check: 'admin' });
+      
+      if (error) {
+        console.error("Error checking role:", error);
+        setIsAdmin(false);
+        return;
+      }
+      
+      setIsAdmin(data || false);
+    } catch (error) {
+      console.error("Exception checking role:", error);
+      setIsAdmin(false);
+    }
+  };
+  
+  // Sign in with email and password
   const login = async (email: string, password: string) => {
-    setLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Find user with matching email
-    const foundUser = mockUsers.find(u => u.email === email);
-    
-    if (foundUser && password === "password") {
-      // In a real app, we would verify the password properly
-      setUser(foundUser);
-      localStorage.setItem("soltanaUser", JSON.stringify(foundUser));
-      toast.success(`Welcome back, ${foundUser.name}!`);
-    } else {
-      toast.error("Invalid email or password");
-      throw new Error("Invalid email or password");
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      
+      toast.success("Login successful!");
+      return data;
+    } catch (error) {
+      console.error("Login error:", error);
+      throw error;
     }
-    
-    setLoading(false);
   };
-
-  const register = async (name: string, email: string, password: string) => {
-    setLoading(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    // Check if email already exists
-    if (mockUsers.some(u => u.email === email)) {
-      toast.error("Email already in use");
-      throw new Error("Email already in use");
+  
+  // Sign up with email and password
+  const register = async (formData: RegisterFormData) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            first_name: formData.firstName,
+            last_name: formData.lastName,
+          },
+        },
+      });
+      
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      
+      toast.success("Registration successful!");
+      return data;
+    } catch (error) {
+      console.error("Registration error:", error);
+      throw error;
     }
-    
-    // Create new user
-    const newUser: User = {
-      id: Math.random().toString(36).substring(2, 9),
-      name,
-      email,
-      isAdmin: false,
-    };
-    
-    // In a real app, we would save the user to a database
-    mockUsers.push(newUser);
-    
-    setUser(newUser);
-    localStorage.setItem("soltanaUser", JSON.stringify(newUser));
-    toast.success("Registration successful!");
-    
-    setLoading(false);
   };
-
-  const logout = () => {
-    setUser(null);
-    localStorage.removeItem("soltanaUser");
-    toast.success("Logged out successfully");
+  
+  // Sign out
+  const logout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      
+      if (error) {
+        toast.error(error.message);
+        throw error;
+      }
+      
+      toast.success("Logged out successfully!");
+    } catch (error) {
+      console.error("Logout error:", error);
+      throw error;
+    }
   };
-
+  
+  const value = {
+    user,
+    session,
+    loading,
+    isAuthenticated: !!user,
+    isAdmin,
+    login,
+    register,
+    logout,
+  };
+  
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        loading,
-        login,
-        register,
-        logout,
-        isAuthenticated: !!user,
-        isAdmin: !!user?.isAdmin,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  
   if (context === undefined) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
+  
   return context;
 };

@@ -25,8 +25,13 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const location = useLocation();
   
   // Redirect if not authenticated or not an admin
-  if (!isAuthenticated || !isAdmin) {
+  if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} />;
+  }
+  
+  // Redirect if authenticated but not admin
+  if (isAuthenticated && !isAdmin) {
+    return <Navigate to="/" />;
   }
 
   const navigation = [
@@ -115,7 +120,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </Link>
               
               <button
-                onClick={logout}
+                onClick={() => logout()}
                 className="flex items-center text-sm text-red-600 hover:text-red-800"
               >
                 <LogOut className="h-4 w-4 mr-1" />
