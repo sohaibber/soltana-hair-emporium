@@ -2,13 +2,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Menu, X, Search } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Search, Heart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { useWishlist } from "@/context/WishlistContext";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
+  const { totalItems: wishlistItems } = useWishlist();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -68,6 +70,14 @@ const Navbar = () => {
             <Link to="/account" className="hover:text-primary transition-colors">
               <User size={20} />
             </Link>
+            <Link to="/wishlist" className="relative hover:text-primary transition-colors">
+              <Heart size={20} />
+              {wishlistItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                  {wishlistItems > 99 ? '99+' : wishlistItems}
+                </span>
+              )}
+            </Link>
             <Link to="/cart" className="relative hover:text-primary transition-colors">
               <ShoppingCart size={20} />
               {totalItems > 0 && (
@@ -111,6 +121,13 @@ const Navbar = () => {
               onClick={() => setIsMenuOpen(false)}
             >
               Contact
+            </Link>
+            <Link 
+              to="/wishlist" 
+              className="block font-medium hover:text-primary transition-colors"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              Wishlist
             </Link>
           </div>
         </div>
