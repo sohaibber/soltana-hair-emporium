@@ -69,11 +69,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setupAuth();
   }, []);
   
-  // Check if user has admin role
+  // Check if user has admin role - Fixed to directly query user_roles table
   const checkUserRole = async (userId: string) => {
     try {
       const { data, error } = await supabase
-        .rpc('has_role', { role_to_check: 'admin' });
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', userId)
+        .eq('role', 'admin')
+        .single();
       
       if (error) {
         console.error("Error checking role:", error);
@@ -81,7 +85,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return;
       }
       
-      setIsAdmin(data || false);
+      setIsAdmin(data ? true : false);
     } catch (error) {
       console.error("Exception checking role:", error);
       setIsAdmin(false);

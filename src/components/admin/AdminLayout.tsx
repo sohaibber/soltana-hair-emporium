@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,23 +14,47 @@ import {
   Home,
 } from "lucide-react";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated, isAdmin, logout } = useAuth();
+  const { isAuthenticated, isAdmin, logout, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [checking, setChecking] = useState(true);
   const location = useLocation();
+
+  useEffect(() => {
+    // Small delay to ensure auth state is updated
+    const timer = setTimeout(() => {
+      setChecking(false);
+    }, 500);
+    
+    return () => clearTimeout(timer);
+  }, []);
   
-  // Redirect if not authenticated or not an admin
+  // Show loading state while checking auth
+  if (checking) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="mt-4 text-gray-600">Checking authentication...</p>
+        </div>
+      </div>
+    );
+  }
+  
+  // Redirect if not authenticated
   if (!isAuthenticated) {
     return <Navigate to="/admin/login" state={{ from: location }} />;
   }
   
   // Redirect if authenticated but not admin
   if (isAuthenticated && !isAdmin) {
+    toast.error("You don't have permission to access the admin area");
     return <Navigate to="/" />;
   }
 

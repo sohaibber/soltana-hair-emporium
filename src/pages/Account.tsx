@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -31,11 +30,6 @@ const Account: React.FC = () => {
   });
   const [isUpdating, setIsUpdating] = useState(false);
   
-  // Move this outside of component body to avoid early returns before hooks
-  if (!isAuthenticated) {
-    return <Navigate to="/login" state={{ from: { pathname: "/account" } }} />;
-  }
-
   useEffect(() => {
     async function loadProfile() {
       if (!user) return;
@@ -105,6 +99,10 @@ const Account: React.FC = () => {
       setIsUpdating(false);
     }
   };
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" state={{ from: { pathname: "/account" } }} />;
+  }
 
   return (
     <Layout>
