@@ -31,7 +31,7 @@ const Account: React.FC = () => {
   });
   const [isUpdating, setIsUpdating] = useState(false);
   
-  // Redirect to login if not authenticated
+  // Move this outside of component body to avoid early returns before hooks
   if (!isAuthenticated) {
     return <Navigate to="/login" state={{ from: { pathname: "/account" } }} />;
   }
