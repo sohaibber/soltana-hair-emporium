@@ -116,7 +116,7 @@ const Checkout: React.FC = () => {
         // Create order items
         const orderItems = items.map(item => ({
           order_id: orderData[0].id,
-          product_id: item.id,
+          product_id: String(item.id), // Convert item.id to string
           quantity: item.quantity,
           price: item.price,
           total: item.price * item.quantity,

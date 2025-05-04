@@ -102,7 +102,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       toast.success("Login successful!");
-      return data;
     } catch (error) {
       console.error("Login error:", error);
       throw error;
@@ -129,7 +128,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       
       toast.success("Registration successful!");
-      return data;
     } catch (error) {
       console.error("Registration error:", error);
       throw error;
