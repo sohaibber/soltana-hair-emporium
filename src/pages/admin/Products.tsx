@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -18,13 +19,13 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Edit, Plus, Search, Trash2 } from "lucide-react";
 import { ProductType } from "@/components/shop/ProductCard";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import ProductForm from "@/components/admin/ProductForm";
 
 interface ProductWithStock extends ProductType {
   stock: number;
@@ -34,59 +35,49 @@ const Products: React.FC = () => {
   const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
-  const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
+  const [isFormDialogOpen, setIsFormDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<string | null>(null);
+  const [productToEdit, setProductToEdit] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   
-  // Form state
-  const [formData, setFormData] = useState({
-    name: "",
-    price: "",
-    category: "",
-    description: "",
-    stock: "",
-    imageUrl: "",
-    colors: [] as string[],
-  });
-
   // Load products from database
-  useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        setLoading(true);
-        const { data, error } = await supabase
-          .from('products')
-          .select('*');
-        
-        if (error) {
-          console.error("Error fetching products:", error);
-          toast.error("Failed to load products");
-          return;
-        }
-        
-        // Transform the data to match our frontend model
-        const transformedProducts = data.map(product => ({
-          id: product.id,
-          name: product.name,
-          price: Number(product.price),
-          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-          category: product.category || "Uncategorized",
-          colors: product.tags as string[] || [],
-          rating: 4.5, // Default rating since we don't have this in DB yet
-          stock: product.stock || 0,
-          badge: product.is_active ? undefined : "Inactive"
-        }));
-        
-        setProducts(transformedProducts);
-      } catch (error) {
-        console.error("Exception loading products:", error);
+  const fetchProducts = async () => {
+    try {
+      setLoading(true);
+      const { data, error } = await supabase
+        .from('products')
+        .select('*');
+      
+      if (error) {
+        console.error("Error fetching products:", error);
         toast.error("Failed to load products");
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
-    
+      
+      // Transform the data to match our frontend model
+      const transformedProducts = data.map(product => ({
+        id: product.id,
+        name: product.name,
+        price: Number(product.price),
+        image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+        category: product.category || "Uncategorized",
+        colors: product.tags as string[] || [],
+        rating: 4.5, // Default rating since we don't have this in DB yet
+        stock: product.stock || 0,
+        badge: product.is_active ? undefined : "Inactive"
+      }));
+      
+      setProducts(transformedProducts);
+    } catch (error) {
+      console.error("Exception loading products:", error);
+      toast.error("Failed to load products");
+    } finally {
+      setLoading(false);
+    }
+  };
+  
+  useEffect(() => {
     fetchProducts();
   }, []);
   
@@ -113,94 +104,21 @@ const Products: React.FC = () => {
     }
   };
   
-  // Handle form input changes
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { id, value } = e.target;
-    setFormData({
-      ...formData,
-      [id]: value
-    });
-  };
-
-  // Handle checkbox changes for colors
-  const handleColorChange = (color: string) => {
-    setFormData(prev => {
-      const newColors = prev.colors.includes(color)
-        ? prev.colors.filter(c => c !== color)
-        : [...prev.colors, color];
-      
-      return {
-        ...prev,
-        colors: newColors
-      };
-    });
+  // Handle adding/editing product
+  const handleAddProduct = () => {
+    setProductToEdit(null);
+    setIsFormDialogOpen(true);
   };
   
-  // Handle adding new product
-  const addProduct = async () => {
-    try {
-      // Basic validation
-      if (!formData.name || !formData.price || !formData.category) {
-        toast.error("Please fill all required fields");
-        return;
-      }
-      
-      // Prepare the data for Supabase
-      const productData = {
-        name: formData.name,
-        price: parseFloat(formData.price),
-        category: formData.category,
-        description: formData.description,
-        stock: parseInt(formData.stock) || 0,
-        image_urls: formData.imageUrl ? [formData.imageUrl] : [],
-        tags: formData.colors,
-        is_active: true
-      };
-      
-      // Insert into database
-      const { data, error } = await supabase
-        .from('products')
-        .insert(productData)
-        .select();
-      
-      if (error) {
-        console.error("Error adding product:", error);
-        toast.error("Failed to add product");
-        return;
-      }
-      
-      // Transform the returned data to match our frontend model
-      const newProduct = {
-        id: String(data[0].id),
-        name: data[0].name,
-        price: Number(data[0].price),
-        image: data[0].image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-        category: data[0].category,
-        colors: data[0].tags,
-        rating: 4.5,
-        stock: data[0].stock
-      };
-      
-      // Update the local state
-      setProducts([...products, newProduct]);
-      
-      // Reset form and close dialog
-      setFormData({
-        name: "",
-        price: "",
-        category: "",
-        description: "",
-        stock: "",
-        imageUrl: "",
-        colors: []
-      });
-      
-      setIsAddDialogOpen(false);
-      toast.success("Product added successfully!");
-    } catch (error) {
-      console.error("Exception adding product:", error);
-      toast.error("Failed to add product");
-    }
+  const handleEditProduct = (id: string) => {
+    setProductToEdit(id);
+    setIsFormDialogOpen(true);
+  };
+  
+  // Handle product save
+  const handleProductSaved = () => {
+    setIsFormDialogOpen(false);
+    fetchProducts();
   };
   
   // Handle deleting product
@@ -236,114 +154,23 @@ const Products: React.FC = () => {
     }
   };
 
+  // Helper function to get image source
+  const getImageSrc = (imagePath: string) => {
+    if (imagePath.startsWith('http')) {
+      return imagePath;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${imagePath}`;
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold">Products</h1>
           
-          <Dialog open={isAddDialogOpen} onOpenChange={setIsAddDialogOpen}>
-            <DialogTrigger asChild>
-              <Button>
-                <Plus className="mr-1" size={16} /> Add Product
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-lg">
-              <DialogHeader>
-                <DialogTitle>Add New Product</DialogTitle>
-                <DialogDescription>
-                  Enter the details of the new product below.
-                </DialogDescription>
-              </DialogHeader>
-              
-              <div className="grid gap-4 py-4">
-                <div className="grid gap-2">
-                  <Label htmlFor="name">Product Name*</Label>
-                  <Input 
-                    id="name" 
-                    placeholder="Enter product name" 
-                    value={formData.name} 
-                    onChange={handleInputChange} 
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="price">Price*</Label>
-                    <Input 
-                      id="price" 
-                      type="number" 
-                      step="0.01" 
-                      placeholder="0.00" 
-                      value={formData.price} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="category">Category*</Label>
-                    <Input 
-                      id="category" 
-                      placeholder="Category" 
-                      value={formData.category} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="description">Description</Label>
-                  <textarea 
-                    id="description"
-                    className="min-h-24 rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
-                    placeholder="Enter product description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                  ></textarea>
-                </div>
-                <div className="grid gap-2">
-                  <Label>Colors</Label>
-                  <div className="flex flex-wrap gap-2">
-                    {["Black", "Brown", "Blonde", "Auburn", "Red"].map((color) => (
-                      <div key={color} className="flex items-center space-x-2">
-                        <Checkbox 
-                          id={`color-${color}`} 
-                          checked={formData.colors.includes(color)}
-                          onCheckedChange={() => handleColorChange(color)}
-                        />
-                        <Label htmlFor={`color-${color}`}>{color}</Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="grid gap-2">
-                    <Label htmlFor="stock">Stock</Label>
-                    <Input 
-                      id="stock" 
-                      type="number" 
-                      placeholder="0" 
-                      value={formData.stock} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                  <div className="grid gap-2">
-                    <Label htmlFor="imageUrl">Image URL</Label>
-                    <Input 
-                      id="imageUrl" 
-                      placeholder="https://..." 
-                      value={formData.imageUrl} 
-                      onChange={handleInputChange} 
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              <DialogFooter>
-                <Button variant="outline" onClick={() => setIsAddDialogOpen(false)}>
-                  Cancel
-                </Button>
-                <Button onClick={addProduct}>Add Product</Button>
-              </DialogFooter>
-            </DialogContent>
-          </Dialog>
+          <Button onClick={handleAddProduct}>
+            <Plus className="mr-1" size={16} /> Add Product
+          </Button>
         </div>
         
         {/* Search and filters */}
@@ -417,7 +244,7 @@ const Products: React.FC = () => {
                     <TableCell>
                       <div className="w-10 h-10 rounded-md overflow-hidden">
                         <img 
-                          src={product.image} 
+                          src={getImageSrc(product.image)} 
                           alt={product.name} 
                           className="w-full h-full object-cover"
                         />
@@ -440,7 +267,11 @@ const Products: React.FC = () => {
                     </TableCell>
                     <TableCell className="text-right">
                       <div className="flex justify-end space-x-2">
-                        <Button variant="ghost" size="sm">
+                        <Button 
+                          variant="ghost" 
+                          size="sm"
+                          onClick={() => handleEditProduct(product.id)}
+                        >
                           <Edit size={16} />
                         </Button>
                         <Button 
@@ -460,6 +291,24 @@ const Products: React.FC = () => {
           </Table>
         </div>
       </div>
+      
+      {/* Product Form Dialog */}
+      <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
+        <DialogContent className="sm:max-w-lg">
+          <DialogHeader>
+            <DialogTitle>{productToEdit ? 'Edit Product' : 'Add New Product'}</DialogTitle>
+            <DialogDescription>
+              {productToEdit ? 'Update the product details below.' : 'Enter the details of the new product below.'}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <ProductForm 
+            productId={productToEdit || undefined}
+            onCancel={() => setIsFormDialogOpen(false)}
+            onSave={handleProductSaved}
+          />
+        </DialogContent>
+      </Dialog>
       
       {/* Delete confirmation dialog */}
       <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>

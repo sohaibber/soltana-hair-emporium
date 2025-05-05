@@ -1,4 +1,3 @@
-
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -6,6 +5,7 @@ import { ShoppingCart, Heart } from "lucide-react";
 import { toast } from "sonner";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface ProductType {
   id: string;
@@ -61,12 +61,22 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
 
   const inWishlist = isInWishlist(product.id);
 
+  // Helper function to render image - handles both URL and storage path
+  const getImageSrc = () => {
+    // If image starts with http or https, it's a URL
+    if (product.image.startsWith('http')) {
+      return product.image;
+    } 
+    // Otherwise, it's a storage path
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${product.image}`;
+  };
+
   return (
     <Link to={`/product/${product.id}`} className="group">
       <div className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover-lift">
         <div className="relative aspect-square overflow-hidden">
           <img 
-            src={product.image} 
+            src={getImageSrc()} 
             alt={product.name} 
             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
           />
