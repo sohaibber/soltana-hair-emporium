@@ -191,13 +191,13 @@ const ProductDetail = () => {
     );
   }
   
-  const inWishlist = isInWishlist(product.id);
+  const inWishlist = isInWishlist(product?.id);
 
   const handleAddToCart = () => {
     if (!product) return;
     
     addItem({
-      id: product.id,
+      id: String(product.id),
       name: product.name,
       price: Number(product.price),
       image: product.images[0],
@@ -218,7 +218,7 @@ const ProductDetail = () => {
       removeFromWishlist(product.id);
     } else {
       addToWishlist({
-        id: product.id,
+        id: String(product.id),
         name: product.name,
         price: product.price,
         image: product.images[0],

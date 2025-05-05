@@ -173,7 +173,7 @@ const Products: React.FC = () => {
       const newProduct = {
         id: data[0].id,
         name: data[0].name,
-        price: data[0].price,
+        price: Number(data[0].price),
         image: data[0].image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
         category: data[0].category,
         colors: data[0].tags,

@@ -33,7 +33,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     
     // Add the product to cart with default color
     addItem({
-      id: product.id,
+      id: String(product.id),
       name: product.name,
       price: Number(product.price),
       image: product.image,
@@ -46,11 +46,11 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     e.preventDefault();
     e.stopPropagation();
     
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id);
+    if (isInWishlist(String(product.id))) {
+      removeFromWishlist(String(product.id));
     } else {
       addToWishlist({
-        id: product.id,
+        id: String(product.id),
         name: product.name,
         price: Number(product.price),
         image: product.image,
@@ -59,7 +59,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     }
   };
 
-  const inWishlist = isInWishlist(product.id);
+  const inWishlist = isInWishlist(String(product.id));
 
   return (
     <Link to={`/product/${product.id}`} className="group">
