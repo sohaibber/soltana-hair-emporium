@@ -1,73 +1,116 @@
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
-import { ProductType } from "../shop/ProductCard";
+import { ProductType } from "./ProductCard";
 import { Button } from "@/components/ui/button";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ProductRecommendationsProps {
-  currentProductId: number;
+  currentProductId: string | number;
   title?: string;
 }
-
-// Mock products - in a real app, this would come from an API
-const mockProducts: ProductType[] = [
-  {
-    id: 1,
-    name: "Premium Clip-in Hair Extensions",
-    price: 129.99,
-    image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.8,
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Seamless Tape-in Extensions",
-    price: 159.99,
-    image: "https://images.unsplash.com/photo-1620331311520-246422fd82f9?q=80&w=500&auto=format&fit=crop",
-    category: "Tape-ins",
-    colors: ["Light Brown", "Dark Brown", "Black"],
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    name: "Luxury Ponytail Extension",
-    price: 89.99,
-    image: "https://images.unsplash.com/photo-1595515538772-5d9f4ea38e8d?q=80&w=500&auto=format&fit=crop",
-    category: "Ponytails",
-    colors: ["Blonde", "Brown", "Black", "Auburn"],
-    rating: 4.7,
-    badge: "New",
-  },
-  {
-    id: 4,
-    name: "Full Volume Halo Extensions",
-    price: 199.99,
-    image: "https://images.unsplash.com/photo-1626954079673-dc3d04c7f938?q=80&w=500&auto=format&fit=crop",
-    category: "Halo",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.9,
-  },
-  {
-    id: 5,
-    name: "Brazilian Wavy Clip-ins",
-    price: 149.99,
-    image: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Dark Brown", "Black"],
-    rating: 4.6,
-  },
-];
 
 const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({ 
   currentProductId, 
   title = "You may also like"
 }) => {
-  // Filter out the current product and select up to 4 products to show
-  const recommendations = mockProducts
-    .filter(product => product.id !== currentProductId)
-    .slice(0, 4);
+  const [recommendations, setRecommendations] = useState<ProductType[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchRecommendations = async () => {
+      try {
+        setLoading(true);
+        
+        // Get the category of the current product
+        const { data: currentProduct, error: currentProductError } = await supabase
+          .from('products')
+          .select('category')
+          .eq('id', currentProductId)
+          .single();
+        
+        if (currentProductError) {
+          console.error("Error fetching current product:", currentProductError);
+          return;
+        }
+        
+        // Fetch products from the same category
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true)
+          .eq('category', currentProduct.category)
+          .neq('id', currentProductId)
+          .limit(4);
+        
+        if (error) {
+          console.error("Error fetching recommendations:", error);
+          return;
+        }
+        
+        // If we don't have enough products from the same category, get some random ones
+        let recommendationData = data;
+        if (data.length < 4) {
+          const { data: randomProducts, error: randomError } = await supabase
+            .from('products')
+            .select('*')
+            .eq('is_active', true)
+            .neq('id', currentProductId)
+            .limit(4 - data.length);
+          
+          if (!randomError && randomProducts) {
+            recommendationData = [...data, ...randomProducts];
+          }
+        }
+        
+        // Transform the data to match our frontend model
+        const transformedRecommendations = recommendationData.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+          category: product.category || "Uncategorized",
+          colors: product.tags as string[] || [],
+          rating: 4.5, // Default rating since we don't have this in DB yet
+          badge: product.sale_price ? "Sale" : undefined
+        }));
+        
+        setRecommendations(transformedRecommendations.slice(0, 4)); // Ensure max 4 items
+      } catch (error) {
+        console.error("Exception loading recommendations:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    if (currentProductId) {
+      fetchRecommendations();
+    }
+  }, [currentProductId]);
+
+  if (loading) {
+    return (
+      <div className="py-8 mb-8 border-t">
+        <h2 className="font-serif text-2xl font-semibold mb-6">{title}</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {[1, 2, 3, 4].map(i => (
+            <div key={i} className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm animate-pulse">
+              <div className="aspect-square bg-gray-200"></div>
+              <div className="p-3">
+                <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
+                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
+  if (recommendations.length === 0) {
+    return null; // Don't show the section if no recommendations
+  }
 
   return (
     <div className="py-8 mb-8 border-t">

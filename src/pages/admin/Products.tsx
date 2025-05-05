@@ -1,5 +1,5 @@
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { 
@@ -24,101 +24,72 @@ import { Checkbox } from "@/components/ui/checkbox";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Edit, Plus, Search, Trash2 } from "lucide-react";
 import { ProductType } from "@/components/shop/ProductCard";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-// Mock data for products
-const mockProducts: (ProductType & { stock: number })[] = [
-  {
-    id: 1,
-    name: "Premium Clip-in Hair Extensions",
-    price: 129.99,
-    image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.8,
-    stock: 15,
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Seamless Tape-in Extensions",
-    price: 159.99,
-    image: "https://images.unsplash.com/photo-1620331311520-246422fd82f9?q=80&w=500&auto=format&fit=crop",
-    category: "Tape-ins",
-    colors: ["Light Brown", "Dark Brown", "Black"],
-    rating: 4.9,
-    stock: 8,
-  },
-  {
-    id: 3,
-    name: "Luxury Ponytail Extension",
-    price: 89.99,
-    image: "https://images.unsplash.com/photo-1595515538772-5d9f4ea38e8d?q=80&w=500&auto=format&fit=crop",
-    category: "Ponytails",
-    colors: ["Blonde", "Brown", "Black", "Auburn"],
-    rating: 4.7,
-    stock: 22,
-    badge: "New",
-  },
-  {
-    id: 4,
-    name: "Full Volume Halo Extensions",
-    price: 199.99,
-    image: "https://images.unsplash.com/photo-1626954079673-dc3d04c7f938?q=80&w=500&auto=format&fit=crop",
-    category: "Halo",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.9,
-    stock: 5,
-  },
-  {
-    id: 5,
-    name: "Brazilian Wavy Clip-ins",
-    price: 149.99,
-    image: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Dark Brown", "Black"],
-    rating: 4.6,
-    stock: 10,
-  },
-  {
-    id: 6,
-    name: "Keratin Bond Extensions",
-    price: 249.99,
-    image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=500&auto=format&fit=crop",
-    category: "Keratin",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.8,
-    stock: 12,
-  },
-  {
-    id: 7,
-    name: "Balayage Ombre Clip-ins",
-    price: 179.99,
-    image: "https://images.unsplash.com/photo-1600950207944-0d63e8edbc3f?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Balayage"],
-    rating: 4.7,
-    stock: 7,
-    badge: "Popular",
-  },
-  {
-    id: 8,
-    name: "Human Hair Full Lace Wig",
-    price: 399.99,
-    image: "https://images.unsplash.com/photo-1629747490241-8bce1298d221?q=80&w=500&auto=format&fit=crop",
-    category: "Wigs",
-    colors: ["Black", "Dark Brown"],
-    rating: 4.9,
-    stock: 3,
-  },
-];
+interface ProductWithStock extends ProductType {
+  stock: number;
+}
 
 const Products: React.FC = () => {
-  const [products, setProducts] = useState(mockProducts);
+  const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] = useState<number | null>(null);
+  const [loading, setLoading] = useState(true);
+  
+  // Form state
+  const [formData, setFormData] = useState({
+    name: "",
+    price: "",
+    category: "",
+    description: "",
+    stock: "",
+    imageUrl: "",
+    colors: [] as string[],
+  });
+
+  // Load products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*');
+        
+        if (error) {
+          console.error("Error fetching products:", error);
+          toast.error("Failed to load products");
+          return;
+        }
+        
+        // Transform the data to match our frontend model
+        const transformedProducts = data.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+          category: product.category || "Uncategorized",
+          colors: product.tags as string[] || [],
+          rating: 4.5, // Default rating since we don't have this in DB yet
+          stock: product.stock || 0,
+          badge: product.is_active ? undefined : "Inactive"
+        }));
+        
+        setProducts(transformedProducts);
+      } catch (error) {
+        console.error("Exception loading products:", error);
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, []);
   
   // Filter products based on search query
   const filteredProducts = products.filter((product) =>
@@ -131,7 +102,7 @@ const Products: React.FC = () => {
     if (selectedProducts.length === filteredProducts.length) {
       setSelectedProducts([]);
     } else {
-      setSelectedProducts(filteredProducts.map((product) => product.id));
+      setSelectedProducts(filteredProducts.map((product) => Number(product.id)));
     }
   };
   
@@ -143,12 +114,94 @@ const Products: React.FC = () => {
     }
   };
   
+  // Handle form input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { id, value } = e.target;
+    setFormData({
+      ...formData,
+      [id]: value
+    });
+  };
+
+  // Handle checkbox changes for colors
+  const handleColorChange = (color: string) => {
+    setFormData(prev => {
+      const newColors = prev.colors.includes(color)
+        ? prev.colors.filter(c => c !== color)
+        : [...prev.colors, color];
+      
+      return {
+        ...prev,
+        colors: newColors
+      };
+    });
+  };
+  
   // Handle adding new product
-  const addProduct = () => {
-    setIsAddDialogOpen(false);
-    // In a real app, we would add the product to the database
-    // For now, let's just show a success message
-    alert("Product added successfully!");
+  const addProduct = async () => {
+    try {
+      // Basic validation
+      if (!formData.name || !formData.price || !formData.category) {
+        toast.error("Please fill all required fields");
+        return;
+      }
+      
+      // Prepare the data for Supabase
+      const productData = {
+        name: formData.name,
+        price: parseFloat(formData.price),
+        category: formData.category,
+        description: formData.description,
+        stock: parseInt(formData.stock) || 0,
+        image_urls: formData.imageUrl ? [formData.imageUrl] : [],
+        tags: formData.colors,
+        is_active: true
+      };
+      
+      // Insert into database
+      const { data, error } = await supabase
+        .from('products')
+        .insert(productData)
+        .select();
+      
+      if (error) {
+        console.error("Error adding product:", error);
+        toast.error("Failed to add product");
+        return;
+      }
+      
+      // Transform the returned data to match our frontend model
+      const newProduct = {
+        id: data[0].id,
+        name: data[0].name,
+        price: data[0].price,
+        image: data[0].image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+        category: data[0].category,
+        colors: data[0].tags,
+        rating: 4.5,
+        stock: data[0].stock
+      };
+      
+      // Update the local state
+      setProducts([...products, newProduct]);
+      
+      // Reset form and close dialog
+      setFormData({
+        name: "",
+        price: "",
+        category: "",
+        description: "",
+        stock: "",
+        imageUrl: "",
+        colors: []
+      });
+      
+      setIsAddDialogOpen(false);
+      toast.success("Product added successfully!");
+    } catch (error) {
+      console.error("Exception adding product:", error);
+      toast.error("Failed to add product");
+    }
   };
   
   // Handle deleting product
@@ -157,12 +210,31 @@ const Products: React.FC = () => {
     setIsDeleteDialogOpen(true);
   };
   
-  const deleteProduct = () => {
+  const deleteProduct = async () => {
     if (productToDelete === null) return;
     
-    setProducts(products.filter((product) => product.id !== productToDelete));
-    setIsDeleteDialogOpen(false);
-    setProductToDelete(null);
+    try {
+      const { error } = await supabase
+        .from('products')
+        .delete()
+        .eq('id', productToDelete);
+      
+      if (error) {
+        console.error("Error deleting product:", error);
+        toast.error("Failed to delete product");
+        return;
+      }
+      
+      // Update local state
+      setProducts(products.filter((product) => Number(product.id) !== productToDelete));
+      toast.success("Product deleted successfully");
+    } catch (error) {
+      console.error("Exception deleting product:", error);
+      toast.error("Failed to delete product");
+    } finally {
+      setIsDeleteDialogOpen(false);
+      setProductToDelete(null);
+    }
   };
 
   return (
@@ -187,17 +259,34 @@ const Products: React.FC = () => {
               
               <div className="grid gap-4 py-4">
                 <div className="grid gap-2">
-                  <Label htmlFor="name">Product Name</Label>
-                  <Input id="name" placeholder="Enter product name" />
+                  <Label htmlFor="name">Product Name*</Label>
+                  <Input 
+                    id="name" 
+                    placeholder="Enter product name" 
+                    value={formData.name} 
+                    onChange={handleInputChange} 
+                  />
                 </div>
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
-                    <Label htmlFor="price">Price</Label>
-                    <Input id="price" type="number" step="0.01" placeholder="0.00" />
+                    <Label htmlFor="price">Price*</Label>
+                    <Input 
+                      id="price" 
+                      type="number" 
+                      step="0.01" 
+                      placeholder="0.00" 
+                      value={formData.price} 
+                      onChange={handleInputChange} 
+                    />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="category">Category</Label>
-                    <Input id="category" placeholder="Category" />
+                    <Label htmlFor="category">Category*</Label>
+                    <Input 
+                      id="category" 
+                      placeholder="Category" 
+                      value={formData.category} 
+                      onChange={handleInputChange} 
+                    />
                   </div>
                 </div>
                 <div className="grid gap-2">
@@ -206,6 +295,8 @@ const Products: React.FC = () => {
                     id="description"
                     className="min-h-24 rounded-md border border-input px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                     placeholder="Enter product description"
+                    value={formData.description}
+                    onChange={handleInputChange}
                   ></textarea>
                 </div>
                 <div className="grid gap-2">
@@ -213,7 +304,11 @@ const Products: React.FC = () => {
                   <div className="flex flex-wrap gap-2">
                     {["Black", "Brown", "Blonde", "Auburn", "Red"].map((color) => (
                       <div key={color} className="flex items-center space-x-2">
-                        <Checkbox id={`color-${color}`} />
+                        <Checkbox 
+                          id={`color-${color}`} 
+                          checked={formData.colors.includes(color)}
+                          onCheckedChange={() => handleColorChange(color)}
+                        />
                         <Label htmlFor={`color-${color}`}>{color}</Label>
                       </div>
                     ))}
@@ -222,11 +317,22 @@ const Products: React.FC = () => {
                 <div className="grid grid-cols-2 gap-4">
                   <div className="grid gap-2">
                     <Label htmlFor="stock">Stock</Label>
-                    <Input id="stock" type="number" placeholder="0" />
+                    <Input 
+                      id="stock" 
+                      type="number" 
+                      placeholder="0" 
+                      value={formData.stock} 
+                      onChange={handleInputChange} 
+                    />
                   </div>
                   <div className="grid gap-2">
-                    <Label htmlFor="image">Image URL</Label>
-                    <Input id="image" placeholder="https://..." />
+                    <Label htmlFor="imageUrl">Image URL</Label>
+                    <Input 
+                      id="imageUrl" 
+                      placeholder="https://..." 
+                      value={formData.imageUrl} 
+                      onChange={handleInputChange} 
+                    />
                   </div>
                 </div>
               </div>
@@ -285,7 +391,16 @@ const Products: React.FC = () => {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredProducts.length === 0 ? (
+              {loading ? (
+                <TableRow>
+                  <TableCell colSpan={7} className="text-center py-8">
+                    <div className="flex justify-center">
+                      <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                    </div>
+                    <p className="mt-2 text-gray-500">Loading products...</p>
+                  </TableCell>
+                </TableRow>
+              ) : filteredProducts.length === 0 ? (
                 <TableRow>
                   <TableCell colSpan={7} className="text-center py-8 text-gray-500">
                     No products found
@@ -296,8 +411,8 @@ const Products: React.FC = () => {
                   <TableRow key={product.id}>
                     <TableCell>
                       <Checkbox 
-                        checked={selectedProducts.includes(product.id)} 
-                        onCheckedChange={() => toggleSelectProduct(product.id)}
+                        checked={selectedProducts.includes(Number(product.id))} 
+                        onCheckedChange={() => toggleSelectProduct(Number(product.id))}
                       />
                     </TableCell>
                     <TableCell>
@@ -333,7 +448,7 @@ const Products: React.FC = () => {
                           variant="ghost" 
                           size="sm" 
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => confirmDelete(product.id)}
+                          onClick={() => confirmDelete(Number(product.id))}
                         >
                           <Trash2 size={16} />
                         </Button>

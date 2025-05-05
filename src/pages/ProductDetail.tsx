@@ -1,5 +1,6 @@
-import React, { useState } from "react";
-import { useParams } from "react-router-dom";
+
+import React, { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
@@ -14,81 +15,188 @@ import Layout from "@/components/layout/Layout";
 import ProductRecommendations from "@/components/shop/ProductRecommendations";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "sonner";
 
-// Temporary mock product data - this would come from your API
-const mockProducts = [
+// Default values for product reviews
+const defaultReviews = [
   {
-    id: "1",
-    name: "Premium Clip-in Hair Extensions",
-    price: 129.99,
-    description: "Our Premium Clip-in Hair Extensions are made from 100% Remy human hair, providing a seamless blend with your natural hair. These extensions are easy to apply and remove, making them perfect for adding instant length and volume.",
-    details: [
-      "100% Remy human hair",
-      "Double weft for extra volume",
-      "Silicone-lined clips for secure attachment",
-      "Can be washed, styled, and heat-treated",
-      "Reusable with proper care",
-    ],
-    specifications: [
-      { name: "Material", value: "100% Remy human hair" },
-      { name: "Weight", value: "120g - 160g (varies by length)" },
-      { name: "Application Method", value: "Clip-in" },
-      { name: "Reusable", value: "Yes" },
-      { name: "Heat Styling", value: "Up to 180°C (365°F)" },
-    ],
-    colors: ["Jet Black", "Natural Black", "Dark Brown", "Medium Brown", "Light Brown", "Ash Blonde", "Golden Blonde", "Platinum Blonde"],
-    lengths: ["14\"", "16\"", "18\"", "20\"", "22\""],
-    images: [
-      "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1595515538772-5d9f4ea38e8d?q=80&w=500&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1626954079673-dc3d04c7f938?q=80&w=500&auto=format&fit=crop",
-    ],
-    reviews: [
-      {
-        id: 1,
-        user: "Sophie M.",
-        rating: 5,
-        date: "March 15, 2023",
-        comment: "These extensions blend perfectly with my hair! I'm so impressed with the quality and how natural they look. Will definitely purchase again.",
-        verified: true,
-      },
-      {
-        id: 2,
-        user: "Jennifer L.",
-        rating: 4,
-        date: "February 2, 2023",
-        comment: "Great quality hair, very soft and easy to style. The clips are secure and comfortable. I removed one star because the color was slightly different than expected, but still looks good.",
-        verified: true,
-      },
-      {
-        id: 3,
-        user: "Rachel T.",
-        rating: 5,
-        date: "January 10, 2023",
-        comment: "Absolutely love these extensions! They match my hair perfectly and add so much volume. I've received so many compliments!",
-        verified: true,
-      },
-    ],
-    category: "Clip-ins",
+    id: 1,
+    user: "Sophie M.",
+    rating: 5,
+    date: "March 15, 2023",
+    comment: "These extensions blend perfectly with my hair! I'm so impressed with the quality and how natural they look. Will definitely purchase again.",
+    verified: true,
   },
-  // More products would be here
+  {
+    id: 2,
+    user: "Jennifer L.",
+    rating: 4,
+    date: "February 2, 2023",
+    comment: "Great quality hair, very soft and easy to style. The clips are secure and comfortable. I removed one star because the color was slightly different than expected, but still looks good.",
+    verified: true,
+  },
+  {
+    id: 3,
+    user: "Rachel T.",
+    rating: 5,
+    date: "January 10, 2023",
+    comment: "Absolutely love these extensions! They match my hair perfectly and add so much volume. I've received so many compliments!",
+    verified: true,
+  },
 ];
+
+// Standard lengths for hair extensions
+const standardLengths = ["14\"", "16\"", "18\"", "20\"", "22\""];
+
+interface ProductData {
+  id: string;
+  name: string;
+  price: number;
+  description: string;
+  details?: string[];
+  specifications?: { name: string; value: string }[];
+  colors: string[];
+  lengths: string[];
+  images: string[];
+  reviews: typeof defaultReviews;
+  category: string;
+}
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
-  const product = mockProducts.find(p => p.id === id) || mockProducts[0]; // Fallback for demo
+  const navigate = useNavigate();
+  const [product, setProduct] = useState<ProductData | null>(null);
+  const [loading, setLoading] = useState(true);
   
-  const [selectedColor, setSelectedColor] = useState(product.colors[0]);
-  const [selectedLength, setSelectedLength] = useState(product.lengths[0]);
+  const [selectedColor, setSelectedColor] = useState<string>("");
+  const [selectedLength, setSelectedLength] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
   
-  const inWishlist = isInWishlist(parseInt(product.id));
+  // Fetch product data
+  useEffect(() => {
+    const fetchProduct = async () => {
+      if (!id) return;
+      
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('id', id)
+          .single();
+        
+        if (error) {
+          console.error("Error fetching product:", error);
+          toast.error("Product not found");
+          navigate('/shop');
+          return;
+        }
+        
+        // Transform the data
+        const productData: ProductData = {
+          id: data.id,
+          name: data.name,
+          price: data.price,
+          description: data.description || "No description available",
+          category: data.category || "Uncategorized",
+          colors: data.tags as string[] || [],
+          lengths: standardLengths,
+          images: data.image_urls || ["https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop"],
+          reviews: defaultReviews,
+          details: [
+            "100% Remy human hair",
+            "Double weft for extra volume",
+            "Silicone-lined clips for secure attachment",
+            "Can be washed, styled, and heat-treated",
+            "Reusable with proper care",
+          ],
+          specifications: [
+            { name: "Material", value: "100% Remy human hair" },
+            { name: "Weight", value: "120g - 160g (varies by length)" },
+            { name: "Application Method", value: data.category || "Clip-in" },
+            { name: "Reusable", value: "Yes" },
+            { name: "Heat Styling", value: "Up to 180°C (365°F)" },
+          ]
+        };
+        
+        setProduct(productData);
+        
+        // Set default selected values
+        if (productData.colors.length > 0) {
+          setSelectedColor(productData.colors[0]);
+        }
+        
+        if (productData.lengths.length > 0) {
+          setSelectedLength(productData.lengths[0]);
+        }
+      } catch (error) {
+        console.error("Exception loading product:", error);
+        toast.error("Failed to load product details");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProduct();
+  }, [id, navigate]);
+  
+  // Show loading state
+  if (loading) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            <div className="animate-pulse bg-gray-200 aspect-square rounded-lg"></div>
+            <div className="space-y-4">
+              <div className="h-8 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+              <div className="h-4 bg-gray-200 rounded w-1/3"></div>
+              <div className="h-24 bg-gray-200 rounded w-full"></div>
+              <div className="space-y-2">
+                <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                <div className="flex space-x-2">
+                  {[1, 2, 3, 4].map(i => (
+                    <div key={i} className="h-8 bg-gray-200 rounded w-16"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="space-y-2">
+                <div className="h-6 bg-gray-200 rounded w-1/4"></div>
+                <div className="flex space-x-2">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="h-8 bg-gray-200 rounded w-16"></div>
+                  ))}
+                </div>
+              </div>
+              <div className="h-10 bg-gray-200 rounded w-full"></div>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+  
+  // If product not found
+  if (!product) {
+    return (
+      <Layout>
+        <div className="container mx-auto px-4 py-12 text-center">
+          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
+          <p className="mb-6">The product you're looking for doesn't exist or has been removed.</p>
+          <Button onClick={() => navigate('/shop')}>Browse All Products</Button>
+        </div>
+      </Layout>
+    );
+  }
+  
+  const inWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
     addItem({
-      id: parseInt(product.id),
+      id: product.id,
       name: product.name,
       price: product.price,
       image: product.images[0],
@@ -106,10 +214,10 @@ const ProductDetail = () => {
 
   const handleWishlistToggle = () => {
     if (inWishlist) {
-      removeFromWishlist(parseInt(product.id));
+      removeFromWishlist(product.id);
     } else {
       addToWishlist({
-        id: parseInt(product.id),
+        id: product.id,
         name: product.name,
         price: product.price,
         image: product.images[0],
@@ -141,17 +249,19 @@ const ProductDetail = () => {
               <CarouselPrevious />
               <CarouselNext />
             </Carousel>
-            <div className="flex mt-4 space-x-2">
-              {product.images.map((image, index) => (
-                <div key={index} className="w-20 h-20 border rounded-md overflow-hidden cursor-pointer">
-                  <img
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              ))}
-            </div>
+            {product.images.length > 1 && (
+              <div className="flex mt-4 space-x-2">
+                {product.images.map((image, index) => (
+                  <div key={index} className="w-20 h-20 border rounded-md overflow-hidden cursor-pointer">
+                    <img
+                      src={image}
+                      alt={`Thumbnail ${index + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
           
           {/* Product Info */}
@@ -184,24 +294,26 @@ const ProductDetail = () => {
             <p className="text-gray-700 mb-6">{product.description}</p>
             
             {/* Color Selection */}
-            <div className="mb-6">
-              <h3 className="font-medium mb-2">Color</h3>
-              <div className="flex flex-wrap gap-2">
-                {product.colors.map((color) => (
-                  <button
-                    key={color}
-                    className={`px-3 py-1 border rounded-md text-sm ${
-                      selectedColor === color
-                        ? "border-soltana-dark bg-soltana-dark text-white"
-                        : "border-gray-300 hover:border-gray-400"
-                    }`}
-                    onClick={() => setSelectedColor(color)}
-                  >
-                    {color}
-                  </button>
-                ))}
+            {product.colors.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-medium mb-2">Color</h3>
+                <div className="flex flex-wrap gap-2">
+                  {product.colors.map((color) => (
+                    <button
+                      key={color}
+                      className={`px-3 py-1 border rounded-md text-sm ${
+                        selectedColor === color
+                          ? "border-soltana-dark bg-soltana-dark text-white"
+                          : "border-gray-300 hover:border-gray-400"
+                      }`}
+                      onClick={() => setSelectedColor(color)}
+                    >
+                      {color}
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
             
             {/* Length Selection */}
             <div className="mb-6">
@@ -297,7 +409,7 @@ const ProductDetail = () => {
                 <h3 className="text-xl font-medium mb-4">About this Product</h3>
                 <p className="mb-4">{product.description}</p>
                 <ul className="list-disc pl-5 space-y-1">
-                  {product.details.map((detail, index) => (
+                  {product.details?.map((detail, index) => (
                     <li key={index}>{detail}</li>
                   ))}
                 </ul>
@@ -306,7 +418,7 @@ const ProductDetail = () => {
             <TabsContent value="specifications" className="bg-white p-6 rounded-lg border">
               <h3 className="text-xl font-medium mb-4">Specifications</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {product.specifications.map((spec, index) => (
+                {product.specifications?.map((spec, index) => (
                   <div key={index} className="flex border-b pb-2">
                     <div className="font-medium w-1/3">{spec.name}</div>
                     <div className="w-2/3">{spec.value}</div>
@@ -357,7 +469,7 @@ const ProductDetail = () => {
         </div>
 
         {/* Product Recommendations */}
-        <ProductRecommendations currentProductId={parseInt(product.id)} />
+        <ProductRecommendations currentProductId={product.id} />
       </div>
     </Layout>
   );

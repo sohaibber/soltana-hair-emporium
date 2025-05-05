@@ -5,112 +5,86 @@ import Layout from "@/components/layout/Layout";
 import ProductCard, { ProductType } from "@/components/shop/ProductCard";
 import ProductFilters from "@/components/shop/ProductFilters";
 import { Button } from "@/components/ui/button";
-import { Filter, Grid2X2, List, ShoppingCart } from "lucide-react"; // Added ShoppingCart import here
+import { Filter, Grid2X2, List, ShoppingCart } from "lucide-react";
 import { useCart } from "@/context/CartContext";
+import { supabase } from "@/integrations/supabase/client";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
-
-// Mock product data - in a real app, this would come from an API
-const mockProducts: ProductType[] = [
-  {
-    id: 1,
-    name: "Premium Clip-in Hair Extensions",
-    price: 129.99,
-    image: "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.8,
-    badge: "Best Seller",
-  },
-  {
-    id: 2,
-    name: "Seamless Tape-in Extensions",
-    price: 159.99,
-    image: "https://images.unsplash.com/photo-1620331311520-246422fd82f9?q=80&w=500&auto=format&fit=crop",
-    category: "Tape-ins",
-    colors: ["Light Brown", "Dark Brown", "Black"],
-    rating: 4.9,
-  },
-  {
-    id: 3,
-    name: "Luxury Ponytail Extension",
-    price: 89.99,
-    image: "https://images.unsplash.com/photo-1595515538772-5d9f4ea38e8d?q=80&w=500&auto=format&fit=crop",
-    category: "Ponytails",
-    colors: ["Blonde", "Brown", "Black", "Auburn"],
-    rating: 4.7,
-    badge: "New",
-  },
-  {
-    id: 4,
-    name: "Full Volume Halo Extensions",
-    price: 199.99,
-    image: "https://images.unsplash.com/photo-1626954079673-dc3d04c7f938?q=80&w=500&auto=format&fit=crop",
-    category: "Halo",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.9,
-  },
-  {
-    id: 5,
-    name: "Brazilian Wavy Clip-ins",
-    price: 149.99,
-    image: "https://images.unsplash.com/photo-1605497788044-5a32c7078486?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Dark Brown", "Black"],
-    rating: 4.6,
-  },
-  {
-    id: 6,
-    name: "Keratin Bond Extensions",
-    price: 249.99,
-    image: "https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=500&auto=format&fit=crop",
-    category: "Keratin",
-    colors: ["Blonde", "Brown", "Black"],
-    rating: 4.8,
-  },
-  {
-    id: 7,
-    name: "Balayage Ombre Clip-ins",
-    price: 179.99,
-    image: "https://images.unsplash.com/photo-1600950207944-0d63e8edbc3f?q=80&w=500&auto=format&fit=crop",
-    category: "Clip-ins",
-    colors: ["Balayage"],
-    rating: 4.7,
-    badge: "Popular",
-  },
-  {
-    id: 8,
-    name: "Human Hair Full Lace Wig",
-    price: 399.99,
-    image: "https://images.unsplash.com/photo-1629747490241-8bce1298d221?q=80&w=500&auto=format&fit=crop",
-    category: "Wigs",
-    colors: ["Black", "Dark Brown"],
-    rating: 4.9,
-  },
-];
+import { toast } from "sonner";
 
 const Shop: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
   const { addItem } = useCart();
 
-  const [products, setProducts] = useState<ProductType[]>(mockProducts);
-  const [filteredProducts, setFilteredProducts] = useState<ProductType[]>(mockProducts);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
   const [gridView, setGridView] = useState<boolean>(true);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
 
-  // Filters
-  const allCategories = Array.from(new Set(mockProducts.map(product => product.category)));
-  const allColors = Array.from(new Set(mockProducts.flatMap(product => product.colors || [])));
+  // Load products from database
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        setLoading(true);
+        const { data, error } = await supabase
+          .from('products')
+          .select('*')
+          .eq('is_active', true);
+        
+        if (error) {
+          console.error("Error fetching products:", error);
+          toast.error("Failed to load products");
+          return;
+        }
+        
+        // Transform the data to match our frontend model
+        const transformedProducts = data.map(product => ({
+          id: product.id,
+          name: product.name,
+          price: product.price,
+          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+          category: product.category || "Uncategorized",
+          colors: product.tags as string[] || [],
+          rating: 4.5, // Default rating since we don't have this in DB yet
+          badge: product.sale_price ? "Sale" : undefined
+        }));
+        
+        setProducts(transformedProducts);
+        setFilteredProducts(transformedProducts);
+      } catch (error) {
+        console.error("Exception loading products:", error);
+        toast.error("Failed to load products");
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchProducts();
+  }, []);
+
+  // Extract filter options from real data
+  const allCategories = Array.from(new Set(products.map(product => product.category)));
+  const allColors = Array.from(new Set(products.flatMap(product => product.colors || [])));
   const lengths = ["14 inches", "16 inches", "18 inches", "20 inches", "22 inches"];
-  const maxPrice = Math.max(...mockProducts.map(product => product.price));
+  const maxPrice = Math.max(...products.map(product => product.price), 0);
   
   const [filters, setFilters] = useState({
     categories: initialCategory ? [initialCategory.replace(/-/g, " ")] : [],
     colors: [],
     lengths: [],
-    priceRange: [0, maxPrice] as [number, number],
+    priceRange: [0, maxPrice || 500] as [number, number],
   });
+
+  // Update price range when maxPrice changes
+  useEffect(() => {
+    if (maxPrice > 0) {
+      setFilters(prev => ({
+        ...prev,
+        priceRange: [prev.priceRange[0], maxPrice]
+      }));
+    }
+  }, [maxPrice]);
 
   const handleAddToCart = (product: ProductType) => {
     addItem({
@@ -127,33 +101,31 @@ const Shop: React.FC = () => {
   useEffect(() => {
     setLoading(true);
     
-    // Simulate API call
-    setTimeout(() => {
-      let result = [...mockProducts];
+    // Apply filters to products
+    let result = [...products];
       
-      // Filter by category
-      if (filters.categories.length > 0) {
-        result = result.filter(product => 
-          filters.categories.includes(product.category)
-        );
-      }
-      
-      // Filter by color
-      if (filters.colors.length > 0) {
-        result = result.filter(product => 
-          product.colors?.some(color => filters.colors.includes(color))
-        );
-      }
-      
-      // Filter by price
+    // Filter by category
+    if (filters.categories.length > 0) {
       result = result.filter(product => 
-        product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+        filters.categories.includes(product.category)
       );
-      
-      setFilteredProducts(result);
-      setLoading(false);
-    }, 300);
-  }, [filters]);
+    }
+    
+    // Filter by color
+    if (filters.colors.length > 0) {
+      result = result.filter(product => 
+        product.colors?.some(color => filters.colors.includes(color))
+      );
+    }
+    
+    // Filter by price
+    result = result.filter(product => 
+      product.price >= filters.priceRange[0] && product.price <= filters.priceRange[1]
+    );
+    
+    setFilteredProducts(result);
+    setLoading(false);
+  }, [filters, products]);
 
   const handleFilterChange = (filterType: keyof typeof filters, value: string) => {
     setFilters(prev => {
@@ -310,4 +282,3 @@ const Shop: React.FC = () => {
 };
 
 export default Shop;
-
