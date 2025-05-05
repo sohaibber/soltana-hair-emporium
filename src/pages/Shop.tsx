@@ -40,7 +40,7 @@ const Shop: React.FC = () => {
         
         // Transform the data to match our frontend model
         const transformedProducts = data.map(product => ({
-          id: product.id,
+          id: String(product.id),
           name: product.name,
           price: Number(product.price),
           image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",

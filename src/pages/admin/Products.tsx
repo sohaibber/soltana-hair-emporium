@@ -171,7 +171,7 @@ const Products: React.FC = () => {
       
       // Transform the returned data to match our frontend model
       const newProduct = {
-        id: data[0].id,
+        id: String(data[0].id),
         name: data[0].name,
         price: Number(data[0].price),
         image: data[0].image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",

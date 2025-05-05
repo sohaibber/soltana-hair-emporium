@@ -49,7 +49,7 @@ const defaultReviews = [
 const standardLengths = ["14\"", "16\"", "18\"", "20\"", "22\""];
 
 interface ProductData {
-  id: string;
+  id: string;  // Changed to string only
   name: string;
   price: number;
   description: string;
@@ -96,7 +96,7 @@ const ProductDetail = () => {
         
         // Transform the data
         const productData: ProductData = {
-          id: data.id,
+          id: String(data.id),
           name: data.name,
           price: Number(data.price),
           description: data.description || "No description available",
@@ -191,15 +191,15 @@ const ProductDetail = () => {
     );
   }
   
-  const inWishlist = isInWishlist(product?.id);
+  const inWishlist = product ? isInWishlist(product.id) : false;
 
   const handleAddToCart = () => {
     if (!product) return;
     
     addItem({
-      id: String(product.id),
+      id: product.id,
       name: product.name,
-      price: Number(product.price),
+      price: product.price,
       image: product.images[0],
       color: selectedColor,
       length: selectedLength,
@@ -214,11 +214,13 @@ const ProductDetail = () => {
   };
 
   const handleWishlistToggle = () => {
+    if (!product) return;
+    
     if (inWishlist) {
       removeFromWishlist(product.id);
     } else {
       addToWishlist({
-        id: String(product.id),
+        id: product.id,
         name: product.name,
         price: product.price,
         image: product.images[0],

@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
 export interface ProductType {
-  id: string | number;
+  id: string;  // Change to just string type for consistency
   name: string;
   price: number;
   image: string;
@@ -33,9 +33,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     
     // Add the product to cart with default color
     addItem({
-      id: String(product.id),
+      id: product.id,
       name: product.name,
-      price: Number(product.price),
+      price: product.price,
       image: product.image,
       color: product.colors?.[0] || "Default",
       quantity: 1
@@ -46,20 +46,20 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     e.preventDefault();
     e.stopPropagation();
     
-    if (isInWishlist(String(product.id))) {
-      removeFromWishlist(String(product.id));
+    if (isInWishlist(product.id)) {
+      removeFromWishlist(product.id);
     } else {
       addToWishlist({
-        id: String(product.id),
+        id: product.id,
         name: product.name,
-        price: Number(product.price),
+        price: product.price,
         image: product.image,
         category: product.category
       });
     }
   };
 
-  const inWishlist = isInWishlist(String(product.id));
+  const inWishlist = isInWishlist(product.id);
 
   return (
     <Link to={`/product/${product.id}`} className="group">
@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
             {product.name}
           </h3>
           <div className="flex justify-between items-center mb-2">
-            <div className="font-semibold">${Number(product.price).toFixed(2)}</div>
+            <div className="font-semibold">${product.price.toFixed(2)}</div>
             {product.rating && (
               <div className="text-xs text-amber-500">★ {product.rating}</div>
             )}
