@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -20,7 +21,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
     category: "",
     description: "",
     stock: "",
-    imagePath: "",
+    imagePaths: [] as string[],
     colors: [] as string[],
   });
   const [loading, setLoading] = useState(false);
@@ -54,7 +55,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
         category: data.category || "",
         description: data.description || "",
         stock: data.stock.toString(),
-        imagePath: data.image_urls?.[0] || "",
+        imagePaths: data.image_urls || [],
         colors: data.tags || [],
       });
     } catch (error) {
@@ -89,10 +90,10 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
   };
 
   // Handle image upload
-  const handleImageUploaded = (path: string) => {
+  const handleImagesUploaded = (paths: string[]) => {
     setFormData({
       ...formData,
-      imagePath: path
+      imagePaths: paths
     });
   };
 
@@ -113,7 +114,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
         category: formData.category,
         description: formData.description,
         stock: parseInt(formData.stock) || 0,
-        image_urls: formData.imagePath ? [formData.imagePath] : [],
+        image_urls: formData.imagePaths,
         tags: formData.colors,
         is_active: true
       };
@@ -199,10 +200,11 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
         ></textarea>
       </div>
       <div className="grid gap-2">
-        <Label>Product Image</Label>
+        <Label>Product Images</Label>
         <ImageUpload 
-          onImageUploaded={handleImageUploaded} 
-          defaultImage={formData.imagePath}
+          onImagesUploaded={handleImagesUploaded} 
+          defaultImages={formData.imagePaths}
+          multiple={true}
         />
       </div>
       <div className="grid gap-2">

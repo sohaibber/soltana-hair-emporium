@@ -68,12 +68,21 @@ const ProductDetail = () => {
   const navigate = useNavigate();
   const [product, setProduct] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeImageIndex, setActiveImageIndex] = useState(0);
   
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedLength, setSelectedLength] = useState<string>("");
   const [quantity, setQuantity] = useState(1);
   const { addItem } = useCart();
   const { addItem: addToWishlist, removeItem: removeFromWishlist, isInWishlist } = useWishlist();
+  
+  // Helper function to get image URL
+  const getImageUrl = (path: string) => {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
+  };
   
   // Fetch product data
   useEffect(() => {
@@ -95,6 +104,12 @@ const ProductDetail = () => {
           return;
         }
         
+        // Process images
+        const productImages = data.image_urls || [];
+        const formattedImages = productImages.length > 0 
+          ? productImages 
+          : ["https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop"];
+        
         // Transform the data
         const productData: ProductData = {
           id: String(data.id),
@@ -104,7 +119,7 @@ const ProductDetail = () => {
           category: data.category || "Uncategorized",
           colors: data.tags as string[] || [],
           lengths: standardLengths,
-          images: data.image_urls || ["https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop"],
+          images: formattedImages,
           reviews: defaultReviews,
           details: [
             "100% Remy human hair",
@@ -236,13 +251,13 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div>
-            <Carousel className="w-full">
+            <Carousel className="w-full mb-4">
               <CarouselContent>
                 {product.images.map((image, index) => (
                   <CarouselItem key={index}>
                     <div className="aspect-square overflow-hidden rounded-lg">
                       <img
-                        src={image}
+                        src={getImageUrl(image)}
                         alt={`${product.name} - Image ${index + 1}`}
                         className="w-full h-full object-cover"
                       />
@@ -250,15 +265,22 @@ const ProductDetail = () => {
                   </CarouselItem>
                 ))}
               </CarouselContent>
-              <CarouselPrevious />
-              <CarouselNext />
+              <CarouselPrevious className="-left-4 md:-left-6" />
+              <CarouselNext className="-right-4 md:-right-6" />
             </Carousel>
+            
             {product.images.length > 1 && (
-              <div className="flex mt-4 space-x-2">
+              <div className="flex mt-4 space-x-2 overflow-x-auto pb-2">
                 {product.images.map((image, index) => (
-                  <div key={index} className="w-20 h-20 border rounded-md overflow-hidden cursor-pointer">
+                  <div 
+                    key={index} 
+                    className={`w-20 h-20 border rounded-md overflow-hidden cursor-pointer ${
+                      activeImageIndex === index ? 'border-primary border-2' : ''
+                    }`}
+                    onClick={() => setActiveImageIndex(index)}
+                  >
                     <img
-                      src={image}
+                      src={getImageUrl(image)}
                       alt={`Thumbnail ${index + 1}`}
                       className="w-full h-full object-cover"
                     />
