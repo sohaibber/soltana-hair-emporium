@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -34,10 +33,10 @@ interface ProductWithStock extends ProductType {
 const Products: React.FC = () => {
   const [products, setProducts] = useState<ProductWithStock[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
-  const [selectedProducts, setSelectedProducts] = useState<number[]>([]);
+  const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
-  const [productToDelete, setProductToDelete] = useState<number | null>(null);
+  const [productToDelete, setProductToDelete] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   
   // Form state
@@ -70,7 +69,7 @@ const Products: React.FC = () => {
         const transformedProducts = data.map(product => ({
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: Number(product.price),
           image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
           category: product.category || "Uncategorized",
           colors: product.tags as string[] || [],
@@ -102,11 +101,11 @@ const Products: React.FC = () => {
     if (selectedProducts.length === filteredProducts.length) {
       setSelectedProducts([]);
     } else {
-      setSelectedProducts(filteredProducts.map((product) => Number(product.id)));
+      setSelectedProducts(filteredProducts.map((product) => String(product.id)));
     }
   };
   
-  const toggleSelectProduct = (productId: number) => {
+  const toggleSelectProduct = (productId: string) => {
     if (selectedProducts.includes(productId)) {
       setSelectedProducts(selectedProducts.filter((id) => id !== productId));
     } else {
@@ -205,7 +204,7 @@ const Products: React.FC = () => {
   };
   
   // Handle deleting product
-  const confirmDelete = (id: number) => {
+  const confirmDelete = (id: string) => {
     setProductToDelete(id);
     setIsDeleteDialogOpen(true);
   };
@@ -226,7 +225,7 @@ const Products: React.FC = () => {
       }
       
       // Update local state
-      setProducts(products.filter((product) => Number(product.id) !== productToDelete));
+      setProducts(products.filter((product) => product.id !== productToDelete));
       toast.success("Product deleted successfully");
     } catch (error) {
       console.error("Exception deleting product:", error);
@@ -411,8 +410,8 @@ const Products: React.FC = () => {
                   <TableRow key={product.id}>
                     <TableCell>
                       <Checkbox 
-                        checked={selectedProducts.includes(Number(product.id))} 
-                        onCheckedChange={() => toggleSelectProduct(Number(product.id))}
+                        checked={selectedProducts.includes(product.id)} 
+                        onCheckedChange={() => toggleSelectProduct(product.id)}
                       />
                     </TableCell>
                     <TableCell>
@@ -448,7 +447,7 @@ const Products: React.FC = () => {
                           variant="ghost" 
                           size="sm" 
                           className="text-red-600 hover:text-red-700 hover:bg-red-50"
-                          onClick={() => confirmDelete(Number(product.id))}
+                          onClick={() => confirmDelete(product.id)}
                         >
                           <Trash2 size={16} />
                         </Button>

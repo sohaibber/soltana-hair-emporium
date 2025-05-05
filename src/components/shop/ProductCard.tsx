@@ -35,7 +35,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       image: product.image,
       color: product.colors?.[0] || "Default",
       quantity: 1
@@ -52,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
       addToWishlist({
         id: product.id,
         name: product.name,
-        price: product.price,
+        price: Number(product.price),
         image: product.image,
         category: product.category
       });
@@ -92,7 +92,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product, showAddToCart = fals
             {product.name}
           </h3>
           <div className="flex justify-between items-center mb-2">
-            <div className="font-semibold">${product.price.toFixed(2)}</div>
+            <div className="font-semibold">${Number(product.price).toFixed(2)}</div>
             {product.rating && (
               <div className="text-xs text-amber-500">★ {product.rating}</div>
             )}

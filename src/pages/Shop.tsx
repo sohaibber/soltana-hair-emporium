@@ -42,7 +42,7 @@ const Shop: React.FC = () => {
         const transformedProducts = data.map(product => ({
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: Number(product.price),
           image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
           category: product.category || "Uncategorized",
           colors: product.tags as string[] || [],

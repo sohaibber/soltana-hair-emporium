@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -99,7 +98,7 @@ const ProductDetail = () => {
         const productData: ProductData = {
           id: data.id,
           name: data.name,
-          price: data.price,
+          price: Number(data.price),
           description: data.description || "No description available",
           category: data.category || "Uncategorized",
           colors: data.tags as string[] || [],
@@ -195,10 +194,12 @@ const ProductDetail = () => {
   const inWishlist = isInWishlist(product.id);
 
   const handleAddToCart = () => {
+    if (!product) return;
+    
     addItem({
       id: product.id,
       name: product.name,
-      price: product.price,
+      price: Number(product.price),
       image: product.images[0],
       color: selectedColor,
       length: selectedLength,

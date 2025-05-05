@@ -26,7 +26,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
         const { data: currentProduct, error: currentProductError } = await supabase
           .from('products')
           .select('category')
-          .eq('id', currentProductId)
+          .eq('id', String(currentProductId))
           .single();
         
         if (currentProductError) {
@@ -40,7 +40,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           .select('*')
           .eq('is_active', true)
           .eq('category', currentProduct.category)
-          .neq('id', currentProductId)
+          .neq('id', String(currentProductId))
           .limit(4);
         
         if (error) {
@@ -55,7 +55,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
             .from('products')
             .select('*')
             .eq('is_active', true)
-            .neq('id', currentProductId)
+            .neq('id', String(currentProductId))
             .limit(4 - data.length);
           
           if (!randomError && randomProducts) {
@@ -67,7 +67,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
         const transformedRecommendations = recommendationData.map(product => ({
           id: product.id,
           name: product.name,
-          price: product.price,
+          price: Number(product.price),
           image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
           category: product.category || "Uncategorized",
           colors: product.tags as string[] || [],
@@ -136,7 +136,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
                 <h3 className="font-medium text-sm mb-1 truncate group-hover:text-primary transition-colors">
                   {product.name}
                 </h3>
-                <div className="font-semibold">${product.price.toFixed(2)}</div>
+                <div className="font-semibold">${Number(product.price).toFixed(2)}</div>
               </div>
             </div>
           </Link>
