@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -157,7 +156,7 @@ const ProductForm: React.FC<ProductFormProps> = ({ productId, onCancel, onSave }
   }
 
   return (
-    <div className="grid gap-4 py-4">
+    <div className="grid gap-4 py-4 max-h-full">
       <div className="grid gap-2">
         <Label htmlFor="name">Product Name*</Label>
         <Input 

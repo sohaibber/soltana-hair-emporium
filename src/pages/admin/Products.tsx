@@ -294,7 +294,7 @@ const Products: React.FC = () => {
       
       {/* Product Form Dialog */}
       <Dialog open={isFormDialogOpen} onOpenChange={setIsFormDialogOpen}>
-        <DialogContent className="sm:max-w-lg">
+        <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-auto">
           <DialogHeader>
             <DialogTitle>{productToEdit ? 'Edit Product' : 'Add New Product'}</DialogTitle>
             <DialogDescription>
