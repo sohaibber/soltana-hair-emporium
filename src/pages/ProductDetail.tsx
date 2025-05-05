@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -49,7 +50,7 @@ const defaultReviews = [
 const standardLengths = ["14\"", "16\"", "18\"", "20\"", "22\""];
 
 interface ProductData {
-  id: string;  // Changed to string only
+  id: string;
   name: string;
   price: number;
   description: string;

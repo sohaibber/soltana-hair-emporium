@@ -1,11 +1,10 @@
 
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { toast } from "sonner";
-import { ProductType } from "@/components/shop/ProductCard";
 
 // Types
-interface WishlistItem {
-  id: number;
+export interface WishlistItem {
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -14,25 +13,23 @@ interface WishlistItem {
 
 interface WishlistState {
   items: WishlistItem[];
-  totalItems: number;
 }
 
 type WishlistAction =
   | { type: "ADD_ITEM"; payload: WishlistItem }
-  | { type: "REMOVE_ITEM"; payload: { id: number } }
+  | { type: "REMOVE_ITEM"; payload: { id: string } }
   | { type: "CLEAR_WISHLIST" };
 
 interface WishlistContextType extends WishlistState {
   addItem: (item: WishlistItem) => void;
-  removeItem: (id: number) => void;
+  removeItem: (id: string) => void;
   clearWishlist: () => void;
-  isInWishlist: (id: number) => boolean;
+  isInWishlist: (id: string) => boolean;
 }
 
 // Initial state
 const initialState: WishlistState = {
   items: [],
-  totalItems: 0,
 };
 
 // Load wishlist from localStorage
@@ -63,19 +60,15 @@ const saveWishlist = (wishlist: WishlistState) => {
 const wishlistReducer = (state: WishlistState, action: WishlistAction): WishlistState => {
   switch (action.type) {
     case "ADD_ITEM": {
-      const existingItem = state.items.find(
-        (item) => item.id === action.payload.id
-      );
-
+      // Check if the item already exists
+      const existingItem = state.items.find(item => item.id === action.payload.id);
+      
       if (existingItem) {
-        return state; // Item already exists in wishlist
+        return state; // Don't add duplicates
       }
-
-      const newItems = [...state.items, action.payload];
       
       const newState = {
-        items: newItems,
-        totalItems: newItems.length,
+        items: [...state.items, action.payload],
       };
 
       saveWishlist(newState);
@@ -83,11 +76,8 @@ const wishlistReducer = (state: WishlistState, action: WishlistAction): Wishlist
     }
 
     case "REMOVE_ITEM": {
-      const newItems = state.items.filter((item) => item.id !== action.payload.id);
-      
       const newState = {
-        items: newItems,
-        totalItems: newItems.length,
+        items: state.items.filter(item => item.id !== action.payload.id),
       };
 
       saveWishlist(newState);
@@ -126,10 +116,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const value: WishlistContextType = {
     ...state,
     addItem: (item) => {
-      dispatch({
-        type: "ADD_ITEM",
-        payload: item,
-      });
+      dispatch({ type: "ADD_ITEM", payload: item });
       toast.success(`Added ${item.name} to your wishlist`);
     },
     removeItem: (id) => {
@@ -142,7 +129,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     },
     isInWishlist: (id) => {
       return state.items.some(item => item.id === id);
-    }
+    },
   };
 
   return <WishlistContext.Provider value={value}>{children}</WishlistContext.Provider>;

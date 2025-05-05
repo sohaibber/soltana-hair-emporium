@@ -8,7 +8,7 @@ import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 
 export interface ProductType {
-  id: string;  // Change to just string type for consistency
+  id: string;
   name: string;
   price: number;
   image: string;

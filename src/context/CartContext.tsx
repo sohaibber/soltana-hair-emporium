@@ -4,7 +4,7 @@ import { toast } from "sonner";
 
 // Types
 export interface CartItem {
-  id: number;
+  id: string;
   name: string;
   price: number;
   image: string;
@@ -21,14 +21,14 @@ interface CartState {
 
 type CartAction =
   | { type: "ADD_ITEM"; payload: CartItem }
-  | { type: "REMOVE_ITEM"; payload: { id: number } }
-  | { type: "UPDATE_QUANTITY"; payload: { id: number; quantity: number } }
+  | { type: "REMOVE_ITEM"; payload: { id: string } }
+  | { type: "UPDATE_QUANTITY"; payload: { id: string; quantity: number } }
   | { type: "CLEAR_CART" };
 
 interface CartContextType extends CartState {
   addItem: (item: Omit<CartItem, "quantity"> & { quantity?: number }) => void;
-  removeItem: (id: number) => void;
-  updateQuantity: (id: number, quantity: number) => void;
+  removeItem: (id: string) => void;
+  updateQuantity: (id: string, quantity: number) => void;
   clearCart: () => void;
 }
 

@@ -10,7 +10,7 @@ import ProductRecommendations from "@/components/shop/ProductRecommendations";
 const Cart: React.FC = () => {
   const { items, totalItems, totalPrice, removeItem, updateQuantity } = useCart();
 
-  const handleQuantityChange = (id: number, currentQuantity: number, change: number) => {
+  const handleQuantityChange = (id: string, currentQuantity: number, change: number) => {
     const newQuantity = currentQuantity + change;
     if (newQuantity >= 1 && newQuantity <= 10) {
       updateQuantity(id, newQuantity);
@@ -163,7 +163,7 @@ const Cart: React.FC = () => {
             {items.length > 0 && (
               <div className="mt-12">
                 <ProductRecommendations 
-                  currentProductId={items[0].id} 
+                  currentProductId={items[0].id.toString()} 
                   title="Frequently Bought Together"
                 />
               </div>
