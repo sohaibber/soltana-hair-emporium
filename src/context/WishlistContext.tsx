@@ -25,6 +25,7 @@ interface WishlistContextType extends WishlistState {
   removeItem: (id: string) => void;
   clearWishlist: () => void;
   isInWishlist: (id: string) => boolean;
+  totalItems: number;
 }
 
 // Initial state
@@ -115,6 +116,7 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   // Context value
   const value: WishlistContextType = {
     ...state,
+    totalItems: state.items.length,
     addItem: (item) => {
       dispatch({ type: "ADD_ITEM", payload: item });
       toast.success(`Added ${item.name} to your wishlist`);
