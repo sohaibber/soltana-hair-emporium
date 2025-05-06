@@ -38,6 +38,7 @@ interface OrderItem {
   price: number;
   total: number;
   product_name?: string;
+  product_image?: string;
 }
 
 interface Order {
@@ -130,24 +131,27 @@ const Orders: React.FC = () => {
               .select('*')
               .eq('order_id', order.id);
             
-            // Get product names for order items
+            // Get product names and images for order items
             const itemsWithProducts = await Promise.all(
               (itemsData || []).map(async (item) => {
                 const { data: productData } = await supabase
                   .from('products')
-                  .select('name')
+                  .select('name, image_urls')
                   .eq('id', item.product_id)
                   .single();
                 
                 return {
                   ...item,
-                  product_name: productData?.name || 'Unknown Product'
+                  product_name: productData?.name || 'Unknown Product',
+                  product_image: productData?.image_urls ? productData.image_urls[0] : null
                 };
               })
             );
               
             return {
               ...order,
+              // Cast status to ensure it matches the union type
+              status: order.status as Order['status'],
               customer_name: profileData ? `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() : 'Unknown',
               customer_email: profileData?.email || 'No email',
               items: itemsWithProducts
@@ -309,7 +313,7 @@ const Orders: React.FC = () => {
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full"
-              icon={<Search className="w-4 h-4" />}
+              startAdornment={<Search className="w-4 h-4" />}
             />
           </div>
           <div>

@@ -137,6 +137,8 @@ const Orders: React.FC = () => {
               
             return {
               ...order,
+              // Cast status to ensure it matches the union type
+              status: order.status as Order['status'],
               items: itemsWithProducts
             };
           })
