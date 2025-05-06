@@ -31,6 +31,9 @@ import Dashboard from "./pages/admin/Dashboard";
 import Products from "./pages/admin/Products";
 import AdminOrders from "./pages/admin/Orders";
 
+// Protected Route Component
+import AdminProtectedRoute from "./components/admin/AdminProtectedRoute";
+
 // Not found
 import NotFound from "./pages/NotFound";
 
@@ -61,11 +64,25 @@ const App = () => (
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 
-                {/* Admin Routes */}
+                {/* Admin Login Route - public */}
                 <Route path="/admin/login" element={<AdminLogin />} />
-                <Route path="/admin" element={<Dashboard />} />
-                <Route path="/admin/products" element={<Products />} />
-                <Route path="/admin/orders" element={<AdminOrders />} />
+                
+                {/* Protected Admin Routes */}
+                <Route path="/admin" element={
+                  <AdminProtectedRoute>
+                    <Dashboard />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/products" element={
+                  <AdminProtectedRoute>
+                    <Products />
+                  </AdminProtectedRoute>
+                } />
+                <Route path="/admin/orders" element={
+                  <AdminProtectedRoute>
+                    <AdminOrders />
+                  </AdminProtectedRoute>
+                } />
                 
                 {/* Catch All */}
                 <Route path="*" element={<NotFound />} />

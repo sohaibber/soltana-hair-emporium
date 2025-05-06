@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { useAuth } from "@/context/AuthContext";
+import { toast } from "sonner";
 
 const AdminLogin: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -34,17 +35,16 @@ const AdminLogin: React.FC = () => {
     try {
       await login(email, password);
       
-      // We need to check if the user is an admin after login
+      // We need to wait briefly for the admin status to be checked after login
       setTimeout(() => {
-        if (!isAdmin) {
+        if (isAuthenticated && !isAdmin) {
           setError("Access denied. You don't have admin privileges.");
+          setIsSubmitting(false);
           return;
         }
-        navigate(from);
-      }, 500);
+      }, 1000);
     } catch (err) {
       setError("Invalid email or password. Please try again.");
-    } finally {
       setIsSubmitting(false);
     }
   };
