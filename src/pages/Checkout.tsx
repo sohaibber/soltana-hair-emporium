@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, CreditCard, Info } from "lucide-react";
+import { Check, CreditCard, Info, Truck, Cash } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -37,6 +37,7 @@ const Checkout: React.FC = () => {
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   
   // Load user data if authenticated
   useEffect(() => {
@@ -77,6 +78,62 @@ const Checkout: React.FC = () => {
     setFormData(prev => ({ ...prev, paymentMethod: value }));
   };
   
+  const processStripePayment = async () => {
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to complete your order.",
+        variant: "destructive",
+      });
+      navigate("/login", { state: { from: { pathname: "/checkout" } } });
+      return false;
+    }
+    
+    try {
+      setIsProcessingPayment(true);
+      
+      // Create Stripe Checkout session
+      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          success_url: `${window.location.origin}/order-confirmation`,
+          cancel_url: `${window.location.origin}/checkout`,
+          line_items: JSON.stringify(items.map(item => ({
+            price_data: {
+              currency: 'usd',
+              product_data: { name: item.name },
+              unit_amount: Math.round(item.price * 100), // Convert to cents
+            },
+            quantity: item.quantity,
+          }))),
+          mode: 'payment',
+        }),
+      });
+      
+      if (!response.ok) {
+        throw new Error('Failed to create checkout session');
+      }
+      
+      const session = await response.json();
+      window.location.href = session.url;
+      return true;
+      
+    } catch (error) {
+      console.error('Payment processing error:', error);
+      toast({
+        title: "Payment Failed",
+        description: "There was an error processing your payment. Please try again.",
+        variant: "destructive",
+      });
+      return false;
+    } finally {
+      setIsProcessingPayment(false);
+    }
+  };
+  
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -92,14 +149,19 @@ const Checkout: React.FC = () => {
       return;
     }
     
-    if (formData.paymentMethod === 'credit' && 
-        (!formData.cardNumber || !formData.cardName || !formData.cardExpiry || !formData.cardCvc)) {
-      toast({
-        title: "Payment Information Required",
-        description: "Please fill out all payment fields.",
-        variant: "destructive",
-      });
-      return;
+    if (formData.paymentMethod === 'credit') {
+      if (!formData.cardNumber || !formData.cardName || !formData.cardExpiry || !formData.cardCvc) {
+        toast({
+          title: "Payment Information Required",
+          description: "Please fill out all payment fields.",
+          variant: "destructive",
+        });
+        return;
+      }
+      
+      // Attempt to process Stripe payment
+      const paymentSuccessful = await processStripePayment();
+      if (!paymentSuccessful) return;
     }
     
     if (!isAuthenticated || !user) {
@@ -135,7 +197,8 @@ const Checkout: React.FC = () => {
           total_amount: totalPrice,
           shipping_address: shippingAddress,
           status: 'pending',
-          payment_intent_id: `pi_${Math.random().toString(36).substr(2, 9)}`,
+          payment_method: formData.paymentMethod,
+          payment_intent_id: formData.paymentMethod === 'cod' ? 'cod_order' : `pi_${Math.random().toString(36).substr(2, 9)}`,
         })
         .select();
       
@@ -165,7 +228,9 @@ const Checkout: React.FC = () => {
       
       toast({
         title: "Order Placed Successfully!",
-        description: "Thank you for your purchase. You will receive a confirmation email shortly.",
+        description: formData.paymentMethod === 'cod' ? 
+          "Thank you for your order. You will pay on delivery." : 
+          "Thank you for your purchase. You will receive a confirmation email shortly.",
       });
       
       // Redirect to confirmation page
@@ -334,8 +399,10 @@ const Checkout: React.FC = () => {
                         </Label>
                       </div>
                       <div className="flex items-center space-x-3 border p-3 rounded-md">
-                        <RadioGroupItem value="paypal" id="paypal" />
-                        <Label htmlFor="paypal">PayPal</Label>
+                        <RadioGroupItem value="cod" id="cod" />
+                        <Label htmlFor="cod" className="flex items-center">
+                          <Cash size={16} className="mr-2" /> Cash on Delivery
+                        </Label>
                       </div>
                     </RadioGroup>
                   </div>
@@ -350,7 +417,7 @@ const Checkout: React.FC = () => {
                           placeholder="1234 5678 9012 3456"
                           value={formData.cardNumber}
                           onChange={handleChange}
-                          required
+                          required={formData.paymentMethod === "credit"}
                         />
                       </div>
                       
@@ -361,7 +428,7 @@ const Checkout: React.FC = () => {
                           name="cardName"
                           value={formData.cardName}
                           onChange={handleChange}
-                          required
+                          required={formData.paymentMethod === "credit"}
                         />
                       </div>
                       
@@ -374,7 +441,7 @@ const Checkout: React.FC = () => {
                             placeholder="MM/YY"
                             value={formData.cardExpiry}
                             onChange={handleChange}
-                            required
+                            required={formData.paymentMethod === "credit"}
                           />
                         </div>
                         <div className="space-y-2">
@@ -386,7 +453,7 @@ const Checkout: React.FC = () => {
                             placeholder="***"
                             value={formData.cardCvc}
                             onChange={handleChange}
-                            required
+                            required={formData.paymentMethod === "credit"}
                           />
                         </div>
                       </div>
@@ -400,9 +467,15 @@ const Checkout: React.FC = () => {
                     </div>
                   )}
                   
-                  {formData.paymentMethod === "paypal" && (
+                  {formData.paymentMethod === "cod" && (
                     <div className="mt-4 p-4 bg-gray-50 rounded text-center">
-                      <p>You will be redirected to PayPal to complete your payment after clicking "Place Order".</p>
+                      <div className="flex items-center justify-center mb-2">
+                        <Truck size={20} className="mr-2 text-gray-600" />
+                        <span className="font-medium">Cash on Delivery</span>
+                      </div>
+                      <p className="text-gray-600">
+                        Pay with cash when your order is delivered to your doorstep.
+                      </p>
                     </div>
                   )}
                 </div>
@@ -411,9 +484,9 @@ const Checkout: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full bg-soltana-dark text-white hover:bg-black"
-                disabled={isSubmitting || items.length === 0}
+                disabled={isSubmitting || isProcessingPayment || items.length === 0}
               >
-                {isSubmitting ? "Processing..." : "Place Order"}
+                {isSubmitting || isProcessingPayment ? "Processing..." : "Place Order"}
               </Button>
             </form>
           </div>
