@@ -80,7 +80,37 @@ const Checkout: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Form validation would go here
+    // Form validation
+    if (!formData.firstName || !formData.lastName || !formData.email || 
+        !formData.phone || !formData.address || !formData.city || 
+        !formData.state || !formData.zipCode) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill out all required fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (formData.paymentMethod === 'credit' && 
+        (!formData.cardNumber || !formData.cardName || !formData.cardExpiry || !formData.cardCvc)) {
+      toast({
+        title: "Payment Information Required",
+        description: "Please fill out all payment fields.",
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    if (!isAuthenticated || !user) {
+      toast({
+        title: "Authentication Required",
+        description: "Please log in to complete your order.",
+        variant: "destructive",
+      });
+      navigate("/login", { state: { from: { pathname: "/checkout" } } });
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -97,37 +127,38 @@ const Checkout: React.FC = () => {
         phone: formData.phone,
       };
       
-      if (isAuthenticated && user) {
-        // Create order in database
-        const { data: orderData, error: orderError } = await supabase
-          .from('orders')
-          .insert({
-            user_id: user.id,
-            total_amount: totalPrice + (totalPrice > 100 ? 0 : 10),
-            shipping_address: shippingAddress,
-            status: 'pending',
-            // In a real app, you would create a payment intent with Stripe
-            payment_intent_id: `pi_${Math.random().toString(36).substr(2, 9)}`,
-          })
-          .select();
-        
-        if (orderError) throw orderError;
-        
-        // Create order items
-        const orderItems = items.map(item => ({
-          order_id: orderData[0].id,
-          product_id: String(item.id), // Convert item.id to string
-          quantity: item.quantity,
-          price: item.price,
-          total: item.price * item.quantity,
-        }));
-        
-        const { error: itemsError } = await supabase
-          .from('order_items')
-          .insert(orderItems);
-        
-        if (itemsError) throw itemsError;
+      // Create order in database
+      const { data: orderData, error: orderError } = await supabase
+        .from('orders')
+        .insert({
+          user_id: user.id,
+          total_amount: totalPrice,
+          shipping_address: shippingAddress,
+          status: 'pending',
+          payment_intent_id: `pi_${Math.random().toString(36).substr(2, 9)}`,
+        })
+        .select();
+      
+      if (orderError) throw orderError;
+      
+      if (!orderData || orderData.length === 0) {
+        throw new Error("Order creation failed - no data returned");
       }
+      
+      // Create order items
+      const orderItems = items.map(item => ({
+        order_id: orderData[0].id,
+        product_id: item.id,
+        quantity: item.quantity,
+        price: item.price,
+        total: item.price * item.quantity,
+      }));
+      
+      const { error: itemsError } = await supabase
+        .from('order_items')
+        .insert(orderItems);
+      
+      if (itemsError) throw itemsError;
       
       // Clear the cart
       clearCart();
@@ -138,7 +169,7 @@ const Checkout: React.FC = () => {
       });
       
       // Redirect to confirmation page
-      navigate("/order-confirmation");
+      navigate("/order-confirmation", { state: { orderId: orderData[0].id } });
     } catch (error) {
       console.error("Error creating order:", error);
       toast({
@@ -153,6 +184,15 @@ const Checkout: React.FC = () => {
   
   const shippingPrice = totalPrice > 100 ? 0 : 10;
   const finalTotal = totalPrice + shippingPrice;
+
+  // Helper function to get image URL
+  const getImageUrl = (path: string) => {
+    if (!path) return "/placeholder.svg";
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
+  };
 
   return (
     <Layout>
@@ -371,7 +411,7 @@ const Checkout: React.FC = () => {
               <Button
                 type="submit"
                 className="w-full bg-soltana-dark text-white hover:bg-black"
-                disabled={isSubmitting}
+                disabled={isSubmitting || items.length === 0}
               >
                 {isSubmitting ? "Processing..." : "Place Order"}
               </Button>
@@ -393,10 +433,10 @@ const Checkout: React.FC = () => {
                   </div>
                   
                   {items.map((item) => (
-                    <div key={`${item.id}-${item.color}-${item.length}`} className="flex text-sm">
+                    <div key={`${item.id}-${item.color}`} className="flex text-sm">
                       <div className="w-10 h-10 rounded overflow-hidden flex-shrink-0">
                         <img
-                          src={item.image}
+                          src={getImageUrl(item.image)}
                           alt={item.name}
                           className="w-full h-full object-cover"
                         />
@@ -444,7 +484,11 @@ const Checkout: React.FC = () => {
                 
                 <div className="bg-green-50 p-3 rounded text-sm text-green-700 flex items-start gap-2">
                   <Check size={16} className="mt-1 flex-shrink-0" />
-                  <span>Your order qualifies for free shipping!</span>
+                  <span>
+                    {totalPrice > 100 
+                      ? "Your order qualifies for free shipping!" 
+                      : `Add ${(100 - totalPrice).toFixed(2)} more to get free shipping!`}
+                  </span>
                 </div>
               </div>
             </div>

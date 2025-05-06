@@ -21,6 +21,7 @@ import OrderConfirmation from "./pages/OrderConfirmation";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Account from "./pages/Account";
+import Orders from "./pages/Orders";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
 
@@ -28,6 +29,7 @@ import Contact from "./pages/Contact";
 import AdminLogin from "./pages/admin/AdminLogin";
 import Dashboard from "./pages/admin/Dashboard";
 import Products from "./pages/admin/Products";
+import AdminOrders from "./pages/admin/Orders";
 
 // Not found
 import NotFound from "./pages/NotFound";
@@ -55,6 +57,7 @@ const App = () => (
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
                 <Route path="/account" element={<Account />} />
+                <Route path="/orders" element={<Orders />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
                 
@@ -62,6 +65,7 @@ const App = () => (
                 <Route path="/admin/login" element={<AdminLogin />} />
                 <Route path="/admin" element={<Dashboard />} />
                 <Route path="/admin/products" element={<Products />} />
+                <Route path="/admin/orders" element={<AdminOrders />} />
                 
                 {/* Catch All */}
                 <Route path="*" element={<NotFound />} />

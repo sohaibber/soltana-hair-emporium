@@ -1,129 +1,99 @@
 
-import React, { useState, useEffect } from "react";
-import { Link, Navigate, useLocation } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import {
-  LayoutDashboard,
-  Package,
-  ShoppingBag,
-  Users,
-  Settings,
-  LogOut,
-  Menu,
-  X,
-  Home,
+import React, { useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { 
+  User, Package, Settings, LogOut,
+  Menu, X, Home, ShoppingBag
 } from "lucide-react";
+import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
-import { toast } from "sonner";
+import { useToast } from "@/components/ui/use-toast";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
 }
 
 const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
-  const { isAuthenticated, isAdmin, logout, user } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [checking, setChecking] = useState(true);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+  const { toast } = useToast();
+  
+  const handleLogout = async () => {
+    try {
+      await logout();
+      toast({
+        title: "Logged out",
+        description: "You have been successfully logged out.",
+      });
+      navigate("/admin/login");
+    } catch (error) {
+      console.error("Logout failed", error);
+      toast({
+        title: "Logout failed",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
+  };
 
-  useEffect(() => {
-    // Small delay to ensure auth state is updated
-    const timer = setTimeout(() => {
-      setChecking(false);
-    }, 500);
-    
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Show loading state while checking auth
-  if (checking) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-          <p className="mt-4 text-gray-600">Checking authentication...</p>
-        </div>
-      </div>
-    );
-  }
-  
-  // Redirect if not authenticated
-  if (!isAuthenticated) {
-    return <Navigate to="/admin/login" state={{ from: location }} />;
-  }
-  
-  // Redirect if authenticated but not admin
-  if (isAuthenticated && !isAdmin) {
-    toast.error("You don't have permission to access the admin area");
-    return <Navigate to="/" />;
-  }
-
-  const navigation = [
-    { name: "Dashboard", href: "/admin", icon: LayoutDashboard },
+  const nav = [
+    { name: "Dashboard", href: "/admin", icon: Home },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
-    { name: "Customers", href: "/admin/customers", icon: Users },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
+  
+  const isActive = (path: string) => location.pathname === path;
   
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
-  
+
   return (
-    <div className="flex h-screen">
+    <div className="flex h-screen overflow-hidden">
       {/* Mobile sidebar toggle */}
       <div className="lg:hidden fixed top-4 left-4 z-50">
-        <Button 
-          variant="outline" 
+        <Button
+          variant="outline"
           size="icon"
+          className="rounded-full bg-white shadow-md"
           onClick={toggleSidebar}
-          className="bg-white shadow-md"
         >
-          {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
+          {sidebarOpen ? <X size={18} /> : <Menu size={18} />}
         </Button>
       </div>
       
-      {/* Sidebar overlay */}
-      {sidebarOpen && (
-        <div 
-          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
-          onClick={() => setSidebarOpen(false)}
-        ></div>
-      )}
-      
       {/* Sidebar */}
-      <div 
-        className={`fixed lg:relative w-64 h-screen bg-white border-r z-50 transition-transform lg:transform-none ${
-          sidebarOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
+      <div
+        className={`fixed inset-y-0 left-0 transform bg-white border-r shadow-sm w-64 transition-transform duration-300 ease-in-out z-20 lg:translate-x-0 ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
         <div className="flex flex-col h-full">
-          {/* Logo */}
-          <div className="flex items-center justify-center h-16 border-b">
-            <Link to="/" className="flex items-center">
-              <span className="font-serif font-bold text-xl text-soltana-dark">
-                Soltana<span className="text-primary">Hair</span>
-              </span>
+          <div className="h-16 flex items-center px-4 border-b">
+            <Link to="/admin" className="text-xl font-semibold">
+              Admin Dashboard
             </Link>
           </div>
           
-          {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto p-4">
-            <ul className="space-y-1">
-              {navigation.map((item) => {
-                const isActive = location.pathname === item.href;
+          <nav className="flex-1 overflow-auto py-4">
+            <ul className="space-y-1 px-2">
+              {nav.map((item) => {
+                const Icon = item.icon;
                 return (
                   <li key={item.name}>
                     <Link
                       to={item.href}
-                      className={`flex items-center px-3 py-2 rounded-md text-sm ${
-                        isActive
-                          ? "bg-soltana-light font-medium text-soltana-dark"
-                          : "text-gray-600 hover:bg-gray-100"
+                      className={`flex items-center gap-3 px-3 py-2 rounded-md transition-colors ${
+                        isActive(item.href)
+                          ? "bg-gray-100 text-gray-900"
+                          : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
                       }`}
+                      onClick={() => setSidebarOpen(false)}
                     >
-                      <item.icon className="h-5 w-5 mr-2" />
+                      <Icon size={18} />
                       {item.name}
                     </Link>
                   </li>
@@ -132,33 +102,41 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
             </ul>
           </nav>
           
-          {/* Footer */}
           <div className="p-4 border-t">
-            <div className="flex justify-between">
-              <Link
-                to="/"
-                className="flex items-center text-sm text-gray-600 hover:text-gray-900"
-              >
-                <Home className="h-4 w-4 mr-1" />
-                View Store
-              </Link>
-              
-              <button
-                onClick={() => logout()}
-                className="flex items-center text-sm text-red-600 hover:text-red-800"
-              >
-                <LogOut className="h-4 w-4 mr-1" />
-                Logout
-              </button>
+            <div className="flex items-center gap-3 mb-4">
+              <div className="h-10 w-10 rounded-full bg-gray-200 flex items-center justify-center">
+                <User size={20} className="text-gray-600" />
+              </div>
+              <div>
+                <p className="font-medium">Admin User</p>
+                <p className="text-xs text-gray-500">admin@example.com</p>
+              </div>
             </div>
+            
+            <Button
+              variant="outline"
+              className="w-full flex items-center justify-center gap-2"
+              onClick={handleLogout}
+            >
+              <LogOut size={16} />
+              Logout
+            </Button>
           </div>
         </div>
       </div>
       
+      {/* Overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/20 z-10 lg:hidden"
+          onClick={toggleSidebar}
+        ></div>
+      )}
+      
       {/* Main content */}
-      <main className="flex-1 overflow-auto bg-gray-50">
-        <div className="p-6 lg:p-8">{children}</div>
-      </main>
+      <div className="flex-1 flex flex-col overflow-hidden lg:ml-64">
+        <main className="flex-1 overflow-auto bg-gray-50">{children}</main>
+      </div>
     </div>
   );
 };
