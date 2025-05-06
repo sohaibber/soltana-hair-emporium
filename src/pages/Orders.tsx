@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Package, ChevronRight, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
@@ -135,11 +136,14 @@ const Orders: React.FC = () => {
                 };
               })
             );
+            
+            // Properly parse the shipping_address from JSON to our ShippingAddress type
+            const shippingAddressData = order.shipping_address as any;
               
             return {
               ...order,
               status: order.status as Order['status'],
-              shipping_address: order.shipping_address as ShippingAddress,
+              shipping_address: shippingAddressData as ShippingAddress,
               items: itemsWithProducts
             } as Order;
           })

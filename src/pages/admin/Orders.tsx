@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Eye, Search, ArrowUpDown, CheckCircle, Clock, XCircle, Truck } from "lucide-react";
@@ -149,11 +148,14 @@ const Orders: React.FC = () => {
                 };
               })
             );
+            
+            // Properly parse the shipping_address from JSON to our ShippingAddress type
+            const shippingAddressData = order.shipping_address as any;
               
             return {
               ...order,
               status: order.status as Order['status'],
-              shipping_address: order.shipping_address as ShippingAddress,
+              shipping_address: shippingAddressData as ShippingAddress,
               customer_name: profileData ? `${profileData.first_name || ''} ${profileData.last_name || ''}`.trim() : 'Unknown',
               customer_email: profileData?.email || 'No email',
               items: itemsWithProducts
