@@ -1,7 +1,6 @@
-
 import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
-import { Package, ChevronRight, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
+import { Navigate } from "react-router-dom";
+import { ChevronRight, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -22,6 +21,7 @@ import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/layout/Layout";
 import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
+import UserSidebar from "@/components/user/UserSidebar";
 
 interface OrderItem {
   id: string;
@@ -198,31 +198,7 @@ const Orders: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-8">
           {/* Sidebar */}
           <div className="md:w-1/4">
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <div className="space-y-2">
-                <Link 
-                  to="/account" 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <Package size={18} />
-                  <span>Account Details</span>
-                </Link>
-                <Link 
-                  to="/orders" 
-                  className="flex items-center space-x-2 p-2 rounded-md bg-gray-100 transition-colors"
-                >
-                  <Package size={18} />
-                  <span>Orders</span>
-                </Link>
-                <Link 
-                  to="/wishlist" 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <Package size={18} />
-                  <span>Wishlist</span>
-                </Link>
-              </div>
-            </div>
+            <UserSidebar activePath="orders" />
           </div>
           
           {/* Main content */}

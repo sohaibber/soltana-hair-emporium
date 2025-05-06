@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from "react";
-import { Link, Navigate } from "react-router-dom";
+import { Navigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/layout/Layout";
 import { useAuth } from "@/context/AuthContext";
-import { ShoppingBag, User, Heart, LogOut } from "lucide-react";
+import { User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import UserSidebar from "@/components/user/UserSidebar";
 
 interface Profile {
   id: string;
@@ -109,52 +110,7 @@ const Account: React.FC = () => {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="flex flex-col md:flex-row gap-8">
           <div className="md:w-1/4">
-            <div className="bg-white rounded-lg border shadow-sm p-6">
-              <div className="flex items-center space-x-4 mb-6">
-                <div className="w-16 h-16 bg-soltana-neutral/30 rounded-full flex items-center justify-center">
-                  <User size={32} className="text-soltana-dark/80" />
-                </div>
-                <div>
-                  <h2 className="font-medium">
-                    {profile?.first_name} {profile?.last_name}
-                  </h2>
-                  <p className="text-sm text-gray-600">{profile?.email}</p>
-                </div>
-              </div>
-              
-              <Separator className="my-4" />
-              
-              <nav className="space-y-2">
-                <Link 
-                  to="/account" 
-                  className="flex items-center space-x-2 p-2 rounded-md bg-gray-100 transition-colors"
-                >
-                  <User size={18} />
-                  <span>Account Details</span>
-                </Link>
-                <Link 
-                  to="/orders" 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <ShoppingBag size={18} />
-                  <span>Orders</span>
-                </Link>
-                <Link 
-                  to="/wishlist" 
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <Heart size={18} />
-                  <span>Wishlist</span>
-                </Link>
-                <button 
-                  onClick={() => logout()}
-                  className="flex items-center space-x-2 p-2 rounded-md hover:bg-gray-100 transition-colors w-full text-left text-red-600"
-                >
-                  <LogOut size={18} />
-                  <span>Logout</span>
-                </button>
-              </nav>
-            </div>
+            <UserSidebar activePath="account" />
           </div>
           
           <div className="md:w-3/4">
