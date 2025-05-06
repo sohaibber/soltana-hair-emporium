@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import { Package, ChevronRight, Clock, CheckCircle, XCircle, Truck } from "lucide-react";
@@ -33,21 +32,23 @@ interface OrderItem {
   product_image?: string;
 }
 
+interface ShippingAddress {
+  firstName: string;
+  lastName: string;
+  address: string;
+  city: string;
+  state: string;
+  zipCode: string;
+  country: string;
+  phone: string;
+}
+
 interface Order {
   id: string;
   created_at: string;
   total_amount: number;
   status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  shipping_address: {
-    firstName: string;
-    lastName: string;
-    address: string;
-    city: string;
-    state: string;
-    zipCode: string;
-    country: string;
-    phone: string;
-  };
+  shipping_address: ShippingAddress;
   shipping_tracking: string | null;
   user_id: string;
   items?: OrderItem[];
@@ -137,10 +138,10 @@ const Orders: React.FC = () => {
               
             return {
               ...order,
-              // Cast status to ensure it matches the union type
               status: order.status as Order['status'],
+              shipping_address: order.shipping_address as ShippingAddress,
               items: itemsWithProducts
-            };
+            } as Order;
           })
         );
         
