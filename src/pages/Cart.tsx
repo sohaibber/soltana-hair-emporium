@@ -20,6 +20,14 @@ const Cart: React.FC = () => {
   const shippingPrice = totalPrice > 100 ? 0 : 10;
   const finalTotal = totalPrice + shippingPrice;
 
+  // Helper function to get image URL
+  const getImageUrl = (path: string) => {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
+  };
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 md:py-12">
@@ -56,7 +64,7 @@ const Cart: React.FC = () => {
                       <div key={`${item.id}-${item.color}-${item.length}`} className="p-4 flex">
                         <div className="w-20 h-20 rounded overflow-hidden flex-shrink-0">
                           <img
-                            src={item.image}
+                            src={getImageUrl(item.image)}
                             alt={item.name}
                             className="w-full h-full object-cover"
                           />

@@ -21,12 +21,20 @@ interface ProductCardProps {
 }
 
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+  // Helper function to get image URL
+  const getImageUrl = (path: string) => {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
+  };
+  
   return (
     <Link to={`/product/${product.id}`} className="group">
       <div className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover-lift">
         <div className="relative aspect-square overflow-hidden">
           <img 
-            src={product.image} 
+            src={getImageUrl(product.image)} 
             alt={product.name} 
             className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
           />

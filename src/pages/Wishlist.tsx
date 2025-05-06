@@ -6,6 +6,7 @@ import { ShoppingCart, Heart, Trash2, ArrowRight } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import { supabase } from "@/integrations/supabase/client";
 
 const Wishlist: React.FC = () => {
   const { items, totalItems, removeItem, clearWishlist } = useWishlist();
@@ -20,6 +21,14 @@ const Wishlist: React.FC = () => {
       color: "Default",
       quantity: 1
     });
+  };
+  
+  // Helper function to get image URL
+  const getImageUrl = (path: string) => {
+    if (path.startsWith('http')) {
+      return path;
+    }
+    return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
 
   return (
@@ -61,7 +70,7 @@ const Wishlist: React.FC = () => {
                     <Link to={`/product/${item.id}`} className="group">
                       <div className="relative aspect-square overflow-hidden">
                         <img 
-                          src={item.image} 
+                          src={getImageUrl(item.image)} 
                           alt={item.name} 
                           className="object-cover w-full h-full transition-transform duration-500 group-hover:scale-105"
                         />
