@@ -15,10 +15,13 @@ serve(async (req) => {
   }
 
   try {
+    console.log("Payment function called, processing request");
+    
     // Get the request body
     const { items, successUrl, cancelUrl } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
+      console.error("Invalid items provided:", items);
       return new Response(
         JSON.stringify({ error: "Invalid items provided" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
@@ -41,14 +44,20 @@ serve(async (req) => {
     let userId = null;
     
     if (authHeader) {
+      console.log("Auth header found, retrieving user info");
       // Verify the JWT token
       const token = authHeader.replace("Bearer ", "");
       const { data: { user }, error } = await supabase.auth.getUser(token);
       
       if (user && !error) {
+        console.log("User authenticated:", user.email);
         userEmail = user.email || userEmail;
         userId = user.id;
+      } else {
+        console.log("User authentication failed:", error?.message);
       }
+    } else {
+      console.log("No auth header, proceeding with guest checkout");
     }
     
     // Format line items for Stripe
@@ -65,6 +74,8 @@ serve(async (req) => {
     }));
 
     console.log("Creating checkout session with items:", JSON.stringify(lineItems));
+    console.log("Success URL:", successUrl || `${req.headers.get("origin")}/order-confirmation`);
+    console.log("Cancel URL:", cancelUrl || `${req.headers.get("origin")}/checkout`);
 
     // Create a checkout session
     const session = await stripe.checkout.sessions.create({
@@ -80,6 +91,7 @@ serve(async (req) => {
     });
 
     console.log("Checkout session created:", session.id);
+    console.log("Checkout URL:", session.url);
 
     // Return the session ID and URL
     return new Response(
@@ -87,8 +99,9 @@ serve(async (req) => {
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {
-    // Log the error
+    // Log the detailed error
     console.error("Error creating checkout session:", error);
+    console.error("Error details:", JSON.stringify(error, Object.getOwnPropertyNames(error)));
     
     // Return error response
     return new Response(

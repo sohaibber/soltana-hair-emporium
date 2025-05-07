@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, CreditCard, Info, Truck, Banknote } from "lucide-react";
@@ -12,7 +11,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
-import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const Checkout: React.FC = () => {
   const { items, totalItems, totalPrice, clearCart } = useCart();
@@ -36,6 +35,7 @@ const Checkout: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
+  const [paymentError, setPaymentError] = useState<string | null>(null);
   
   // Load user data if authenticated
   useEffect(() => {
@@ -80,6 +80,9 @@ const Checkout: React.FC = () => {
     try {
       setIsProcessingPayment(true);
       setShowLoadingDialog(true);
+      setPaymentError(null);
+      
+      console.log("Starting Stripe payment process");
       
       // Call our secure Supabase Edge Function to create a Stripe checkout session
       const { data, error } = await supabase.functions.invoke('create-payment', {
@@ -95,20 +98,27 @@ const Checkout: React.FC = () => {
         }
       });
       
+      console.log("Stripe checkout response:", data, error);
+      
       if (error) {
+        console.error("Stripe checkout error:", error);
         throw new Error(error.message || 'Failed to create checkout session');
       }
       
-      // Redirect to Stripe Checkout using full page redirect to avoid iframe issues
-      if (data?.url) {
-        window.location.href = data.url;
-        return true;
-      } else {
+      if (!data?.url) {
+        console.error("No checkout URL returned:", data);
         throw new Error('No checkout URL returned');
       }
       
+      // Redirect to Stripe Checkout using full page redirect to avoid iframe issues
+      console.log("Redirecting to Stripe URL:", data.url);
+      window.location.href = data.url;
+      return true;
+      
     } catch (error) {
       console.error('Payment processing error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      setPaymentError(errorMessage);
       toast({
         title: "Payment Failed",
         description: "There was an error processing your payment. Please try again.",
@@ -117,7 +127,9 @@ const Checkout: React.FC = () => {
       setShowLoadingDialog(false);
       return false;
     } finally {
-      setIsProcessingPayment(false);
+      // Note: we don't set isProcessingPayment to false here because we're redirecting
+      // and don't want the button to flash as enabled before the redirect happens
+      // setIsProcessingPayment(false);
     }
   };
   
@@ -138,8 +150,13 @@ const Checkout: React.FC = () => {
     
     if (formData.paymentMethod === 'credit') {
       // For Stripe payment
+      console.log("Initiating Stripe payment");
       const paymentStarted = await processStripePayment();
-      if (!paymentStarted) return;
+      if (!paymentStarted) {
+        setIsProcessingPayment(false);
+        setShowLoadingDialog(false);
+        return;
+      }
       
       // We don't create an order now, as we'll do that when the user returns from Stripe
       return;
@@ -420,6 +437,11 @@ const Checkout: React.FC = () => {
                 type="submit"
                 className="w-full bg-soltana-dark text-white hover:bg-black"
                 disabled={isSubmitting || isProcessingPayment || items.length === 0}
+                onClick={() => {
+                  if (formData.paymentMethod === 'credit') {
+                    console.log("Submit button clicked for credit card payment");
+                  }
+                }}
               >
                 {isSubmitting || isProcessingPayment ? "Processing..." : "Place Order"}
               </Button>
@@ -513,6 +535,12 @@ const Checkout: React.FC = () => {
             <p className="text-center">
               Please wait while we redirect you to Stripe's secure checkout page...
             </p>
+            {paymentError && (
+              <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
+                <p>Error: {paymentError}</p>
+                <p className="mt-2">Please try again or choose a different payment method.</p>
+              </div>
+            )}
           </div>
         </DialogContent>
       </Dialog>
