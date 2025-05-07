@@ -1,7 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, CreditCard, Info, Truck, Cash } from "lucide-react";
+import { Check, CreditCard, Info, Truck, Banknote } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -92,34 +91,31 @@ const Checkout: React.FC = () => {
     try {
       setIsProcessingPayment(true);
       
-      // Create Stripe Checkout session
-      const response = await fetch('https://api.stripe.com/v1/checkout/sessions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-          success_url: `${window.location.origin}/order-confirmation`,
-          cancel_url: `${window.location.origin}/checkout`,
-          line_items: JSON.stringify(items.map(item => ({
-            price_data: {
-              currency: 'usd',
-              product_data: { name: item.name },
-              unit_amount: Math.round(item.price * 100), // Convert to cents
-            },
-            quantity: item.quantity,
-          }))),
-          mode: 'payment',
-        }),
+      // Call our secure Supabase Edge Function instead of directly calling Stripe
+      const { data, error } = await supabase.functions.invoke('create-payment', {
+        body: {
+          items: items.map(item => ({
+            name: item.name,
+            price: item.price,
+            image: item.image,
+            quantity: item.quantity
+          })),
+          successUrl: `${window.location.origin}/order-confirmation`,
+          cancelUrl: `${window.location.origin}/checkout`
+        }
       });
       
-      if (!response.ok) {
-        throw new Error('Failed to create checkout session');
+      if (error) {
+        throw new Error(error.message || 'Failed to create checkout session');
       }
       
-      const session = await response.json();
-      window.location.href = session.url;
-      return true;
+      // Redirect to Stripe Checkout
+      if (data?.url) {
+        window.location.href = data.url;
+        return true;
+      } else {
+        throw new Error('No checkout URL returned');
+      }
       
     } catch (error) {
       console.error('Payment processing error:', error);
@@ -401,7 +397,7 @@ const Checkout: React.FC = () => {
                       <div className="flex items-center space-x-3 border p-3 rounded-md">
                         <RadioGroupItem value="cod" id="cod" />
                         <Label htmlFor="cod" className="flex items-center">
-                          <Cash size={16} className="mr-2" /> Cash on Delivery
+                          <Banknote size={16} className="mr-2" /> Cash on Delivery
                         </Label>
                       </div>
                     </RadioGroup>

@@ -1,6 +1,7 @@
+
 import React, { useEffect, useState } from "react";
 import { Navigate, Link } from "react-router-dom";
-import { ChevronRight, Clock, CheckCircle, XCircle, Truck, Package } from "lucide-react";
+import { ChevronRight, Clock, CheckCircle, XCircle, Truck, Package as PackageIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -212,7 +213,7 @@ const Orders: React.FC = () => {
                 </div>
               ) : orders.length === 0 ? (
                 <div className="py-8 text-center border rounded-lg">
-                  <Package size={48} className="mx-auto text-gray-400 mb-4" />
+                  <PackageIcon size={48} className="mx-auto text-gray-400 mb-4" />
                   <h2 className="text-xl font-medium mb-2">No orders yet</h2>
                   <p className="text-gray-600 mb-6">
                     You haven't placed any orders yet.

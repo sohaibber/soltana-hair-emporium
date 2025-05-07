@@ -38,6 +38,7 @@ serve(async (req) => {
     // Get the authorization header
     const authHeader = req.headers.get("authorization");
     let userEmail = null;
+    let userId = null;
     
     if (authHeader) {
       // Verify the JWT token
@@ -46,6 +47,7 @@ serve(async (req) => {
       
       if (user && !error) {
         userEmail = user.email;
+        userId = user.id;
       }
     }
     
@@ -70,9 +72,12 @@ serve(async (req) => {
       customer_email: userEmail,
       success_url: successUrl || `${req.headers.get("origin")}/order-confirmation`,
       cancel_url: cancelUrl || `${req.headers.get("origin")}/checkout`,
+      metadata: {
+        userId: userId || 'guest'
+      }
     });
 
-    // Return the session ID
+    // Return the session ID and URL
     return new Response(
       JSON.stringify({ sessionId: session.id, url: session.url }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
