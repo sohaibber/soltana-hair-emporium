@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { Check, CreditCard, Info, Truck, Banknote } from "lucide-react";
@@ -11,6 +12,7 @@ import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
 import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 
 const Checkout: React.FC = () => {
   const { items, totalItems, totalPrice, clearCart } = useCart();
@@ -29,14 +31,11 @@ const Checkout: React.FC = () => {
     zipCode: "",
     country: "United States",
     paymentMethod: "credit",
-    cardNumber: "",
-    cardName: "",
-    cardExpiry: "",
-    cardCvc: "",
   });
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   
   // Load user data if authenticated
   useEffect(() => {
@@ -80,6 +79,7 @@ const Checkout: React.FC = () => {
   const processStripePayment = async () => {
     try {
       setIsProcessingPayment(true);
+      setShowLoadingDialog(true);
       
       // Call our secure Supabase Edge Function to create a Stripe checkout session
       const { data, error } = await supabase.functions.invoke('create-payment', {
@@ -99,7 +99,7 @@ const Checkout: React.FC = () => {
         throw new Error(error.message || 'Failed to create checkout session');
       }
       
-      // Redirect to Stripe Checkout
+      // Redirect to Stripe Checkout using full page redirect to avoid iframe issues
       if (data?.url) {
         window.location.href = data.url;
         return true;
@@ -114,6 +114,7 @@ const Checkout: React.FC = () => {
         description: "There was an error processing your payment. Please try again.",
         variant: "destructive",
       });
+      setShowLoadingDialog(false);
       return false;
     } finally {
       setIsProcessingPayment(false);
@@ -136,13 +137,11 @@ const Checkout: React.FC = () => {
     }
     
     if (formData.paymentMethod === 'credit') {
-      // For Stripe payment, we don't need to validate card fields here
-      // as we'll redirect to Stripe Checkout which handles this
-      const paymentSuccessful = await processStripePayment();
-      if (!paymentSuccessful) return;
+      // For Stripe payment
+      const paymentStarted = await processStripePayment();
+      if (!paymentStarted) return;
       
-      // If we've redirected to Stripe, we'll return here to avoid creating an order
-      // The order will be created when the user returns from Stripe
+      // We don't create an order now, as we'll do that when the user returns from Stripe
       return;
     }
     
@@ -504,6 +503,19 @@ const Checkout: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Processing Payment Dialog */}
+      <Dialog open={showLoadingDialog} onOpenChange={setShowLoadingDialog}>
+        <DialogContent className="sm:max-w-md" onInteractOutside={(e) => e.preventDefault()}>
+          <DialogTitle className="text-center">Processing Payment</DialogTitle>
+          <div className="flex flex-col items-center justify-center py-6">
+            <div className="w-12 h-12 border-4 border-t-primary rounded-full animate-spin mb-4"></div>
+            <p className="text-center">
+              Please wait while we redirect you to Stripe's secure checkout page...
+            </p>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Layout>
   );
 };

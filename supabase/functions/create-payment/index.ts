@@ -37,7 +37,7 @@ serve(async (req) => {
     
     // Get the authorization header
     const authHeader = req.headers.get("authorization");
-    let userEmail = null;
+    let userEmail = "guest@example.com"; // Default for guest checkout
     let userId = null;
     
     if (authHeader) {
@@ -46,7 +46,7 @@ serve(async (req) => {
       const { data: { user }, error } = await supabase.auth.getUser(token);
       
       if (user && !error) {
-        userEmail = user.email;
+        userEmail = user.email || userEmail;
         userId = user.id;
       }
     }
