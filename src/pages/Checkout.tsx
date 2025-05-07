@@ -78,20 +78,10 @@ const Checkout: React.FC = () => {
   };
   
   const processStripePayment = async () => {
-    if (!isAuthenticated || !user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to complete your order.",
-        variant: "destructive",
-      });
-      navigate("/login", { state: { from: { pathname: "/checkout" } } });
-      return false;
-    }
-    
     try {
       setIsProcessingPayment(true);
       
-      // Call our secure Supabase Edge Function instead of directly calling Stripe
+      // Call our secure Supabase Edge Function to create a Stripe checkout session
       const { data, error } = await supabase.functions.invoke('create-payment', {
         body: {
           items: items.map(item => ({
@@ -146,20 +136,17 @@ const Checkout: React.FC = () => {
     }
     
     if (formData.paymentMethod === 'credit') {
-      if (!formData.cardNumber || !formData.cardName || !formData.cardExpiry || !formData.cardCvc) {
-        toast({
-          title: "Payment Information Required",
-          description: "Please fill out all payment fields.",
-          variant: "destructive",
-        });
-        return;
-      }
-      
-      // Attempt to process Stripe payment
+      // For Stripe payment, we don't need to validate card fields here
+      // as we'll redirect to Stripe Checkout which handles this
       const paymentSuccessful = await processStripePayment();
       if (!paymentSuccessful) return;
+      
+      // If we've redirected to Stripe, we'll return here to avoid creating an order
+      // The order will be created when the user returns from Stripe
+      return;
     }
     
+    // For Cash on Delivery, continue with order creation
     if (!isAuthenticated || !user) {
       toast({
         title: "Authentication Required",
@@ -185,7 +172,7 @@ const Checkout: React.FC = () => {
         phone: formData.phone,
       };
       
-      // Create order in database
+      // Create order in database (for COD only; Stripe orders are created after successful payment)
       const { data: orderData, error: orderError } = await supabase
         .from('orders')
         .insert({
@@ -193,12 +180,15 @@ const Checkout: React.FC = () => {
           total_amount: totalPrice,
           shipping_address: shippingAddress,
           status: 'pending',
-          payment_method: formData.paymentMethod,
-          payment_intent_id: formData.paymentMethod === 'cod' ? 'cod_order' : `pi_${Math.random().toString(36).substr(2, 9)}`,
+          payment_method: 'cod',
+          payment_intent_id: 'cod_order',
         })
         .select();
       
-      if (orderError) throw orderError;
+      if (orderError) {
+        console.error("Order creation error details:", orderError);
+        throw orderError;
+      }
       
       if (!orderData || orderData.length === 0) {
         throw new Error("Order creation failed - no data returned");
@@ -224,9 +214,7 @@ const Checkout: React.FC = () => {
       
       toast({
         title: "Order Placed Successfully!",
-        description: formData.paymentMethod === 'cod' ? 
-          "Thank you for your order. You will pay on delivery." : 
-          "Thank you for your purchase. You will receive a confirmation email shortly.",
+        description: "Thank you for your order. You will pay on delivery.",
       });
       
       // Redirect to confirmation page
@@ -391,7 +379,7 @@ const Checkout: React.FC = () => {
                       <div className="flex items-center space-x-3 border p-3 rounded-md">
                         <RadioGroupItem value="credit" id="credit" />
                         <Label htmlFor="credit" className="flex items-center">
-                          <CreditCard size={16} className="mr-2" /> Credit/Debit Card
+                          <CreditCard size={16} className="mr-2" /> Credit/Debit Card (Stripe)
                         </Label>
                       </div>
                       <div className="flex items-center space-x-3 border p-3 rounded-md">
@@ -404,62 +392,14 @@ const Checkout: React.FC = () => {
                   </div>
                   
                   {formData.paymentMethod === "credit" && (
-                    <div className="space-y-4 mt-4">
-                      <div className="space-y-2">
-                        <Label htmlFor="cardNumber">Card Number</Label>
-                        <Input
-                          id="cardNumber"
-                          name="cardNumber"
-                          placeholder="1234 5678 9012 3456"
-                          value={formData.cardNumber}
-                          onChange={handleChange}
-                          required={formData.paymentMethod === "credit"}
-                        />
+                    <div className="mt-4 p-4 bg-gray-50 rounded text-center">
+                      <div className="flex items-center justify-center mb-2">
+                        <CreditCard size={20} className="mr-2 text-gray-600" />
+                        <span className="font-medium">Stripe Secure Checkout</span>
                       </div>
-                      
-                      <div className="space-y-2">
-                        <Label htmlFor="cardName">Name on Card</Label>
-                        <Input
-                          id="cardName"
-                          name="cardName"
-                          value={formData.cardName}
-                          onChange={handleChange}
-                          required={formData.paymentMethod === "credit"}
-                        />
-                      </div>
-                      
-                      <div className="grid grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="cardExpiry">Expiration Date (MM/YY)</Label>
-                          <Input
-                            id="cardExpiry"
-                            name="cardExpiry"
-                            placeholder="MM/YY"
-                            value={formData.cardExpiry}
-                            onChange={handleChange}
-                            required={formData.paymentMethod === "credit"}
-                          />
-                        </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="cardCvc">CVC</Label>
-                          <Input
-                            id="cardCvc"
-                            name="cardCvc"
-                            type="password"
-                            placeholder="***"
-                            value={formData.cardCvc}
-                            onChange={handleChange}
-                            required={formData.paymentMethod === "credit"}
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="flex items-start gap-2 rounded-md bg-blue-50 p-3 text-sm text-blue-600">
-                        <Info size={16} className="mt-1 flex-shrink-0" />
-                        <span>
-                          Your payment information is encrypted and secure. We do not store your card details.
-                        </span>
-                      </div>
+                      <p className="text-gray-600">
+                        You will be redirected to Stripe's secure payment page to complete your purchase.
+                      </p>
                     </div>
                   )}
                   
