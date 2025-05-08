@@ -18,7 +18,7 @@ serve(async (req) => {
     console.log("Payment function called, processing request");
     
     // Get the request body
-    const { items, successUrl, cancelUrl } = await req.json();
+    const { items, successUrl, cancelUrl, paymentMethod = 'card' } = await req.json();
 
     if (!items || !Array.isArray(items) || items.length === 0) {
       console.error("Invalid items provided:", items);
@@ -28,7 +28,16 @@ serve(async (req) => {
       );
     }
 
-    // Initialize Stripe
+    // If payment method is cod (Cash on Delivery), we don't need to create a Stripe checkout
+    if (paymentMethod === 'cod') {
+      console.log("Cash on Delivery payment selected, no Stripe checkout needed");
+      return new Response(
+        JSON.stringify({ type: 'cod', success: true }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Initialize Stripe for card payments
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2023-10-16",
     });
@@ -86,7 +95,8 @@ serve(async (req) => {
       success_url: successUrl || `${req.headers.get("origin")}/order-confirmation`,
       cancel_url: cancelUrl || `${req.headers.get("origin")}/checkout`,
       metadata: {
-        userId: userId || 'guest'
+        userId: userId || 'guest',
+        paymentMethod: 'card'
       }
     });
 
@@ -95,7 +105,7 @@ serve(async (req) => {
 
     // Return the session ID and URL
     return new Response(
-      JSON.stringify({ sessionId: session.id, url: session.url }),
+      JSON.stringify({ type: 'stripe', sessionId: session.id, url: session.url }),
       { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } }
     );
   } catch (error) {

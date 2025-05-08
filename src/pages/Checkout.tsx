@@ -94,26 +94,106 @@ const Checkout: React.FC = () => {
             quantity: item.quantity
           })),
           successUrl: `${window.location.origin}/order-confirmation`,
-          cancelUrl: `${window.location.origin}/checkout`
+          cancelUrl: `${window.location.origin}/checkout`,
+          paymentMethod: formData.paymentMethod
         }
       });
       
-      console.log("Stripe checkout response:", data, error);
+      console.log("Payment function response:", data, error);
       
       if (error) {
-        console.error("Stripe checkout error:", error);
-        throw new Error(error.message || 'Failed to create checkout session');
+        console.error("Payment function error:", error);
+        throw new Error(error.message || 'Failed to process payment');
       }
       
-      if (!data?.url) {
+      // Handle Cash on Delivery - no redirect needed
+      if (data?.type === 'cod') {
+        // Create the shipping address JSON
+        const shippingAddress = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          zipCode: formData.zipCode,
+          country: formData.country,
+          phone: formData.phone,
+        };
+        
+        if (!isAuthenticated || !user) {
+          setIsProcessingPayment(false);
+          setShowLoadingDialog(false);
+          toast({
+            title: "Authentication Required",
+            description: "Please log in to complete your order with Cash on Delivery.",
+            variant: "destructive",
+          });
+          navigate("/login", { state: { from: { pathname: "/checkout" } } });
+          return false;
+        }
+        
+        // Create order in database for COD
+        const { data: orderData, error: orderError } = await supabase
+          .from('orders')
+          .insert({
+            user_id: user.id,
+            total_amount: totalPrice,
+            shipping_address: shippingAddress,
+            status: 'pending',
+            payment_method: 'cod',
+            payment_intent_id: 'cod_order',
+          })
+          .select();
+        
+        if (orderError) {
+          console.error("Order creation error details:", orderError);
+          throw orderError;
+        }
+        
+        if (!orderData || orderData.length === 0) {
+          throw new Error("Order creation failed - no data returned");
+        }
+        
+        // Create order items
+        const orderItems = items.map(item => ({
+          order_id: orderData[0].id,
+          product_id: item.id,
+          quantity: item.quantity,
+          price: item.price,
+          total: item.price * item.quantity,
+        }));
+        
+        const { error: itemsError } = await supabase
+          .from('order_items')
+          .insert(orderItems);
+        
+        if (itemsError) throw itemsError;
+        
+        // Clear the cart
+        clearCart();
+        
+        toast({
+          title: "Order Placed Successfully!",
+          description: "Thank you for your order. You will pay on delivery.",
+        });
+        
+        setIsProcessingPayment(false);
+        setShowLoadingDialog(false);
+        
+        // Redirect to confirmation page
+        navigate("/order-confirmation", { state: { orderId: orderData[0].id } });
+        return true;
+      }
+      
+      // Handle Stripe redirect for card payments
+      if (data?.type === 'stripe' && data?.url) {
+        console.log("Redirecting to Stripe URL:", data.url);
+        window.location.href = data.url;
+        return true;
+      } else {
         console.error("No checkout URL returned:", data);
         throw new Error('No checkout URL returned');
       }
-      
-      // Redirect to Stripe Checkout using full page redirect to avoid iframe issues
-      console.log("Redirecting to Stripe URL:", data.url);
-      window.location.href = data.url;
-      return true;
       
     } catch (error) {
       console.error('Payment processing error:', error);
@@ -125,11 +205,8 @@ const Checkout: React.FC = () => {
         variant: "destructive",
       });
       setShowLoadingDialog(false);
+      setIsProcessingPayment(false);
       return false;
-    } finally {
-      // Note: we don't set isProcessingPayment to false here because we're redirecting
-      // and don't want the button to flash as enabled before the redirect happens
-      // setIsProcessingPayment(false);
     }
   };
   
@@ -148,95 +225,13 @@ const Checkout: React.FC = () => {
       return;
     }
     
-    if (formData.paymentMethod === 'credit') {
-      // For Stripe payment
-      console.log("Initiating Stripe payment");
-      const paymentStarted = await processStripePayment();
-      if (!paymentStarted) {
-        setIsProcessingPayment(false);
-        setShowLoadingDialog(false);
-        return;
-      }
-      
-      // We don't create an order now, as we'll do that when the user returns from Stripe
-      return;
-    }
-    
-    // For Cash on Delivery, continue with order creation
-    if (!isAuthenticated || !user) {
-      toast({
-        title: "Authentication Required",
-        description: "Please log in to complete your order.",
-        variant: "destructive",
-      });
-      navigate("/login", { state: { from: { pathname: "/checkout" } } });
-      return;
-    }
-    
     setIsSubmitting(true);
     
     try {
-      // Create the shipping address JSON
-      const shippingAddress = {
-        firstName: formData.firstName,
-        lastName: formData.lastName,
-        address: formData.address,
-        city: formData.city,
-        state: formData.state,
-        zipCode: formData.zipCode,
-        country: formData.country,
-        phone: formData.phone,
-      };
-      
-      // Create order in database (for COD only; Stripe orders are created after successful payment)
-      const { data: orderData, error: orderError } = await supabase
-        .from('orders')
-        .insert({
-          user_id: user.id,
-          total_amount: totalPrice,
-          shipping_address: shippingAddress,
-          status: 'pending',
-          payment_method: 'cod',
-          payment_intent_id: 'cod_order',
-        })
-        .select();
-      
-      if (orderError) {
-        console.error("Order creation error details:", orderError);
-        throw orderError;
-      }
-      
-      if (!orderData || orderData.length === 0) {
-        throw new Error("Order creation failed - no data returned");
-      }
-      
-      // Create order items
-      const orderItems = items.map(item => ({
-        order_id: orderData[0].id,
-        product_id: item.id,
-        quantity: item.quantity,
-        price: item.price,
-        total: item.price * item.quantity,
-      }));
-      
-      const { error: itemsError } = await supabase
-        .from('order_items')
-        .insert(orderItems);
-      
-      if (itemsError) throw itemsError;
-      
-      // Clear the cart
-      clearCart();
-      
-      toast({
-        title: "Order Placed Successfully!",
-        description: "Thank you for your order. You will pay on delivery.",
-      });
-      
-      // Redirect to confirmation page
-      navigate("/order-confirmation", { state: { orderId: orderData[0].id } });
+      // Process payment based on selected method
+      await processStripePayment();
     } catch (error) {
-      console.error("Error creating order:", error);
+      console.error("Error processing order:", error);
       toast({
         title: "Order Failed",
         description: "There was an error processing your order. Please try again.",
@@ -260,6 +255,7 @@ const Checkout: React.FC = () => {
   };
 
   return (
+    
     <Layout>
       <div className="container mx-auto px-4 py-8 md:py-12">
         <h1 className="font-serif text-2xl md:text-3xl font-semibold mb-6">Checkout</h1>
@@ -274,6 +270,7 @@ const Checkout: React.FC = () => {
                   <h2 className="font-medium">Shipping Information</h2>
                 </div>
                 <div className="p-6 space-y-4">
+                  
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label htmlFor="firstName">First Name</Label>
@@ -437,11 +434,6 @@ const Checkout: React.FC = () => {
                 type="submit"
                 className="w-full bg-soltana-dark text-white hover:bg-black"
                 disabled={isSubmitting || isProcessingPayment || items.length === 0}
-                onClick={() => {
-                  if (formData.paymentMethod === 'credit') {
-                    console.log("Submit button clicked for credit card payment");
-                  }
-                }}
               >
                 {isSubmitting || isProcessingPayment ? "Processing..." : "Place Order"}
               </Button>
@@ -449,6 +441,7 @@ const Checkout: React.FC = () => {
           </div>
           
           {/* Order Summary */}
+          
           <div className="lg:col-span-1">
             <div className="bg-white rounded-lg shadow-sm border overflow-hidden sticky top-24">
               <div className="p-4 border-b bg-gray-50">
@@ -533,7 +526,9 @@ const Checkout: React.FC = () => {
           <div className="flex flex-col items-center justify-center py-6">
             <div className="w-12 h-12 border-4 border-t-primary rounded-full animate-spin mb-4"></div>
             <p className="text-center">
-              Please wait while we redirect you to Stripe's secure checkout page...
+              {formData.paymentMethod === 'credit' 
+                ? "Please wait while we redirect you to Stripe's secure checkout page..."
+                : "Processing your Cash on Delivery order..."}
             </p>
             {paymentError && (
               <div className="mt-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
