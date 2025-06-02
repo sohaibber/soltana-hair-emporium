@@ -2,15 +2,17 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, Heart, Trash2, ArrowRight } from "lucide-react";
+import { ShoppingCart, Heart, Trash2, ArrowRight, User } from "lucide-react";
 import Layout from "@/components/layout/Layout";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 
 const Wishlist: React.FC = () => {
   const { items, totalItems, removeItem, clearWishlist } = useWishlist();
   const { addItem } = useCart();
+  const { isAuthenticated } = useAuth();
 
   const handleAddToCart = (item: any) => {
     addItem({
@@ -38,7 +40,23 @@ const Wishlist: React.FC = () => {
           Your Wishlist
         </h1>
 
-        {items.length === 0 ? (
+        {!isAuthenticated ? (
+          <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
+            <User size={48} className="mx-auto text-gray-400 mb-4" />
+            <h2 className="font-serif text-xl font-medium mb-2">Login to save your favorites</h2>
+            <p className="text-gray-600 mb-6">
+              Create an account or login to save items to your wishlist and access them from any device.
+            </p>
+            <div className="space-x-4">
+              <Button asChild>
+                <Link to="/login">Login</Link>
+              </Button>
+              <Button variant="outline" asChild>
+                <Link to="/register">Create Account</Link>
+              </Button>
+            </div>
+          </div>
+        ) : items.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
             <Heart size={48} className="mx-auto text-gray-400 mb-4" />
             <h2 className="font-serif text-xl font-medium mb-2">Your wishlist is empty</h2>

@@ -46,6 +46,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
             }, 0);
           } else {
             setIsAdmin(false);
+            // Clear localStorage when user logs out
+            if (event === 'SIGNED_OUT') {
+              clearUserData();
+            }
           }
         }
       );
@@ -68,6 +72,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     
     setupAuth();
   }, []);
+
+  // Clear user-specific data from localStorage
+  const clearUserData = () => {
+    try {
+      // Clear cart data
+      localStorage.removeItem("soltanaCart");
+      // Clear wishlist data
+      localStorage.removeItem("soltanaWishlist");
+      
+      // Dispatch storage events to update contexts
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'soltanaCart',
+        newValue: null,
+        oldValue: localStorage.getItem("soltanaCart")
+      }));
+      
+      window.dispatchEvent(new StorageEvent('storage', {
+        key: 'soltanaWishlist',
+        newValue: null,
+        oldValue: localStorage.getItem("soltanaWishlist")
+      }));
+    } catch (error) {
+      console.error("Error clearing user data:", error);
+    }
+  };
   
   // Check if user has admin role - Fixed to directly query user_roles table
   const checkUserRole = async (userId: string) => {
@@ -141,6 +170,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   // Sign out
   const logout = async () => {
     try {
+      // Clear user data before signing out
+      clearUserData();
+      
       const { error } = await supabase.auth.signOut();
       
       if (error) {

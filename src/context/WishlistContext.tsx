@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -111,6 +110,18 @@ export const WishlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
         dispatch({ type: "ADD_ITEM", payload: item });
       });
     }
+  }, []);
+
+  // Listen for storage events to clear wishlist when user logs out
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'soltanaWishlist' && e.newValue === null) {
+        dispatch({ type: "CLEAR_WISHLIST" });
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Context value

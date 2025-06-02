@@ -2,15 +2,24 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Menu, X, Search, Heart } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Search, Heart, LogOut, UserCircle } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
+  const { user, isAuthenticated, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -18,6 +27,14 @@ const Navbar = () => {
 
   const toggleSearch = () => {
     setIsSearchOpen(!isSearchOpen);
+  };
+
+  const handleLogout = async () => {
+    try {
+      await logout();
+    } catch (error) {
+      console.error("Logout error:", error);
+    }
   };
 
   return (
@@ -67,17 +84,65 @@ const Navbar = () => {
             >
               <Search size={20} />
             </button>
-            <Link to="/account" className="hover:text-primary transition-colors">
-              <User size={20} />
-            </Link>
+            
+            {/* User Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <button className="hover:text-primary transition-colors">
+                  <User size={20} />
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg">
+                {isAuthenticated ? (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/account" className="flex items-center">
+                        <UserCircle size={16} className="mr-2" />
+                        Account
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/orders" className="flex items-center">
+                        <ShoppingCart size={16} className="mr-2" />
+                        Orders
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleLogout} className="text-red-600">
+                      <LogOut size={16} className="mr-2" />
+                      Logout
+                    </DropdownMenuItem>
+                  </>
+                ) : (
+                  <>
+                    <DropdownMenuItem asChild>
+                      <Link to="/login" className="flex items-center">
+                        <User size={16} className="mr-2" />
+                        Login
+                      </Link>
+                    </DropdownMenuItem>
+                    <DropdownMenuItem asChild>
+                      <Link to="/register" className="flex items-center">
+                        <UserCircle size={16} className="mr-2" />
+                        Sign Up
+                      </Link>
+                    </DropdownMenuItem>
+                  </>
+                )}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
+            {/* Wishlist - only show count for authenticated users */}
             <Link to="/wishlist" className="relative hover:text-primary transition-colors">
               <Heart size={20} />
-              {wishlistItems > 0 && (
+              {isAuthenticated && wishlistItems > 0 && (
                 <span className="absolute -top-2 -right-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
                   {wishlistItems > 99 ? '99+' : wishlistItems}
                 </span>
               )}
             </Link>
+
+            {/* Cart - show count for all users */}
             <Link to="/cart" className="relative hover:text-primary transition-colors">
               <ShoppingCart size={20} />
               {totalItems > 0 && (
@@ -122,13 +187,15 @@ const Navbar = () => {
             >
               Contact
             </Link>
-            <Link 
-              to="/wishlist" 
-              className="block font-medium hover:text-primary transition-colors"
-              onClick={() => setIsMenuOpen(false)}
-            >
-              Wishlist
-            </Link>
+            {isAuthenticated && (
+              <Link 
+                to="/wishlist" 
+                className="block font-medium hover:text-primary transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Wishlist
+              </Link>
+            )}
           </div>
         </div>
       )}

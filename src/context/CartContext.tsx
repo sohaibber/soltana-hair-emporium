@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useReducer, useEffect } from "react";
 import { toast } from "sonner";
 
@@ -148,6 +147,18 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         dispatch({ type: "ADD_ITEM", payload: item });
       });
     }
+  }, []);
+
+  // Listen for storage events to clear cart when user logs out
+  useEffect(() => {
+    const handleStorageChange = (e: StorageEvent) => {
+      if (e.key === 'soltanaCart' && e.newValue === null) {
+        dispatch({ type: "CLEAR_CART" });
+      }
+    };
+
+    window.addEventListener('storage', handleStorageChange);
+    return () => window.removeEventListener('storage', handleStorageChange);
   }, []);
 
   // Context value
