@@ -25,26 +25,47 @@ const mockReviews = [
   {
     id: 'mock-1',
     user_id: 'mock-user-1',
+    product_id: 'mock-product',
     rating: 5,
     comment: "These extensions blend perfectly with my hair! I'm so impressed with the quality and how natural they look. Will definitely purchase again.",
     created_at: '2023-03-15T10:00:00Z',
+    updated_at: '2023-03-15T10:00:00Z',
+    image_url: null,
     isMock: true,
+    profiles: {
+      first_name: 'Sophie',
+      last_name: 'M.'
+    }
   },
   {
     id: 'mock-2',
     user_id: 'mock-user-2',
+    product_id: 'mock-product',
     rating: 4,
     comment: "Great quality hair, very soft and easy to style. The clips are secure and comfortable. I removed one star because the color was slightly different than expected, but still looks good.",
     created_at: '2023-02-02T15:30:00Z',
+    updated_at: '2023-02-02T15:30:00Z',
+    image_url: null,
     isMock: true,
+    profiles: {
+      first_name: 'Jennifer',
+      last_name: 'L.'
+    }
   },
   {
     id: 'mock-3',
     user_id: 'mock-user-3',
+    product_id: 'mock-product',
     rating: 5,
     comment: "Absolutely love these extensions! They match my hair perfectly and add so much volume. I've received so many compliments!",
     created_at: '2023-01-10T09:15:00Z',
+    updated_at: '2023-01-10T09:15:00Z',
+    image_url: null,
     isMock: true,
+    profiles: {
+      first_name: 'Rachel',
+      last_name: 'T.'
+    }
   },
 ];
 
@@ -90,12 +111,15 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Fetch reviews for the product
+  // Fetch reviews for the product - Now with proper database relationship
   const fetchReviews = async () => {
     if (!id) return;
     
+    console.log("Fetching reviews for product:", id);
+    
     try {
-      const { data, error } = await supabase
+      // Fetch reviews with profile information using the proper join
+      const { data: reviewsData, error } = await supabase
         .from('reviews')
         .select(`
           *,
@@ -109,20 +133,27 @@ const ProductDetail = () => {
       
       if (error) {
         console.error("Error fetching reviews:", error);
+        // Just show mock reviews if there's an error
+        setReviews(mockReviews);
         return;
       }
       
-      // Combine real reviews with mock reviews
-      const allReviews = [...(data || []), ...mockReviews];
+      console.log("Reviews data from database:", reviewsData);
+      
+      // Combine real reviews with mock reviews for demonstration
+      const allReviews = [...(reviewsData || []), ...mockReviews];
+      console.log("All reviews combined:", allReviews);
       setReviews(allReviews);
       
       // Check if current user has reviewed this product
-      if (user && data) {
-        const currentUserReview = data.find(review => review.user_id === user.id);
+      if (user && reviewsData) {
+        const currentUserReview = reviewsData.find(review => review.user_id === user.id);
         setUserReview(currentUserReview || null);
       }
     } catch (error) {
       console.error("Exception fetching reviews:", error);
+      // Fallback to mock reviews
+      setReviews(mockReviews);
     }
   };
   
@@ -333,6 +364,7 @@ const ProductDetail = () => {
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 md:py-12">
+        {/* Product Images */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
           {/* Product Images */}
           <div>
@@ -579,17 +611,17 @@ const ProductDetail = () => {
               )}
               
               <div className="space-y-6">
-                {reviews.map((review) => (
-                  <ReviewItem
-                    key={review.id}
-                    review={review}
-                    onEdit={handleEditReview}
-                    onDelete={handleDeleteReview}
-                    isMockReview={review.isMock}
-                  />
-                ))}
-                
-                {reviews.length === 0 && (
+                {reviews.length > 0 ? (
+                  reviews.map((review) => (
+                    <ReviewItem
+                      key={review.id}
+                      review={review}
+                      onEdit={handleEditReview}
+                      onDelete={handleDeleteReview}
+                      isMockReview={review.isMock}
+                    />
+                  ))
+                ) : (
                   <p className="text-gray-500 text-center py-8">
                     No reviews yet. Be the first to review this product!
                   </p>
