@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -13,36 +12,39 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import Layout from "@/components/layout/Layout";
 import ProductRecommendations from "@/components/shop/ProductRecommendations";
+import ReviewForm from "@/components/shop/ReviewForm";
+import ReviewItem from "@/components/shop/ReviewItem";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
+import { useAuth } from "@/context/AuthContext";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
-// Default values for product reviews
-const defaultReviews = [
+// Mock reviews data to ensure products aren't empty
+const mockReviews = [
   {
-    id: 1,
-    user: "Sophie M.",
+    id: 'mock-1',
+    user_id: 'mock-user-1',
     rating: 5,
-    date: "March 15, 2023",
     comment: "These extensions blend perfectly with my hair! I'm so impressed with the quality and how natural they look. Will definitely purchase again.",
-    verified: true,
+    created_at: '2023-03-15T10:00:00Z',
+    isMock: true,
   },
   {
-    id: 2,
-    user: "Jennifer L.",
+    id: 'mock-2',
+    user_id: 'mock-user-2',
     rating: 4,
-    date: "February 2, 2023",
     comment: "Great quality hair, very soft and easy to style. The clips are secure and comfortable. I removed one star because the color was slightly different than expected, but still looks good.",
-    verified: true,
+    created_at: '2023-02-02T15:30:00Z',
+    isMock: true,
   },
   {
-    id: 3,
-    user: "Rachel T.",
+    id: 'mock-3',
+    user_id: 'mock-user-3',
     rating: 5,
-    date: "January 10, 2023",
     comment: "Absolutely love these extensions! They match my hair perfectly and add so much volume. I've received so many compliments!",
-    verified: true,
+    created_at: '2023-01-10T09:15:00Z',
+    isMock: true,
   },
 ];
 
@@ -59,16 +61,20 @@ interface ProductData {
   colors: string[];
   lengths: string[];
   images: string[];
-  reviews: typeof defaultReviews;
   category: string;
 }
 
 const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
   const [product, setProduct] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
+  const [reviews, setReviews] = useState<any[]>([]);
+  const [showReviewForm, setShowReviewForm] = useState(false);
+  const [editingReview, setEditingReview] = useState<any>(null);
+  const [userReview, setUserReview] = useState<any>(null);
   
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedLength, setSelectedLength] = useState<string>("");
@@ -82,6 +88,42 @@ const ProductDetail = () => {
       return path;
     }
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
+  };
+  
+  // Fetch reviews for the product
+  const fetchReviews = async () => {
+    if (!id) return;
+    
+    try {
+      const { data, error } = await supabase
+        .from('reviews')
+        .select(`
+          *,
+          profiles (
+            first_name,
+            last_name
+          )
+        `)
+        .eq('product_id', id)
+        .order('created_at', { ascending: false });
+      
+      if (error) {
+        console.error("Error fetching reviews:", error);
+        return;
+      }
+      
+      // Combine real reviews with mock reviews
+      const allReviews = [...(data || []), ...mockReviews];
+      setReviews(allReviews);
+      
+      // Check if current user has reviewed this product
+      if (user && data) {
+        const currentUserReview = data.find(review => review.user_id === user.id);
+        setUserReview(currentUserReview || null);
+      }
+    } catch (error) {
+      console.error("Exception fetching reviews:", error);
+    }
   };
   
   // Fetch product data
@@ -120,7 +162,6 @@ const ProductDetail = () => {
           colors: data.tags as string[] || [],
           lengths: standardLengths,
           images: formattedImages,
-          reviews: defaultReviews,
           details: [
             "100% Remy human hair",
             "Double weft for extra volume",
@@ -147,6 +188,9 @@ const ProductDetail = () => {
         if (productData.lengths.length > 0) {
           setSelectedLength(productData.lengths[0]);
         }
+        
+        // Fetch reviews after product is loaded
+        await fetchReviews();
       } catch (error) {
         console.error("Exception loading product:", error);
         toast.error("Failed to load product details");
@@ -156,7 +200,48 @@ const ProductDetail = () => {
     };
     
     fetchProduct();
-  }, [id, navigate]);
+  }, [id, navigate, user]);
+  
+  // Refresh reviews when user logs in/out
+  useEffect(() => {
+    if (id) {
+      fetchReviews();
+    }
+  }, [user?.id, id]);
+  
+  const handleReviewSuccess = () => {
+    setShowReviewForm(false);
+    setEditingReview(null);
+    fetchReviews();
+  };
+  
+  const handleEditReview = (review: any) => {
+    setEditingReview(review);
+    setShowReviewForm(true);
+  };
+  
+  const handleDeleteReview = async (reviewId: string) => {
+    if (!confirm("Are you sure you want to delete this review?")) return;
+    
+    try {
+      const { error } = await supabase
+        .from('reviews')
+        .delete()
+        .eq('id', reviewId);
+      
+      if (error) {
+        console.error("Error deleting review:", error);
+        toast.error("Failed to delete review");
+        return;
+      }
+      
+      toast.success("Review deleted successfully");
+      fetchReviews();
+    } catch (error) {
+      console.error("Exception deleting review:", error);
+      toast.error("Failed to delete review");
+    }
+  };
   
   // Show loading state
   if (loading) {
@@ -313,7 +398,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-600">
-                ({product.reviews.length} reviews)
+                ({reviews.length} reviews)
               </span>
             </div>
             
@@ -428,7 +513,7 @@ const ProductDetail = () => {
             <TabsList className="mb-6 justify-start">
               <TabsTrigger value="details">Product Details</TabsTrigger>
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews ({product.reviews.length})</TabsTrigger>
+              <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
             </TabsList>
             <TabsContent value="details" className="bg-white p-6 rounded-lg border">
               <div className="prose max-w-none">
@@ -453,42 +538,62 @@ const ProductDetail = () => {
               </div>
             </TabsContent>
             <TabsContent value="reviews" className="bg-white p-6 rounded-lg border">
-              <h3 className="text-xl font-medium mb-6">Customer Reviews</h3>
+              <div className="flex justify-between items-center mb-6">
+                <h3 className="text-xl font-medium">Customer Reviews</h3>
+                
+                {isAuthenticated && !userReview && !showReviewForm && (
+                  <Button 
+                    onClick={() => setShowReviewForm(true)}
+                    className="bg-soltana-dark hover:bg-black"
+                  >
+                    Write a Review
+                  </Button>
+                )}
+              </div>
+              
+              {!isAuthenticated && (
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
+                  <p className="text-sm text-gray-600">
+                    Please <button 
+                      onClick={() => navigate('/login')} 
+                      className="text-soltana-dark hover:underline"
+                    >
+                      log in
+                    </button> to write a review.
+                  </p>
+                </div>
+              )}
+              
+              {showReviewForm && (
+                <div className="mb-6">
+                  <ReviewForm
+                    productId={product.id}
+                    existingReview={editingReview}
+                    onSuccess={handleReviewSuccess}
+                    onCancel={() => {
+                      setShowReviewForm(false);
+                      setEditingReview(null);
+                    }}
+                  />
+                </div>
+              )}
+              
               <div className="space-y-6">
-                {product.reviews.map((review) => (
-                  <div key={review.id} className="border-b pb-6 last:border-b-0 last:pb-0">
-                    <div className="flex justify-between mb-2">
-                      <div className="font-medium">{review.user}</div>
-                      <div className="text-gray-500 text-sm">{review.date}</div>
-                    </div>
-                    <div className="flex items-center mb-2">
-                      <div className="flex text-amber-500">
-                        {[1, 2, 3, 4, 5].map((star) => (
-                          <svg
-                            key={star}
-                            xmlns="http://www.w3.org/2000/svg"
-                            viewBox="0 0 24 24"
-                            fill={star <= review.rating ? "currentColor" : "none"}
-                            stroke={star <= review.rating ? "none" : "currentColor"}
-                            className="w-4 h-4"
-                          >
-                            <path
-                              fillRule="evenodd"
-                              d="M10.788 3.21c.448-1.077 1.976-1.077 2.424 0l2.082 5.007 5.404.433c1.164.093 1.636 1.545.749 2.305l-4.117 3.527 1.257 5.273c.271 1.136-.964 2.033-1.96 1.425L12 18.354 7.373 21.18c-.996.608-2.231-.29-1.96-1.425l1.257-5.273-4.117-3.527c-.887-.76-.415-2.212.749-2.305l5.404-.433 2.082-5.006z"
-                              clipRule="evenodd"
-                            />
-                          </svg>
-                        ))}
-                      </div>
-                      {review.verified && (
-                        <div className="ml-2 px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded border border-green-200">
-                          Verified Purchase
-                        </div>
-                      )}
-                    </div>
-                    <p className="text-gray-700">{review.comment}</p>
-                  </div>
+                {reviews.map((review) => (
+                  <ReviewItem
+                    key={review.id}
+                    review={review}
+                    onEdit={handleEditReview}
+                    onDelete={handleDeleteReview}
+                    isMockReview={review.isMock}
+                  />
                 ))}
+                
+                {reviews.length === 0 && (
+                  <p className="text-gray-500 text-center py-8">
+                    No reviews yet. Be the first to review this product!
+                  </p>
+                )}
               </div>
             </TabsContent>
           </Tabs>
