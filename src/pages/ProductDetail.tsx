@@ -576,7 +576,7 @@ const ProductDetail = () => {
                 {isAuthenticated && !userReview && !showReviewForm && (
                   <Button 
                     onClick={() => setShowReviewForm(true)}
-                    className="bg-soltana-dark hover:bg-black"
+                    className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                   >
                     Write a Review
                   </Button>

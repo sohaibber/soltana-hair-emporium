@@ -83,8 +83,14 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
     try {
       setSubmitting(true);
       
+      const user = (await supabase.auth.getUser()).data.user;
+      if (!user) {
+        toast.error("You must be logged in to write a review");
+        return;
+      }
+
       const reviewData = {
-        user_id: (await supabase.auth.getUser()).data.user?.id,
+        user_id: user.id,
         product_id: productId,
         rating,
         comment: comment.trim(),
@@ -107,6 +113,24 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
         
         error = updateError;
       } else {
+        // Check if user already has a review for this product
+        const { data: existingReviews, error: checkError } = await supabase
+          .from('reviews')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('product_id', productId);
+
+        if (checkError) {
+          console.error("Error checking existing reviews:", checkError);
+          toast.error("Failed to check existing reviews");
+          return;
+        }
+
+        if (existingReviews && existingReviews.length > 0) {
+          toast.error("You have already reviewed this product. You can edit your existing review instead.");
+          return;
+        }
+
         // Create new review
         const { error: insertError } = await supabase
           .from('reviews')
@@ -117,7 +141,11 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
       if (error) {
         console.error("Error saving review:", error);
-        toast.error("Failed to save review");
+        if (error.code === '23505') {
+          toast.error("You have already reviewed this product. Please edit your existing review instead.");
+        } else {
+          toast.error("Failed to save review");
+        }
         return;
       }
 
@@ -222,7 +250,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           <Button 
             type="submit" 
             disabled={submitting || uploading}
-            className="bg-soltana-dark hover:bg-black"
+            className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
           >
             {submitting ? 'Saving...' : existingReview ? 'Update Review' : 'Submit Review'}
           </Button>
