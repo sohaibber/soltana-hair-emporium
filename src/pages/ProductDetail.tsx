@@ -111,18 +111,25 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Fetch reviews for the product - Now with proper database relationship
+  // Fetch reviews for the product with improved error handling and logging
   const fetchReviews = async () => {
     if (!id) return;
     
     console.log("Fetching reviews for product:", id);
     
     try {
-      // Fetch reviews with profile information using the proper join
+      // First, let's try a simpler query to get reviews
       const { data: reviewsData, error } = await supabase
         .from('reviews')
         .select(`
-          *,
+          id,
+          user_id,
+          product_id,
+          rating,
+          comment,
+          image_url,
+          created_at,
+          updated_at,
           profiles (
             first_name,
             last_name
@@ -138,16 +145,25 @@ const ProductDetail = () => {
         return;
       }
       
-      console.log("Reviews data from database:", reviewsData);
+      console.log("Raw reviews data from database:", reviewsData);
+      
+      // Process the reviews data
+      const processedReviews = reviewsData?.map(review => ({
+        ...review,
+        isMock: false
+      })) || [];
+      
+      console.log("Processed reviews:", processedReviews);
       
       // Combine real reviews with mock reviews for demonstration
-      const allReviews = [...(reviewsData || []), ...mockReviews];
+      const allReviews = [...processedReviews, ...mockReviews];
       console.log("All reviews combined:", allReviews);
       setReviews(allReviews);
       
       // Check if current user has reviewed this product
-      if (user && reviewsData) {
-        const currentUserReview = reviewsData.find(review => review.user_id === user.id);
+      if (user && processedReviews) {
+        const currentUserReview = processedReviews.find(review => review.user_id === user.id);
+        console.log("Current user review found:", currentUserReview);
         setUserReview(currentUserReview || null);
       }
     } catch (error) {
@@ -241,9 +257,13 @@ const ProductDetail = () => {
   }, [user?.id, id]);
   
   const handleReviewSuccess = () => {
+    console.log("Review submitted successfully, refreshing reviews...");
     setShowReviewForm(false);
     setEditingReview(null);
-    fetchReviews();
+    // Force refresh reviews after successful submission
+    setTimeout(() => {
+      fetchReviews();
+    }, 500);
   };
   
   const handleEditReview = (review: any) => {
