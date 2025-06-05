@@ -111,60 +111,70 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Fetch reviews for the product with improved error handling and logging
+  // Fetch reviews for the product with better error handling
   const fetchReviews = async () => {
     if (!id) return;
     
     console.log("Fetching reviews for product:", id);
     
     try {
-      // First, let's try a simpler query to get reviews
-      const { data: reviewsData, error } = await supabase
+      // First, fetch reviews without the profile join to see if reviews exist
+      const { data: basicReviews, error: basicError } = await supabase
         .from('reviews')
-        .select(`
-          id,
-          user_id,
-          product_id,
-          rating,
-          comment,
-          image_url,
-          created_at,
-          updated_at,
-          profiles (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('product_id', id)
         .order('created_at', { ascending: false });
-      
-      if (error) {
-        console.error("Error fetching reviews:", error);
-        // Just show mock reviews if there's an error
+
+      console.log("Basic reviews query result:", { basicReviews, basicError });
+
+      if (basicError) {
+        console.error("Error fetching basic reviews:", basicError);
         setReviews(mockReviews);
         return;
       }
+
+      // If we have reviews, fetch user profiles separately
+      let reviewsWithProfiles = [];
       
-      console.log("Raw reviews data from database:", reviewsData);
+      if (basicReviews && basicReviews.length > 0) {
+        console.log("Found reviews, fetching user profiles...");
+        
+        // Get unique user IDs
+        const userIds = [...new Set(basicReviews.map(review => review.user_id))];
+        
+        // Fetch profiles for these users
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', userIds);
+
+        console.log("Profiles query result:", { profiles, profilesError });
+
+        // Combine reviews with profile data
+        reviewsWithProfiles = basicReviews.map(review => ({
+          ...review,
+          isMock: false,
+          profiles: profiles?.find(profile => profile.id === review.user_id) || {
+            first_name: 'Anonymous',
+            last_name: 'User'
+          }
+        }));
+      }
       
-      // Process the reviews data
-      const processedReviews = reviewsData?.map(review => ({
-        ...review,
-        isMock: false
-      })) || [];
+      console.log("Processed reviews with profiles:", reviewsWithProfiles);
       
-      console.log("Processed reviews:", processedReviews);
-      
-      // Combine real reviews with mock reviews for demonstration
-      const allReviews = [...processedReviews, ...mockReviews];
+      // Combine real reviews with mock reviews
+      const allReviews = [...reviewsWithProfiles, ...mockReviews];
       console.log("All reviews combined:", allReviews);
       setReviews(allReviews);
       
       // Check if current user has reviewed this product
-      if (user && processedReviews) {
-        const currentUserReview = processedReviews.find(review => review.user_id === user.id);
+      if (user && reviewsWithProfiles.length > 0) {
+        const currentUserReview = reviewsWithProfiles.find(review => review.user_id === user.id);
         console.log("Current user review found:", currentUserReview);
         setUserReview(currentUserReview || null);
+      } else {
+        setUserReview(null);
       }
     } catch (error) {
       console.error("Exception fetching reviews:", error);
@@ -260,10 +270,10 @@ const ProductDetail = () => {
     console.log("Review submitted successfully, refreshing reviews...");
     setShowReviewForm(false);
     setEditingReview(null);
-    // Force refresh reviews after successful submission
+    // Force refresh reviews after successful submission with longer delay
     setTimeout(() => {
       fetchReviews();
-    }, 500);
+    }, 1000);
   };
   
   const handleEditReview = (review: any) => {
