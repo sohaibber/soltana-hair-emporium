@@ -118,59 +118,86 @@ const ProductDetail = () => {
     console.log("Fetching reviews for product:", id);
     
     try {
-      // First, fetch reviews without the profile join to see if reviews exist
-      const { data: basicReviews, error: basicError } = await supabase
+      // Try a comprehensive query with all data we need
+      const { data: reviewsData, error } = await supabase
         .from('reviews')
-        .select('*')
+        .select(`
+          id,
+          user_id,
+          product_id,
+          rating,
+          comment,
+          image_url,
+          created_at,
+          updated_at,
+          profiles!inner (
+            id,
+            first_name,
+            last_name
+          )
+        `)
         .eq('product_id', id)
         .order('created_at', { ascending: false });
 
-      console.log("Basic reviews query result:", { basicReviews, basicError });
+      console.log("Reviews query result:", { reviewsData, error });
 
-      if (basicError) {
-        console.error("Error fetching basic reviews:", basicError);
-        setReviews(mockReviews);
-        return;
-      }
-
-      // If we have reviews, fetch user profiles separately
-      let reviewsWithProfiles = [];
-      
-      if (basicReviews && basicReviews.length > 0) {
-        console.log("Found reviews, fetching user profiles...");
+      if (error) {
+        console.error("Error fetching reviews with profiles:", error);
         
-        // Get unique user IDs
-        const userIds = [...new Set(basicReviews.map(review => review.user_id))];
+        // Try fallback query without profiles join
+        const { data: basicReviews, error: basicError } = await supabase
+          .from('reviews')
+          .select('*')
+          .eq('product_id', id)
+          .order('created_at', { ascending: false });
+          
+        console.log("Fallback basic reviews query:", { basicReviews, basicError });
         
-        // Fetch profiles for these users
-        const { data: profiles, error: profilesError } = await supabase
-          .from('profiles')
-          .select('id, first_name, last_name')
-          .in('id', userIds);
-
-        console.log("Profiles query result:", { profiles, profilesError });
-
-        // Combine reviews with profile data
-        reviewsWithProfiles = basicReviews.map(review => ({
+        if (basicError) {
+          console.error("Error with fallback query:", basicError);
+          setReviews(mockReviews);
+          return;
+        }
+        
+        // Process basic reviews without profile data
+        const processedReviews = basicReviews?.map(review => ({
           ...review,
           isMock: false,
-          profiles: profiles?.find(profile => profile.id === review.user_id) || {
+          profiles: {
             first_name: 'Anonymous',
             last_name: 'User'
           }
-        }));
+        })) || [];
+        
+        const allReviews = [...processedReviews, ...mockReviews];
+        setReviews(allReviews);
+        
+        // Check current user review
+        if (user && processedReviews.length > 0) {
+          const currentUserReview = processedReviews.find(review => review.user_id === user.id);
+          setUserReview(currentUserReview || null);
+        } else {
+          setUserReview(null);
+        }
+        return;
       }
+
+      // Process successful query with profiles
+      const processedReviews = reviewsData?.map(review => ({
+        ...review,
+        isMock: false
+      })) || [];
       
-      console.log("Processed reviews with profiles:", reviewsWithProfiles);
+      console.log("Processed reviews with profiles:", processedReviews);
       
       // Combine real reviews with mock reviews
-      const allReviews = [...reviewsWithProfiles, ...mockReviews];
+      const allReviews = [...processedReviews, ...mockReviews];
       console.log("All reviews combined:", allReviews);
       setReviews(allReviews);
       
       // Check if current user has reviewed this product
-      if (user && reviewsWithProfiles.length > 0) {
-        const currentUserReview = reviewsWithProfiles.find(review => review.user_id === user.id);
+      if (user && processedReviews.length > 0) {
+        const currentUserReview = processedReviews.find(review => review.user_id === user.id);
         console.log("Current user review found:", currentUserReview);
         setUserReview(currentUserReview || null);
       } else {
@@ -273,7 +300,7 @@ const ProductDetail = () => {
     // Force refresh reviews after successful submission with longer delay
     setTimeout(() => {
       fetchReviews();
-    }, 1000);
+    }, 2000);
   };
   
   const handleEditReview = (review: any) => {
