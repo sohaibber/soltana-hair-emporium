@@ -93,6 +93,7 @@ const ProductDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
   const [reviews, setReviews] = useState<any[]>([]);
+  const [reviewsLoading, setReviewsLoading] = useState(false);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState<any>(null);
   const [userReview, setUserReview] = useState<any>(null);
@@ -111,27 +112,20 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Fetch reviews for the product with better error handling
+  // Improved reviews fetching with better error handling
   const fetchReviews = async () => {
     if (!id) return;
     
-    console.log("Fetching reviews for product:", id);
+    console.log("=== Starting to fetch reviews for product:", id);
+    setReviewsLoading(true);
     
     try {
-      // Try a comprehensive query with all data we need
-      const { data: reviewsData, error } = await supabase
+      // First, try to get reviews with profiles using a left join
+      const { data: reviewsWithProfiles, error: profilesError } = await supabase
         .from('reviews')
         .select(`
-          id,
-          user_id,
-          product_id,
-          rating,
-          comment,
-          image_url,
-          created_at,
-          updated_at,
-          profiles!inner (
-            id,
+          *,
+          profiles:user_id (
             first_name,
             last_name
           )
@@ -139,56 +133,65 @@ const ProductDetail = () => {
         .eq('product_id', id)
         .order('created_at', { ascending: false });
 
-      console.log("Reviews query result:", { reviewsData, error });
+      console.log("Reviews with profiles query result:", { reviewsWithProfiles, profilesError });
 
-      if (error) {
-        console.error("Error fetching reviews with profiles:", error);
+      if (profilesError) {
+        console.error("Error fetching reviews with profiles:", profilesError);
         
-        // Try fallback query without profiles join
+        // Fallback: Get reviews without profiles
         const { data: basicReviews, error: basicError } = await supabase
           .from('reviews')
           .select('*')
           .eq('product_id', id)
           .order('created_at', { ascending: false });
           
-        console.log("Fallback basic reviews query:", { basicReviews, basicError });
+        console.log("Basic reviews fallback:", { basicReviews, basicError });
         
         if (basicError) {
-          console.error("Error with fallback query:", basicError);
+          console.error("Error with basic reviews query:", basicError);
+          // Still show mock reviews even if we can't fetch real ones
           setReviews(mockReviews);
+          setReviewsLoading(false);
           return;
         }
         
         // Process basic reviews without profile data
-        const processedReviews = basicReviews?.map(review => ({
+        const processedBasicReviews = (basicReviews || []).map(review => ({
           ...review,
           isMock: false,
           profiles: {
             first_name: 'Anonymous',
             last_name: 'User'
           }
-        })) || [];
+        }));
         
-        const allReviews = [...processedReviews, ...mockReviews];
+        console.log("Processed basic reviews:", processedBasicReviews);
+        
+        // Combine with mock reviews
+        const allReviews = [...processedBasicReviews, ...mockReviews];
         setReviews(allReviews);
         
-        // Check current user review
-        if (user && processedReviews.length > 0) {
-          const currentUserReview = processedReviews.find(review => review.user_id === user.id);
+        // Set user review if found
+        if (user) {
+          const currentUserReview = processedBasicReviews.find(review => review.user_id === user.id);
           setUserReview(currentUserReview || null);
-        } else {
-          setUserReview(null);
         }
+        
+        setReviewsLoading(false);
         return;
       }
 
-      // Process successful query with profiles
-      const processedReviews = reviewsData?.map(review => ({
+      // Success case: process reviews with profiles
+      const processedReviews = (reviewsWithProfiles || []).map(review => ({
         ...review,
-        isMock: false
-      })) || [];
+        isMock: false,
+        profiles: review.profiles || {
+          first_name: 'Anonymous',
+          last_name: 'User'
+        }
+      }));
       
-      console.log("Processed reviews with profiles:", processedReviews);
+      console.log("Successfully processed reviews with profiles:", processedReviews);
       
       // Combine real reviews with mock reviews
       const allReviews = [...processedReviews, ...mockReviews];
@@ -196,17 +199,20 @@ const ProductDetail = () => {
       setReviews(allReviews);
       
       // Check if current user has reviewed this product
-      if (user && processedReviews.length > 0) {
+      if (user) {
         const currentUserReview = processedReviews.find(review => review.user_id === user.id);
         console.log("Current user review found:", currentUserReview);
         setUserReview(currentUserReview || null);
       } else {
         setUserReview(null);
       }
+      
     } catch (error) {
-      console.error("Exception fetching reviews:", error);
+      console.error("Exception while fetching reviews:", error);
       // Fallback to mock reviews
       setReviews(mockReviews);
+    } finally {
+      setReviewsLoading(false);
     }
   };
   
@@ -284,23 +290,26 @@ const ProductDetail = () => {
     };
     
     fetchProduct();
-  }, [id, navigate, user]);
+  }, [id, navigate]);
   
-  // Refresh reviews when user logs in/out
+  // Refresh reviews when user authentication changes
   useEffect(() => {
-    if (id) {
+    if (id && product) {
+      console.log("User authentication changed, refetching reviews...");
       fetchReviews();
     }
-  }, [user?.id, id]);
+  }, [user?.id, id, product]);
   
   const handleReviewSuccess = () => {
-    console.log("Review submitted successfully, refreshing reviews...");
+    console.log("=== Review submitted successfully! Refreshing reviews...");
     setShowReviewForm(false);
     setEditingReview(null);
-    // Force refresh reviews after successful submission with longer delay
+    
+    // Immediately refresh reviews after successful submission
     setTimeout(() => {
+      console.log("=== Executing delayed review refresh...");
       fetchReviews();
-    }, 2000);
+    }, 1000);
   };
   
   const handleEditReview = (review: any) => {
@@ -667,23 +676,30 @@ const ProductDetail = () => {
                 </div>
               )}
               
-              <div className="space-y-6">
-                {reviews.length > 0 ? (
-                  reviews.map((review) => (
-                    <ReviewItem
-                      key={review.id}
-                      review={review}
-                      onEdit={handleEditReview}
-                      onDelete={handleDeleteReview}
-                      isMockReview={review.isMock}
-                    />
-                  ))
-                ) : (
-                  <p className="text-gray-500 text-center py-8">
-                    No reviews yet. Be the first to review this product!
-                  </p>
-                )}
-              </div>
+              {reviewsLoading ? (
+                <div className="text-center py-8">
+                  <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+                  <p className="mt-2 text-gray-600">Loading reviews...</p>
+                </div>
+              ) : (
+                <div className="space-y-6">
+                  {reviews.length > 0 ? (
+                    reviews.map((review) => (
+                      <ReviewItem
+                        key={review.id}
+                        review={review}
+                        onEdit={handleEditReview}
+                        onDelete={handleDeleteReview}
+                        isMockReview={review.isMock}
+                      />
+                    ))
+                  ) : (
+                    <p className="text-gray-500 text-center py-8">
+                      No reviews yet. Be the first to review this product!
+                    </p>
+                  )}
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
