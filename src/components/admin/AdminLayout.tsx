@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
@@ -17,7 +16,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const location = useLocation();
   const navigate = useNavigate();
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const { toast } = useToast();
   
   const handleLogout = async () => {
@@ -109,7 +108,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
               </div>
               <div>
                 <p className="font-medium">Admin User</p>
-                <p className="text-xs text-gray-500">admin@example.com</p>
+                <p className="text-xs text-gray-500">{user?.email || 'admin@example.com'}</p>
               </div>
             </div>
             
