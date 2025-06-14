@@ -98,6 +98,10 @@ const translations = {
     'common.search': 'Search',
     'common.searchPlaceholder': 'Search for products...',
     'common.language': 'Language',
+    
+    // Instagram section
+    'instagram.followUs': 'Follow Us on Instagram',
+    'instagram.handle': '@soltanahair',
   },
   fr: {
     // Navigation
@@ -187,6 +191,10 @@ const translations = {
     'common.search': 'Rechercher',
     'common.searchPlaceholder': 'Rechercher des produits...',
     'common.language': 'Langue',
+    
+    // Instagram section
+    'instagram.followUs': 'Suivez-nous sur Instagram',
+    'instagram.handle': '@soltanahair',
   },
   ar: {
     // Navigation
@@ -276,6 +284,10 @@ const translations = {
     'common.search': 'بحث',
     'common.searchPlaceholder': 'البحث عن المنتجات...',
     'common.language': 'اللغة',
+    
+    // Instagram section
+    'instagram.followUs': 'تابعونا على إنستغرام',
+    'instagram.handle': '@soltanahair',
   },
 };
 

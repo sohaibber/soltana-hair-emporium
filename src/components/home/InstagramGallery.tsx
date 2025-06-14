@@ -1,8 +1,10 @@
-
 import React from "react";
 import { Instagram } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const InstagramGallery: React.FC = () => {
+  const { t } = useLanguage();
+
   // Mock Instagram posts - would be fetched from Instagram API in a real app
   const instagramPosts = [
     {
@@ -47,14 +49,14 @@ const InstagramGallery: React.FC = () => {
     <section className="py-12 md:py-16">
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between mb-10">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold">Follow Us on Instagram</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold">{t('instagram.followUs')}</h2>
           <a 
             href="https://instagram.com" 
             target="_blank" 
             rel="noopener noreferrer"
             className="flex items-center text-sm font-medium hover:text-primary transition-colors"
           >
-            <Instagram size={16} className="mr-1" /> @soltanahair
+            <Instagram size={16} className="mr-1" /> {t('instagram.handle')}
           </a>
         </div>
         
