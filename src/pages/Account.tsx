@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import UserSidebar from "@/components/user/UserSidebar";
+import AddressList from "@/components/address/AddressList";
 
 interface Profile {
   id: string;
@@ -172,14 +173,7 @@ const Account: React.FC = () => {
                 </TabsContent>
                 
                 <TabsContent value="address" className="space-y-6">
-                  <div className="flex justify-between items-center">
-                    <h2 className="text-xl font-medium">Saved Addresses</h2>
-                    <Button variant="outline">Add New Address</Button>
-                  </div>
-                  
-                  <div className="bg-gray-50 p-6 text-center rounded">
-                    <p className="text-gray-600">You don't have any saved addresses yet.</p>
-                  </div>
+                  <AddressList />
                 </TabsContent>
                 
                 <TabsContent value="password" className="space-y-6">

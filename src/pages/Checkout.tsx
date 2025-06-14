@@ -1,10 +1,11 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, CreditCard, Info, Truck, Banknote } from "lucide-react";
+import { Check, CreditCard, Info, Truck, Banknote, MapPin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Separator } from "@/components/ui/separator";
 import { useToast } from "@/components/ui/use-toast";
 import { useCart } from "@/context/CartContext";
@@ -13,11 +14,29 @@ import Layout from "@/components/layout/Layout";
 import { supabase } from "@/integrations/supabase/client";
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
+interface SavedAddress {
+  id: string;
+  label: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  zip_code: string;
+  country: string;
+  is_default: boolean;
+}
+
 const Checkout: React.FC = () => {
   const { items, totalItems, totalPrice, clearCart } = useCart();
   const { user, isAuthenticated } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [selectedAddressId, setSelectedAddressId] = useState<string>("");
+  const [useNewAddress, setUseNewAddress] = useState(false);
   
   const [formData, setFormData] = useState({
     firstName: "",
@@ -37,26 +56,55 @@ const Checkout: React.FC = () => {
   const [showLoadingDialog, setShowLoadingDialog] = useState(false);
   const [paymentError, setPaymentError] = useState<string | null>(null);
   
-  // Load user data if authenticated
+  // Load user data and saved addresses if authenticated
   useEffect(() => {
     const loadUserData = async () => {
       if (!isAuthenticated || !user) return;
       
       try {
-        const { data, error } = await supabase
+        // Load profile data
+        const { data: profileData, error: profileError } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
           
-        if (error) throw error;
+        if (profileError) throw profileError;
         
-        if (data) {
+        // Load saved addresses
+        const { data: addressData, error: addressError } = await supabase
+          .from('user_addresses')
+          .select('*')
+          .eq('user_id', user.id)
+          .order('is_default', { ascending: false })
+          .order('created_at', { ascending: false });
+          
+        if (addressError) throw addressError;
+        
+        setSavedAddresses(addressData || []);
+        
+        // Auto-select default address if available
+        const defaultAddress = addressData?.find(addr => addr.is_default);
+        if (defaultAddress) {
+          setSelectedAddressId(defaultAddress.id);
           setFormData(prev => ({
             ...prev,
-            firstName: data.first_name || '',
-            lastName: data.last_name || '',
-            email: data.email || user.email || '',
+            firstName: defaultAddress.first_name,
+            lastName: defaultAddress.last_name,
+            email: profileData?.email || user.email || '',
+            phone: defaultAddress.phone,
+            address: defaultAddress.address,
+            city: defaultAddress.city,
+            state: defaultAddress.state,
+            zipCode: defaultAddress.zip_code,
+            country: defaultAddress.country,
+          }));
+        } else if (profileData) {
+          setFormData(prev => ({
+            ...prev,
+            firstName: profileData.first_name || '',
+            lastName: profileData.last_name || '',
+            email: profileData.email || user.email || '',
           }));
         }
       } catch (error) {
@@ -66,6 +114,40 @@ const Checkout: React.FC = () => {
     
     loadUserData();
   }, [user, isAuthenticated]);
+
+  const handleAddressSelect = (addressId: string) => {
+    if (addressId === "new") {
+      setUseNewAddress(true);
+      setSelectedAddressId("");
+      // Clear address fields for manual entry
+      setFormData(prev => ({
+        ...prev,
+        phone: "",
+        address: "",
+        city: "",
+        state: "",
+        zipCode: "",
+        country: "United States",
+      }));
+    } else {
+      setUseNewAddress(false);
+      setSelectedAddressId(addressId);
+      const selectedAddress = savedAddresses.find(addr => addr.id === addressId);
+      if (selectedAddress) {
+        setFormData(prev => ({
+          ...prev,
+          firstName: selectedAddress.first_name,
+          lastName: selectedAddress.last_name,
+          phone: selectedAddress.phone,
+          address: selectedAddress.address,
+          city: selectedAddress.city,
+          state: selectedAddress.state,
+          zipCode: selectedAddress.zip_code,
+          country: selectedAddress.country,
+        }));
+      }
+    }
+  };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -270,6 +352,37 @@ const Checkout: React.FC = () => {
                   <h2 className="font-medium">Shipping Information</h2>
                 </div>
                 <div className="p-6 space-y-4">
+                  
+                  {/* Address Selection for Authenticated Users */}
+                  {isAuthenticated && savedAddresses.length > 0 && (
+                    <div className="space-y-3">
+                      <Label>Choose Address</Label>
+                      <Select value={selectedAddressId || "new"} onValueChange={handleAddressSelect}>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an address" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {savedAddresses.map((address) => (
+                            <SelectItem key={address.id} value={address.id}>
+                              <div className="flex items-center gap-2">
+                                <MapPin className="w-4 h-4" />
+                                <span>
+                                  {address.label} - {address.first_name} {address.last_name}
+                                </span>
+                                {address.is_default && <span className="text-xs bg-gray-100 px-1 rounded">Default</span>}
+                              </div>
+                            </SelectItem>
+                          ))}
+                          <SelectItem value="new">
+                            <div className="flex items-center gap-2">
+                              <MapPin className="w-4 h-4" />
+                              <span>Use new address</span>
+                            </div>
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  )}
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">

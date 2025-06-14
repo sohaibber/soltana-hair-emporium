@@ -269,6 +269,57 @@ export type Database = {
           },
         ]
       }
+      user_addresses: {
+        Row: {
+          address: string
+          city: string
+          country: string
+          created_at: string
+          first_name: string
+          id: string
+          is_default: boolean
+          label: string
+          last_name: string
+          phone: string
+          state: string
+          updated_at: string
+          user_id: string
+          zip_code: string
+        }
+        Insert: {
+          address: string
+          city: string
+          country?: string
+          created_at?: string
+          first_name: string
+          id?: string
+          is_default?: boolean
+          label: string
+          last_name: string
+          phone: string
+          state: string
+          updated_at?: string
+          user_id: string
+          zip_code: string
+        }
+        Update: {
+          address?: string
+          city?: string
+          country?: string
+          created_at?: string
+          first_name?: string
+          id?: string
+          is_default?: boolean
+          label?: string
+          last_name?: string
+          phone?: string
+          state?: string
+          updated_at?: string
+          user_id?: string
+          zip_code?: string
+        }
+        Relationships: []
+      }
       user_roles: {
         Row: {
           created_at: string
