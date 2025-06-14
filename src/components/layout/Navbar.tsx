@@ -2,7 +2,7 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Menu, X, Search, Heart, LogOut, UserCircle } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Search, Heart, LogOut, UserCircle, Settings } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
@@ -19,7 +19,7 @@ const Navbar = () => {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
-  const { user, isAuthenticated, logout } = useAuth();
+  const { user, isAuthenticated, isAdmin, logout } = useAuth();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -73,6 +73,16 @@ const Navbar = () => {
             <Link to="/contact" className="font-medium hover:text-primary transition-colors">
               Contact
             </Link>
+            {/* Admin Link - Only show for admin users */}
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="font-medium text-orange-600 hover:text-orange-700 transition-colors flex items-center space-x-1"
+              >
+                <Settings size={16} />
+                <span>Admin</span>
+              </Link>
+            )}
           </div>
 
           {/* Icons */}
@@ -107,6 +117,18 @@ const Navbar = () => {
                         Orders
                       </Link>
                     </DropdownMenuItem>
+                    {/* Admin Dashboard - Only show for admin users */}
+                    {isAdmin && (
+                      <>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem asChild>
+                          <Link to="/admin" className="flex items-center text-orange-600">
+                            <Settings size={16} className="mr-2" />
+                            Admin Dashboard
+                          </Link>
+                        </DropdownMenuItem>
+                      </>
+                    )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                       <LogOut size={16} className="mr-2" />
@@ -194,6 +216,16 @@ const Navbar = () => {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Wishlist
+              </Link>
+            )}
+            {/* Admin Link for Mobile - Only show for admin users */}
+            {isAdmin && (
+              <Link 
+                to="/admin" 
+                className="block font-medium text-orange-600 hover:text-orange-700 transition-colors"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Admin Dashboard
               </Link>
             )}
           </div>
