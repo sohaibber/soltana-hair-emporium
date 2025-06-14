@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   User, Package, Settings, LogOut,
-  Menu, X, Home, ShoppingBag
+  Menu, X, Home, ShoppingBag, ArrowLeft
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -112,6 +112,18 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
                 <p className="text-xs text-gray-500">admin@example.com</p>
               </div>
             </div>
+            
+            {/* Return to Store button */}
+            <Link to="/" className="block mb-2">
+              <Button
+                variant="outline"
+                className="w-full flex items-center justify-center gap-2"
+                onClick={() => setSidebarOpen(false)}
+              >
+                <ArrowLeft size={16} />
+                Return to Store
+              </Button>
+            </Link>
             
             <Button
               variant="outline"
