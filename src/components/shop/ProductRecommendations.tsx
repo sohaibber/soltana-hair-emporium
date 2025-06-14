@@ -48,18 +48,21 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           return;
         }
         
+        let recommendationData = data || [];
+        
         // If we don't have enough products from the same category, get some random ones
-        let recommendationData = data;
-        if (data.length < 4) {
+        if (recommendationData.length < 4) {
+          const existingIds = recommendationData.map(p => p.id);
+          
           const { data: randomProducts, error: randomError } = await supabase
             .from('products')
             .select('*')
             .eq('is_active', true)
-            .neq('id', currentProductId)
-            .limit(4 - data.length);
+            .not('id', 'in', `(${[currentProductId, ...existingIds].join(',')})`)
+            .limit(4 - recommendationData.length);
           
           if (!randomError && randomProducts) {
-            recommendationData = [...data, ...randomProducts];
+            recommendationData = [...recommendationData, ...randomProducts];
           }
         }
         
@@ -75,7 +78,12 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           badge: product.sale_price ? "Sale" : undefined
         }));
         
-        setRecommendations(transformedRecommendations.slice(0, 4)); // Ensure max 4 items
+        // Remove any potential duplicates and ensure max 4 items
+        const uniqueRecommendations = transformedRecommendations.filter((product, index, self) => 
+          index === self.findIndex(p => p.id === product.id)
+        );
+        
+        setRecommendations(uniqueRecommendations.slice(0, 4));
       } catch (error) {
         console.error("Exception loading recommendations:", error);
       } finally {
