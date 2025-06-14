@@ -12,7 +12,7 @@ interface Product {
   image: string;
   category: string;
   colors: string[];
-  rating: number;
+  rating?: number;
   badge?: string;
 }
 
@@ -49,7 +49,9 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           <h3 className="font-medium mb-1 group-hover:text-primary transition-colors">{product.name}</h3>
           <div className="flex justify-between items-center">
             <div className="font-semibold">${product.price.toFixed(2)}</div>
-            <div className="text-xs text-amber-500">★ {product.rating}</div>
+            {product.rating && (
+              <div className="text-xs text-amber-500">★ {product.rating}</div>
+            )}
           </div>
         </div>
       </div>
@@ -77,17 +79,47 @@ const FeaturedProducts: React.FC = () => {
           return;
         }
         
+        // Fetch real ratings for all products
+        const productIds = data.map(p => p.id);
+        const { data: reviewsData, error: reviewsError } = await supabase
+          .from('reviews')
+          .select('product_id, rating')
+          .in('product_id', productIds);
+        
+        if (reviewsError) {
+          console.error("Error fetching reviews:", reviewsError);
+        }
+        
+        // Calculate average ratings for each product
+        const ratingsMap = new Map();
+        if (reviewsData) {
+          reviewsData.forEach(review => {
+            const productId = review.product_id;
+            if (!ratingsMap.has(productId)) {
+              ratingsMap.set(productId, []);
+            }
+            ratingsMap.get(productId).push(review.rating);
+          });
+        }
+        
         // Transform the data to match our frontend model
-        const transformedProducts = data.map(product => ({
-          id: product.id,
-          name: product.name,
-          price: product.price,
-          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-          category: product.category || "Uncategorized",
-          colors: product.tags as string[] || [],
-          rating: 4.8, // Default rating for now
-          badge: product.sale_price ? "Sale" : undefined
-        }));
+        const transformedProducts = data.map(product => {
+          const productRatings = ratingsMap.get(product.id) || [];
+          const averageRating = productRatings.length > 0 
+            ? Math.round((productRatings.reduce((sum: number, rating: number) => sum + rating, 0) / productRatings.length) * 10) / 10
+            : undefined;
+          
+          return {
+            id: product.id,
+            name: product.name,
+            price: product.price,
+            image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+            category: product.category || "Uncategorized",
+            colors: product.tags as string[] || [],
+            rating: averageRating,
+            badge: product.sale_price ? "Sale" : undefined
+          };
+        });
         
         setProducts(transformedProducts);
       } catch (error) {
@@ -132,7 +164,6 @@ const FeaturedProducts: React.FC = () => {
     );
   }
 
-  // If no products yet, show a nice empty state
   if (products.length === 0) {
     return (
       <section className="py-12 md:py-16 bg-soltana-light">

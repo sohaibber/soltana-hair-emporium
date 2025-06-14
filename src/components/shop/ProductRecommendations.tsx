@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
 
 interface ProductRecommendationsProps {
-  currentProductId: string;  // Changed to string only
+  currentProductId: string;
   title?: string;
 }
 
@@ -66,17 +66,47 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
           }
         }
         
+        // Fetch real ratings for all products
+        const productIds = recommendationData.map(p => p.id);
+        const { data: reviewsData, error: reviewsError } = await supabase
+          .from('reviews')
+          .select('product_id, rating')
+          .in('product_id', productIds);
+        
+        if (reviewsError) {
+          console.error("Error fetching reviews:", reviewsError);
+        }
+        
+        // Calculate average ratings for each product
+        const ratingsMap = new Map();
+        if (reviewsData) {
+          reviewsData.forEach(review => {
+            const productId = review.product_id;
+            if (!ratingsMap.has(productId)) {
+              ratingsMap.set(productId, []);
+            }
+            ratingsMap.get(productId).push(review.rating);
+          });
+        }
+        
         // Transform the data to match our frontend model
-        const transformedRecommendations = recommendationData.map(product => ({
-          id: String(product.id),
-          name: product.name,
-          price: Number(product.price),
-          image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
-          category: product.category || "Uncategorized",
-          colors: product.tags as string[] || [],
-          rating: 4.5, // Default rating since we don't have this in DB yet
-          badge: product.sale_price ? "Sale" : undefined
-        }));
+        const transformedRecommendations = recommendationData.map(product => {
+          const productRatings = ratingsMap.get(product.id) || [];
+          const averageRating = productRatings.length > 0 
+            ? Math.round((productRatings.reduce((sum: number, rating: number) => sum + rating, 0) / productRatings.length) * 10) / 10
+            : undefined;
+          
+          return {
+            id: String(product.id),
+            name: product.name,
+            price: Number(product.price),
+            image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
+            category: product.category || "Uncategorized",
+            colors: product.tags as string[] || [],
+            rating: averageRating,
+            badge: product.sale_price ? "Sale" : undefined
+          };
+        });
         
         // Remove any potential duplicates and ensure max 4 items
         const uniqueRecommendations = transformedRecommendations.filter((product, index, self) => 
@@ -125,7 +155,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
   }
 
   if (recommendations.length === 0) {
-    return null; // Don't show the section if no recommendations
+    return null; 
   }
 
   return (
@@ -152,7 +182,12 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
                 <h3 className="font-medium text-sm mb-1 truncate group-hover:text-primary transition-colors">
                   {product.name}
                 </h3>
-                <div className="font-semibold">${product.price.toFixed(2)}</div>
+                <div className="flex justify-between items-center">
+                  <div className="font-semibold">${product.price.toFixed(2)}</div>
+                  {product.rating && (
+                    <div className="text-xs text-amber-500">★ {product.rating}</div>
+                  )}
+                </div>
               </div>
             </div>
           </Link>
