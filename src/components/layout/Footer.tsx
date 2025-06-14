@@ -2,9 +2,11 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Instagram, Facebook, Twitter } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Footer = () => {
   const currentYear = new Date().getFullYear();
+  const { t } = useLanguage();
   
   return (
     <footer className="bg-soltana-light border-t border-soltana-neutral/10 pt-12 pb-6">
@@ -16,7 +18,7 @@ const Footer = () => {
               Soltana<span className="text-primary">Hair</span>
             </div>
             <p className="text-gray-600 mb-4">
-              Premium quality hair extensions for every queen. Elevate your look with our luxury hair products.
+              {t('footer.brand.description')}
             </p>
             <div className="flex space-x-4">
               <a href="https://instagram.com" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-primary transition-colors">
@@ -33,31 +35,31 @@ const Footer = () => {
 
           {/* Shop Column */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Shop</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.shop')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/shop" className="text-gray-600 hover:text-primary transition-colors">
-                  All Products
+                  {t('footer.allProducts')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=clip-ins" className="text-gray-600 hover:text-primary transition-colors">
-                  Clip-ins
+                  {t('footer.clipIns')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=tape-ins" className="text-gray-600 hover:text-primary transition-colors">
-                  Tape-ins
+                  {t('footer.tapeIns')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=ponytails" className="text-gray-600 hover:text-primary transition-colors">
-                  Ponytails
+                  {t('footer.ponytails')}
                 </Link>
               </li>
               <li>
                 <Link to="/shop?category=wigs" className="text-gray-600 hover:text-primary transition-colors">
-                  Wigs
+                  {t('footer.wigs')}
                 </Link>
               </li>
             </ul>
@@ -65,26 +67,26 @@ const Footer = () => {
 
           {/* Company Column */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Company</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.company')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/about" className="text-gray-600 hover:text-primary transition-colors">
-                  About Us
+                  {t('footer.aboutUs')}
                 </Link>
               </li>
               <li>
                 <Link to="/contact" className="text-gray-600 hover:text-primary transition-colors">
-                  Contact
+                  {t('footer.contact')}
                 </Link>
               </li>
               <li>
                 <Link to="/careers" className="text-gray-600 hover:text-primary transition-colors">
-                  Careers
+                  {t('footer.careers')}
                 </Link>
               </li>
               <li>
                 <Link to="/press" className="text-gray-600 hover:text-primary transition-colors">
-                  Press
+                  {t('footer.press')}
                 </Link>
               </li>
             </ul>
@@ -92,31 +94,31 @@ const Footer = () => {
 
           {/* Help Column */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Help</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('footer.help')}</h3>
             <ul className="space-y-2">
               <li>
                 <Link to="/shipping" className="text-gray-600 hover:text-primary transition-colors">
-                  Shipping
+                  {t('footer.shipping')}
                 </Link>
               </li>
               <li>
                 <Link to="/returns" className="text-gray-600 hover:text-primary transition-colors">
-                  Returns
+                  {t('footer.returns')}
                 </Link>
               </li>
               <li>
                 <Link to="/faq" className="text-gray-600 hover:text-primary transition-colors">
-                  FAQ
+                  {t('footer.faq')}
                 </Link>
               </li>
               <li>
                 <Link to="/privacy-policy" className="text-gray-600 hover:text-primary transition-colors">
-                  Privacy Policy
+                  {t('footer.privacyPolicy')}
                 </Link>
               </li>
               <li>
                 <Link to="/terms" className="text-gray-600 hover:text-primary transition-colors">
-                  Terms of Service
+                  {t('footer.terms')}
                 </Link>
               </li>
             </ul>
@@ -124,7 +126,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t border-gray-200 pt-6 text-center text-sm text-gray-500">
-          <p>&copy; {currentYear} SoltanaHair. All rights reserved.</p>
+          <p>&copy; {currentYear} SoltanaHair. {t('footer.copyright')}</p>
         </div>
       </div>
     </footer>

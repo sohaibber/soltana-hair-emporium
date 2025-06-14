@@ -2,30 +2,33 @@
 import React from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
+import { useLanguage } from "@/context/LanguageContext";
 
 const HeroBanner: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
-    <div className="relative bg-gradient-to-r from-soltana-blush/20 to-soltana-peach/20 overflow-hidden">
+    <div className="relative bg-gradient-to-r from-solt 
+/20 to-soltana-peach/20 overflow-hidden">
       <div className="container mx-auto px-4 py-16 md:py-24">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
           <div className="md:order-1 order-2">
             <h1 className="font-serif font-bold text-4xl md:text-5xl lg:text-6xl mb-4 animate-fade-in">
-              Luxury Hair Extensions <br />
-              <span className="text-primary">for Every Queen</span>
+              {t('home.hero.title')} <br />
+              <span className="text-primary">{t('home.hero.subtitle')}</span>
             </h1>
             <p className="text-gray-700 mb-8 text-lg md:pr-12 animate-fade-in" style={{ animationDelay: "0.2s" }}>
-              Transform your look with premium quality hair extensions. 
-              Ethically sourced, beautifully crafted, and designed to make you feel confident.
+              {t('home.hero.description')}
             </p>
             <div className="space-x-4 animate-fade-in" style={{ animationDelay: "0.4s" }}>
               <Button asChild className="bg-soltana-dark text-white hover:bg-black shadow-md hover:shadow-lg">
                 <Link to="/shop">
-                  Shop Now
+                  {t('home.hero.shopNow')}
                 </Link>
               </Button>
               <Button asChild variant="outline" className="border-soltana-dark text-soltana-dark hover:bg-soltana-dark/5">
                 <Link to="/about">
-                  Our Story
+                  {t('home.hero.ourStory')}
                 </Link>
               </Button>
             </div>

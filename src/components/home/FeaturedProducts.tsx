@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface Product {
   id: string;
@@ -62,6 +62,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
 const FeaturedProducts: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
 
   useEffect(() => {
     const fetchFeaturedProducts = async () => {
@@ -139,12 +140,12 @@ const FeaturedProducts: React.FC = () => {
       <section className="py-12 md:py-16 bg-soltana-light">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="font-serif text-2xl md:text-3xl font-semibold">Featured Products</h2>
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold">{t('home.featured.title')}</h2>
             <Link 
               to="/shop" 
               className="flex items-center text-sm font-medium hover:text-primary transition-colors"
             >
-              View All <ArrowRight size={16} className="ml-1" />
+              {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -168,13 +169,13 @@ const FeaturedProducts: React.FC = () => {
     return (
       <section className="py-12 md:py-16 bg-soltana-light">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4">Featured Products</h2>
-          <p className="text-gray-600 mb-6">No products available yet. Check back soon!</p>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4">{t('home.featured.title')}</h2>
+          <p className="text-gray-600 mb-6">{t('product.noProducts')}</p>
           <Link 
             to="/shop" 
             className="inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
           >
-            View All Products <ArrowRight size={16} className="ml-1" />
+            {t('product.viewAllProducts')} <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
       </section>
@@ -185,12 +186,12 @@ const FeaturedProducts: React.FC = () => {
     <section className="py-12 md:py-16 bg-soltana-light">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold">Featured Products</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold">{t('home.featured.title')}</h2>
           <Link 
             to="/shop" 
             className="flex items-center text-sm font-medium hover:text-primary transition-colors"
           >
-            View All <ArrowRight size={16} className="ml-1" />
+            {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">

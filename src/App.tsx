@@ -9,6 +9,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { CartProvider } from "./context/CartContext";
 import { WishlistProvider } from "./context/WishlistContext";
+import { LanguageProvider } from "./context/LanguageContext";
 
 // Main pages
 import Index from "./pages/Index";
@@ -43,60 +44,62 @@ const queryClient = new QueryClient();
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <TooltipProvider>
-      <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<Index />} />
-                <Route path="/shop" element={<Shop />} />
-                <Route path="/product/:id" element={<ProductDetail />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/order-confirmation" element={<OrderConfirmation />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
-                <Route path="/account" element={<Account />} />
-                <Route path="/orders" element={<Orders />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                
-                {/* Admin Login Route - public */}
-                <Route path="/admin/login" element={<AdminLogin />} />
-                
-                {/* Protected Admin Routes */}
-                <Route path="/admin" element={
-                  <AdminProtectedRoute>
-                    <Dashboard />
-                  </AdminProtectedRoute>
-                } />
-                <Route path="/admin/products" element={
-                  <AdminProtectedRoute>
-                    <Products />
-                  </AdminProtectedRoute>
-                } />
-                <Route path="/admin/orders" element={
-                  <AdminProtectedRoute>
-                    <AdminOrders />
-                  </AdminProtectedRoute>
-                } />
-                <Route path="/admin/users" element={
-                  <AdminProtectedRoute>
-                    <Users />
-                  </AdminProtectedRoute>
-                } />
-                
-                {/* Catch All */}
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </WishlistProvider>
-        </CartProvider>
-      </AuthProvider>
+      <LanguageProvider>
+        <AuthProvider>
+          <CartProvider>
+            <WishlistProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  {/* Public Routes */}
+                  <Route path="/" element={<Index />} />
+                  <Route path="/shop" element={<Shop />} />
+                  <Route path="/product/:id" element={<ProductDetail />} />
+                  <Route path="/cart" element={<Cart />} />
+                  <Route path="/wishlist" element={<Wishlist />} />
+                  <Route path="/checkout" element={<Checkout />} />
+                  <Route path="/order-confirmation" element={<OrderConfirmation />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/account" element={<Account />} />
+                  <Route path="/orders" element={<Orders />} />
+                  <Route path="/about" element={<About />} />
+                  <Route path="/contact" element={<Contact />} />
+                  
+                  {/* Admin Login Route - public */}
+                  <Route path="/admin/login" element={<AdminLogin />} />
+                  
+                  {/* Protected Admin Routes */}
+                  <Route path="/admin" element={
+                    <AdminProtectedRoute>
+                      <Dashboard />
+                    </AdminProtectedRoute>
+                  } />
+                  <Route path="/admin/products" element={
+                    <AdminProtectedRoute>
+                      <Products />
+                    </AdminProtectedRoute>
+                  } />
+                  <Route path="/admin/orders" element={
+                    <AdminProtectedRoute>
+                      <AdminOrders />
+                    </AdminProtectedRoute>
+                  } />
+                  <Route path="/admin/users" element={
+                    <AdminProtectedRoute>
+                      <Users />
+                    </AdminProtectedRoute>
+                  } />
+                  
+                  {/* Catch All */}
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </WishlistProvider>
+          </CartProvider>
+        </AuthProvider>
+      </LanguageProvider>
     </TooltipProvider>
   </QueryClientProvider>
 );

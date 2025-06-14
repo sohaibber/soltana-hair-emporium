@@ -6,6 +6,8 @@ import { ShoppingCart, User, Menu, X, Search, Heart, LogOut, UserCircle, Setting
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
+import LanguageSelector from "./LanguageSelector";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -20,6 +22,7 @@ const Navbar = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
+  const { t } = useLanguage();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -62,16 +65,16 @@ const Navbar = () => {
           {/* Desktop Navigation */}
           <div className="hidden md:flex space-x-8">
             <Link to="/" className="font-medium hover:text-primary transition-colors">
-              Home
+              {t('nav.home')}
             </Link>
             <Link to="/shop" className="font-medium hover:text-primary transition-colors">
-              Shop
+              {t('nav.shop')}
             </Link>
             <Link to="/about" className="font-medium hover:text-primary transition-colors">
-              About
+              {t('nav.about')}
             </Link>
             <Link to="/contact" className="font-medium hover:text-primary transition-colors">
-              Contact
+              {t('nav.contact')}
             </Link>
             {/* Admin Link - Only show for admin users */}
             {isAdmin && (
@@ -80,17 +83,20 @@ const Navbar = () => {
                 className="font-medium text-orange-600 hover:text-orange-700 transition-colors flex items-center space-x-1"
               >
                 <Settings size={16} />
-                <span>Admin</span>
+                <span>{t('nav.admin')}</span>
               </Link>
             )}
           </div>
 
           {/* Icons */}
           <div className="flex items-center space-x-4">
+            {/* Language Selector */}
+            <LanguageSelector />
+            
             <button 
               onClick={toggleSearch}
               className="hover:text-primary transition-colors"
-              aria-label="Search"
+              aria-label={t('common.search')}
             >
               <Search size={20} />
             </button>
@@ -108,13 +114,13 @@ const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/account" className="flex items-center">
                         <UserCircle size={16} className="mr-2" />
-                        Account
+                        {t('nav.account')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/orders" className="flex items-center">
                         <ShoppingCart size={16} className="mr-2" />
-                        Orders
+                        {t('nav.orders')}
                       </Link>
                     </DropdownMenuItem>
                     {/* Admin Dashboard - Only show for admin users */}
@@ -124,7 +130,7 @@ const Navbar = () => {
                         <DropdownMenuItem asChild>
                           <Link to="/admin" className="flex items-center text-orange-600">
                             <Settings size={16} className="mr-2" />
-                            Admin Dashboard
+                            {t('nav.adminDashboard')}
                           </Link>
                         </DropdownMenuItem>
                       </>
@@ -132,7 +138,7 @@ const Navbar = () => {
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                       <LogOut size={16} className="mr-2" />
-                      Logout
+                      {t('nav.logout')}
                     </DropdownMenuItem>
                   </>
                 ) : (
@@ -140,13 +146,13 @@ const Navbar = () => {
                     <DropdownMenuItem asChild>
                       <Link to="/login" className="flex items-center">
                         <User size={16} className="mr-2" />
-                        Login
+                        {t('nav.login')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/register" className="flex items-center">
                         <UserCircle size={16} className="mr-2" />
-                        Sign Up
+                        {t('nav.register')}
                       </Link>
                     </DropdownMenuItem>
                   </>
@@ -186,28 +192,28 @@ const Navbar = () => {
               className="block font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Home
+              {t('nav.home')}
             </Link>
             <Link 
               to="/shop" 
               className="block font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Shop
+              {t('nav.shop')}
             </Link>
             <Link 
               to="/about" 
               className="block font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              About
+              {t('nav.about')}
             </Link>
             <Link 
               to="/contact" 
               className="block font-medium hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
-              Contact
+              {t('nav.contact')}
             </Link>
             {isAuthenticated && (
               <Link 
@@ -215,7 +221,7 @@ const Navbar = () => {
                 className="block font-medium hover:text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Wishlist
+                {t('nav.wishlist')}
               </Link>
             )}
             {/* Admin Link for Mobile - Only show for admin users */}
@@ -225,7 +231,7 @@ const Navbar = () => {
                 className="block font-medium text-orange-600 hover:text-orange-700 transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
-                Admin Dashboard
+                {t('nav.adminDashboard')}
               </Link>
             )}
           </div>
@@ -239,7 +245,7 @@ const Navbar = () => {
             <div className="relative">
               <input
                 type="text"
-                placeholder="Search for products..."
+                placeholder={t('common.searchPlaceholder')}
                 className="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 autoFocus
               />

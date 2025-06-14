@@ -1,9 +1,9 @@
-
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ProductType } from "./ProductCard";
 import { Button } from "@/components/ui/button";
 import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProductRecommendationsProps {
   currentProductId: string;
@@ -12,10 +12,13 @@ interface ProductRecommendationsProps {
 
 const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({ 
   currentProductId, 
-  title = "You may also like"
+  title
 }) => {
   const [recommendations, setRecommendations] = useState<ProductType[]>([]);
   const [loading, setLoading] = useState(true);
+  const { t } = useLanguage();
+
+  const displayTitle = title || t('product.youMayLike');
 
   useEffect(() => {
     const fetchRecommendations = async () => {
@@ -137,7 +140,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
   if (loading) {
     return (
       <div className="py-8 mb-8 border-t">
-        <h2 className="font-serif text-2xl font-semibold mb-6">{title}</h2>
+        <h2 className="font-serif text-2xl font-semibold mb-6">{displayTitle}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
             <div key={i} className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm animate-pulse">
@@ -160,7 +163,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
 
   return (
     <div className="py-8 mb-8 border-t">
-      <h2 className="font-serif text-2xl font-semibold mb-6">{title}</h2>
+      <h2 className="font-serif text-2xl font-semibold mb-6">{displayTitle}</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {recommendations.map(product => (
           <Link key={product.id} to={`/product/${product.id}`} className="group">
@@ -173,7 +176,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
                 />
                 {product.badge && (
                   <div className="absolute top-2 right-2 bg-primary text-primary-foreground text-xs font-bold px-2 py-1 rounded">
-                    {product.badge}
+                    {t('product.sale')}
                   </div>
                 )}
               </div>
@@ -195,7 +198,7 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
       </div>
       <div className="text-center mt-6">
         <Button variant="outline" asChild>
-          <Link to="/shop">View More Products</Link>
+          <Link to="/shop">{t('product.viewMore')}</Link>
         </Button>
       </div>
     </div>

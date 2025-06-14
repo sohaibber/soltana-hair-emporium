@@ -3,10 +3,12 @@ import React, { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Newsletter: React.FC = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
+  const { t } = useLanguage();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ const Newsletter: React.FC = () => {
     setTimeout(() => {
       setLoading(false);
       setEmail("");
-      toast.success("Thank you for subscribing to our newsletter!");
+      toast.success(t('home.newsletter.success'));
     }, 1000);
   };
 
@@ -25,15 +27,15 @@ const Newsletter: React.FC = () => {
       <div className="container mx-auto px-4">
         <div className="max-w-2xl mx-auto text-center">
           <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4">
-            Join Our Community
+            {t('home.newsletter.title')}
           </h2>
           <p className="text-gray-600 mb-6">
-            Subscribe to our newsletter for exclusive offers, hair care tips, and new product announcements.
+            {t('home.newsletter.description')}
           </p>
           <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
             <Input
               type="email"
-              placeholder="Your email address"
+              placeholder={t('home.newsletter.placeholder')}
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -44,7 +46,7 @@ const Newsletter: React.FC = () => {
               className="bg-soltana-dark text-white hover:bg-black"
               disabled={loading}
             >
-              {loading ? "Subscribing..." : "Subscribe"}
+              {loading ? t('home.newsletter.subscribing') : t('home.newsletter.subscribe')}
             </Button>
           </form>
         </div>

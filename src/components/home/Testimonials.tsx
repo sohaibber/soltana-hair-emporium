@@ -1,6 +1,6 @@
-
 import React from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface TestimonialProps {
   quote: string;
@@ -67,13 +67,15 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ quote, author, image, rat
 };
 
 const Testimonials: React.FC = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="py-12 md:py-16 bg-gradient-to-b from-white to-soltana-light">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2">What Our Customers Say</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2">{t('home.testimonials.title')}</h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
-            Read genuine reviews from our happy customers
+            {t('home.testimonials.subtitle')}
           </p>
         </div>
 
