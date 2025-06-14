@@ -112,7 +112,7 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Improved reviews fetching with better error handling
+  // Fixed reviews fetching with proper profile joining
   const fetchReviews = async () => {
     if (!id) return;
     
@@ -120,78 +120,58 @@ const ProductDetail = () => {
     setReviewsLoading(true);
     
     try {
-      // First, try to get reviews with profiles using a left join
-      const { data: reviewsWithProfiles, error: profilesError } = await supabase
+      // Get reviews first
+      const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
-        .select(`
-          *,
-          profiles:user_id (
-            first_name,
-            last_name
-          )
-        `)
+        .select('*')
         .eq('product_id', id)
         .order('created_at', { ascending: false });
 
-      console.log("Reviews with profiles query result:", { reviewsWithProfiles, profilesError });
+      console.log("Raw reviews data:", { reviewsData, reviewsError });
 
-      if (profilesError) {
-        console.error("Error fetching reviews with profiles:", profilesError);
-        
-        // Fallback: Get reviews without profiles
-        const { data: basicReviews, error: basicError } = await supabase
-          .from('reviews')
-          .select('*')
-          .eq('product_id', id)
-          .order('created_at', { ascending: false });
-          
-        console.log("Basic reviews fallback:", { basicReviews, basicError });
-        
-        if (basicError) {
-          console.error("Error with basic reviews query:", basicError);
-          // Still show mock reviews even if we can't fetch real ones
-          setReviews(mockReviews);
-          setReviewsLoading(false);
-          return;
-        }
-        
-        // Process basic reviews without profile data
-        const processedBasicReviews = (basicReviews || []).map(review => ({
-          ...review,
-          isMock: false,
-          profiles: {
-            first_name: 'Anonymous',
-            last_name: 'User'
-          }
-        }));
-        
-        console.log("Processed basic reviews:", processedBasicReviews);
-        
-        // Combine with mock reviews
-        const allReviews = [...processedBasicReviews, ...mockReviews];
-        setReviews(allReviews);
-        
-        // Set user review if found
-        if (user) {
-          const currentUserReview = processedBasicReviews.find(review => review.user_id === user.id);
-          setUserReview(currentUserReview || null);
-        }
-        
+      if (reviewsError) {
+        console.error("Error fetching reviews:", reviewsError);
+        setReviews(mockReviews);
         setReviewsLoading(false);
         return;
       }
 
-      // Success case: process reviews with profiles
-      const processedReviews = (reviewsWithProfiles || []).map(review => ({
-        ...review,
-        isMock: false,
-        profiles: review.profiles || {
-          first_name: 'Anonymous',
-          last_name: 'User'
+      // Get unique user IDs from reviews
+      const userIds = [...new Set((reviewsData || []).map(review => review.user_id))];
+      console.log("User IDs to fetch profiles for:", userIds);
+
+      let profilesData = [];
+      if (userIds.length > 0) {
+        // Fetch profiles for these users
+        const { data: profiles, error: profilesError } = await supabase
+          .from('profiles')
+          .select('id, first_name, last_name')
+          .in('id', userIds);
+
+        console.log("Profiles data:", { profiles, profilesError });
+        
+        if (!profilesError && profiles) {
+          profilesData = profiles;
         }
-      }));
+      }
+
+      // Combine reviews with profile data
+      const processedReviews = (reviewsData || []).map(review => {
+        const profile = profilesData.find(p => p.id === review.user_id);
+        return {
+          ...review,
+          isMock: false,
+          profiles: profile ? {
+            first_name: profile.first_name,
+            last_name: profile.last_name
+          } : {
+            first_name: 'Anonymous',
+            last_name: 'User'
+          }
+        };
+      });
       
-      console.log("Successfully processed reviews with profiles:", processedReviews);
+      console.log("Successfully processed reviews:", processedReviews);
       
       // Combine real reviews with mock reviews
       const allReviews = [...processedReviews, ...mockReviews];
@@ -309,7 +289,7 @@ const ProductDetail = () => {
     setTimeout(() => {
       console.log("=== Executing delayed review refresh...");
       fetchReviews();
-    }, 1000);
+    }, 2000); // Increased delay to 2 seconds
   };
   
   const handleEditReview = (review: any) => {
