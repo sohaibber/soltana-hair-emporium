@@ -93,38 +93,58 @@ const Dashboard: React.FC = () => {
   };
 
   const fetchRecentOrders = async (): Promise<RecentOrder[]> => {
-    const { data: orders, error } = await supabase
+    // First, fetch the orders
+    const { data: orders, error: ordersError } = await supabase
       .from('orders')
-      .select(`
-        id,
-        total_amount,
-        status,
-        created_at,
-        profiles:user_id (
-          first_name,
-          last_name
-        )
-      `)
+      .select('id, total_amount, status, created_at, user_id')
       .order('created_at', { ascending: false })
       .limit(5);
 
-    if (error) {
-      console.error('Error fetching recent orders:', error);
+    if (ordersError) {
+      console.error('Error fetching recent orders:', ordersError);
       return [];
     }
 
-    return orders?.map(order => ({
-      id: `#ORD-${order.id.slice(-6).toUpperCase()}`,
-      customer: order.profiles 
-        ? `${order.profiles.first_name || ''} ${order.profiles.last_name || ''}`.trim() || 'Unknown Customer'
-        : 'Unknown Customer',
-      date: new Date(order.created_at).toLocaleDateString(),
-      status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
-      total: new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-      }).format(Number(order.total_amount))
-    })) || [];
+    if (!orders || orders.length === 0) {
+      return [];
+    }
+
+    // Get unique user IDs
+    const userIds = [...new Set(orders.map(order => order.user_id))];
+
+    // Fetch profiles for these users
+    const { data: profiles, error: profilesError } = await supabase
+      .from('profiles')
+      .select('id, first_name, last_name')
+      .in('id', userIds);
+
+    if (profilesError) {
+      console.error('Error fetching profiles:', profilesError);
+    }
+
+    // Create a map of user profiles for quick lookup
+    const profileMap = new Map();
+    profiles?.forEach(profile => {
+      profileMap.set(profile.id, profile);
+    });
+
+    return orders.map(order => {
+      const profile = profileMap.get(order.user_id);
+      const customerName = profile 
+        ? `${profile.first_name || ''} ${profile.last_name || ''}`.trim() || 'Unknown Customer'
+        : 'Unknown Customer';
+
+      return {
+        id: `#ORD-${order.id.slice(-6).toUpperCase()}`,
+        customer: customerName,
+        date: new Date(order.created_at).toLocaleDateString(),
+        status: order.status.charAt(0).toUpperCase() + order.status.slice(1),
+        total: new Intl.NumberFormat('en-US', {
+          style: 'currency',
+          currency: 'USD',
+        }).format(Number(order.total_amount))
+      };
+    });
   };
 
   const getStatusColor = (status: string) => {
