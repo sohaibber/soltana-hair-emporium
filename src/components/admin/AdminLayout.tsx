@@ -1,8 +1,9 @@
+
 import React, { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { 
   User, Package, Settings, LogOut,
-  Menu, X, Home, ShoppingBag, ArrowLeft
+  Menu, X, Home, ShoppingBag, ArrowLeft, Users
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -41,6 +42,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children }) => {
     { name: "Dashboard", href: "/admin", icon: Home },
     { name: "Products", href: "/admin/products", icon: Package },
     { name: "Orders", href: "/admin/orders", icon: ShoppingBag },
+    { name: "Users", href: "/admin/users", icon: Users },
     { name: "Settings", href: "/admin/settings", icon: Settings },
   ];
   
