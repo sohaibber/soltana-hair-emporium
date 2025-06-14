@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -97,7 +98,6 @@ const ProductDetail = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState<any>(null);
   const [userReview, setUserReview] = useState<any>(null);
-  const [refreshKey, setRefreshKey] = useState(0); // Add refresh key to force re-render
   
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedLength, setSelectedLength] = useState<string>("");
@@ -113,55 +113,50 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Completely rewritten reviews fetching with better state management
-  const fetchReviews = async (forceRefresh = false) => {
+  // Simplified and more reliable review fetching
+  const fetchReviews = async () => {
     if (!id) return;
     
-    console.log("=== FETCHING REVIEWS ===", { 
-      productId: id, 
-      forceRefresh, 
-      timestamp: new Date().toISOString() 
-    });
-    
+    console.log("🔄 Starting to fetch reviews for product:", id);
     setReviewsLoading(true);
     
     try {
-      // Get reviews from database
+      // Step 1: Fetch all reviews for this product
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')
         .eq('product_id', id)
         .order('created_at', { ascending: false });
 
-      console.log("Database reviews:", { reviewsData, reviewsError, count: reviewsData?.length || 0 });
+      console.log("📊 Raw reviews from database:", reviewsData);
+      console.log("❌ Reviews error:", reviewsError);
 
       if (reviewsError) {
-        console.error("Database error:", reviewsError);
-        // Show only mock reviews on error
+        console.error("Database error fetching reviews:", reviewsError);
         setReviews(mockReviews);
         setUserReview(null);
         return;
       }
 
-      // Process real reviews
-      const realReviews = [];
+      let processedReviews = [];
       
+      // Step 2: If we have reviews, get the profile information
       if (reviewsData && reviewsData.length > 0) {
-        // Get user profiles for the reviews
-        const userIds = [...new Set(reviewsData.map(review => review.user_id))];
-        console.log("Fetching profiles for user IDs:", userIds);
+        const userIds = reviewsData.map(review => review.user_id);
+        console.log("👥 Fetching profiles for user IDs:", userIds);
         
-        const { data: profiles, error: profilesError } = await supabase
+        const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
-          .select('id, first_name, last_name')
+          .select('*')
           .in('id', userIds);
 
-        console.log("Profiles fetched:", { profiles, profilesError });
+        console.log("👤 Profiles data:", profilesData);
+        console.log("❌ Profiles error:", profilesError);
 
-        // Create reviews with profile data
-        for (const review of reviewsData) {
-          const profile = profiles?.find(p => p.id === review.user_id);
-          realReviews.push({
+        // Step 3: Combine reviews with profile data
+        processedReviews = reviewsData.map(review => {
+          const profile = profilesData?.find(p => p.id === review.user_id);
+          return {
             ...review,
             isMock: false,
             profiles: profile ? {
@@ -171,42 +166,34 @@ const ProductDetail = () => {
               first_name: 'Anonymous',
               last_name: 'User'
             }
-          });
-        }
+          };
+        });
       }
+
+      console.log("✅ Processed real reviews:", processedReviews);
+
+      // Step 4: Combine with mock reviews and update state
+      const allReviews = [...processedReviews, ...mockReviews];
+      console.log("🎯 Final reviews array:", allReviews);
       
-      console.log("Processed real reviews:", realReviews);
-      
-      // Combine real reviews with mock reviews
-      const allReviews = [...realReviews, ...mockReviews];
-      console.log("All reviews combined:", { 
-        realCount: realReviews.length, 
-        mockCount: mockReviews.length, 
-        totalCount: allReviews.length 
-      });
-      
-      // Update state
       setReviews(allReviews);
-      
-      // Check if current user has a review
-      if (user) {
-        const currentUserReview = realReviews.find(review => review.user_id === user.id);
-        console.log("Current user review:", currentUserReview);
+
+      // Step 5: Check for current user's review
+      if (user && processedReviews.length > 0) {
+        const currentUserReview = processedReviews.find(review => review.user_id === user.id);
+        console.log("🔍 Current user review:", currentUserReview);
         setUserReview(currentUserReview || null);
       } else {
         setUserReview(null);
       }
-      
-      // Force component re-render
-      setRefreshKey(prev => prev + 1);
-      
+
     } catch (error) {
-      console.error("Exception in fetchReviews:", error);
+      console.error("💥 Exception in fetchReviews:", error);
       setReviews(mockReviews);
       setUserReview(null);
     } finally {
       setReviewsLoading(false);
-      console.log("=== REVIEWS FETCH COMPLETE ===");
+      console.log("✅ Review fetching completed");
     }
   };
   
@@ -273,8 +260,6 @@ const ProductDetail = () => {
           setSelectedLength(productData.lengths[0]);
         }
         
-        // Fetch reviews after product is loaded
-        await fetchReviews();
       } catch (error) {
         console.error("Exception loading product:", error);
         toast.error("Failed to load product details");
@@ -285,29 +270,28 @@ const ProductDetail = () => {
     
     fetchProduct();
   }, [id, navigate]);
-  
-  // Refresh reviews when user authentication changes
+
+  // Fetch reviews when product loads or user changes
   useEffect(() => {
-    if (id && product) {
-      console.log("User authentication changed, refetching reviews...");
+    if (product) {
+      console.log("🚀 Product loaded, fetching reviews...");
       fetchReviews();
     }
-  }, [user?.id, id, product]);
+  }, [product, user?.id]);
   
   const handleReviewSuccess = () => {
-    console.log("=== REVIEW SUBMITTED SUCCESSFULLY ===");
+    console.log("🎉 Review submitted successfully, refreshing reviews...");
     setShowReviewForm(false);
     setEditingReview(null);
     
     // Immediate refresh
-    console.log("Triggering immediate review refresh...");
-    fetchReviews(true);
+    fetchReviews();
     
-    // Also refresh after delay as backup
+    // Additional refresh after delay to ensure database consistency
     setTimeout(() => {
-      console.log("=== BACKUP REVIEW REFRESH ===");
-      fetchReviews(true);
-    }, 3000);
+      console.log("🔄 Delayed refresh after review submission");
+      fetchReviews();
+    }, 2000);
   };
   
   const handleEditReview = (review: any) => {
@@ -674,31 +658,26 @@ const ProductDetail = () => {
                 </div>
               )}
               
-              {/* Reviews list with refresh key to force re-render */}
-              <div key={refreshKey}>
+              <div className="space-y-6">
                 {reviewsLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
                     <p className="mt-2 text-gray-600">Loading reviews...</p>
                   </div>
+                ) : reviews.length > 0 ? (
+                  reviews.map((review) => (
+                    <ReviewItem
+                      key={review.id}
+                      review={review}
+                      onEdit={handleEditReview}
+                      onDelete={handleDeleteReview}
+                      isMockReview={review.isMock}
+                    />
+                  ))
                 ) : (
-                  <div className="space-y-6">
-                    {reviews.length > 0 ? (
-                      reviews.map((review, index) => (
-                        <ReviewItem
-                          key={`${review.id}-${refreshKey}-${index}`}
-                          review={review}
-                          onEdit={handleEditReview}
-                          onDelete={handleDeleteReview}
-                          isMockReview={review.isMock}
-                        />
-                      ))
-                    ) : (
-                      <p className="text-gray-500 text-center py-8">
-                        No reviews yet. Be the first to review this product!
-                      </p>
-                    )}
-                  </div>
+                  <p className="text-gray-500 text-center py-8">
+                    No reviews yet. Be the first to review this product!
+                  </p>
                 )}
               </div>
             </TabsContent>
