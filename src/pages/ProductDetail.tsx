@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { ShoppingCart, Heart, Share2, Minus, Plus, Check } from "lucide-react";
@@ -98,6 +97,7 @@ const ProductDetail = () => {
   const [showReviewForm, setShowReviewForm] = useState(false);
   const [editingReview, setEditingReview] = useState<any>(null);
   const [userReview, setUserReview] = useState<any>(null);
+  const [refreshKey, setRefreshKey] = useState(0);
   
   const [selectedColor, setSelectedColor] = useState<string>("");
   const [selectedLength, setSelectedLength] = useState<string>("");
@@ -113,15 +113,31 @@ const ProductDetail = () => {
     return `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${path}`;
   };
   
-  // Simplified and more reliable review fetching
+  // Enhanced review fetching with better debugging
   const fetchReviews = async () => {
-    if (!id) return;
+    if (!id) {
+      console.log("❌ No product ID available for fetching reviews");
+      return;
+    }
     
     console.log("🔄 Starting to fetch reviews for product:", id);
+    console.log("👤 Current user:", user?.id || 'Not authenticated');
     setReviewsLoading(true);
     
     try {
-      // Step 1: Fetch all reviews for this product
+      // Step 1: Test database connection
+      console.log("🔌 Testing database connection...");
+      const { data: testData, error: testError } = await supabase
+        .from('reviews')
+        .select('count', { count: 'exact', head: true });
+      
+      console.log("📊 Total reviews in database:", testData);
+      if (testError) {
+        console.error("❌ Database connection test failed:", testError);
+      }
+
+      // Step 2: Fetch reviews for this specific product
+      console.log("🔍 Fetching reviews for product ID:", id);
       const { data: reviewsData, error: reviewsError } = await supabase
         .from('reviews')
         .select('*')
@@ -140,10 +156,12 @@ const ProductDetail = () => {
 
       let processedReviews = [];
       
-      // Step 2: If we have reviews, get the profile information
+      // Step 3: If we have reviews, get the profile information
       if (reviewsData && reviewsData.length > 0) {
-        const userIds = reviewsData.map(review => review.user_id);
-        console.log("👥 Fetching profiles for user IDs:", userIds);
+        console.log("👥 Found", reviewsData.length, "reviews, fetching user profiles...");
+        
+        const userIds = [...new Set(reviewsData.map(review => review.user_id))];
+        console.log("👥 Unique user IDs to fetch:", userIds);
         
         const { data: profilesData, error: profilesError } = await supabase
           .from('profiles')
@@ -151,11 +169,15 @@ const ProductDetail = () => {
           .in('id', userIds);
 
         console.log("👤 Profiles data:", profilesData);
-        console.log("❌ Profiles error:", profilesError);
+        if (profilesError) {
+          console.error("❌ Profiles error:", profilesError);
+        }
 
-        // Step 3: Combine reviews with profile data
+        // Step 4: Combine reviews with profile data
         processedReviews = reviewsData.map(review => {
           const profile = profilesData?.find(p => p.id === review.user_id);
+          console.log(`👤 Processing review ${review.id} for user ${review.user_id}:`, profile);
+          
           return {
             ...review,
             isMock: false,
@@ -168,23 +190,26 @@ const ProductDetail = () => {
             }
           };
         });
+      } else {
+        console.log("📭 No reviews found in database for this product");
       }
 
       console.log("✅ Processed real reviews:", processedReviews);
 
-      // Step 4: Combine with mock reviews and update state
+      // Step 5: Combine with mock reviews and update state
       const allReviews = [...processedReviews, ...mockReviews];
-      console.log("🎯 Final reviews array:", allReviews);
+      console.log("🎯 Final reviews array (", allReviews.length, "total):", allReviews);
       
       setReviews(allReviews);
 
-      // Step 5: Check for current user's review
+      // Step 6: Check for current user's review
       if (user && processedReviews.length > 0) {
         const currentUserReview = processedReviews.find(review => review.user_id === user.id);
         console.log("🔍 Current user review:", currentUserReview);
         setUserReview(currentUserReview || null);
       } else {
         setUserReview(null);
+        console.log("🔍 No current user review found");
       }
 
     } catch (error) {
@@ -271,26 +296,26 @@ const ProductDetail = () => {
     fetchProduct();
   }, [id, navigate]);
 
-  // Fetch reviews when product loads or user changes
+  // Fetch reviews when product loads, user changes, or refresh key changes
   useEffect(() => {
     if (product) {
-      console.log("🚀 Product loaded, fetching reviews...");
+      console.log("🚀 Product loaded, fetching reviews... (refresh key:", refreshKey, ")");
       fetchReviews();
     }
-  }, [product, user?.id]);
+  }, [product, user?.id, refreshKey]);
   
   const handleReviewSuccess = () => {
-    console.log("🎉 Review submitted successfully, refreshing reviews...");
+    console.log("🎉 Review submitted successfully, triggering refresh...");
     setShowReviewForm(false);
     setEditingReview(null);
     
-    // Immediate refresh
-    fetchReviews();
+    // Force immediate refresh with a new key
+    setRefreshKey(prev => prev + 1);
     
     // Additional refresh after delay to ensure database consistency
     setTimeout(() => {
       console.log("🔄 Delayed refresh after review submission");
-      fetchReviews();
+      setRefreshKey(prev => prev + 1);
     }, 2000);
   };
   
@@ -315,7 +340,7 @@ const ProductDetail = () => {
       }
       
       toast.success("Review deleted successfully");
-      fetchReviews();
+      setRefreshKey(prev => prev + 1);
     } catch (error) {
       console.error("Exception deleting review:", error);
       toast.error("Failed to delete review");
@@ -665,9 +690,9 @@ const ProductDetail = () => {
                     <p className="mt-2 text-gray-600">Loading reviews...</p>
                   </div>
                 ) : reviews.length > 0 ? (
-                  reviews.map((review) => (
+                  reviews.map((review, index) => (
                     <ReviewItem
-                      key={review.id}
+                      key={`${review.id}-${refreshKey}-${index}`}
                       review={review}
                       onEdit={handleEditReview}
                       onDelete={handleDeleteReview}
