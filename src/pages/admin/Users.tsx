@@ -1,17 +1,27 @@
-
 import React, { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, MoreHorizontal, Shield, User } from "lucide-react";
+import { Search, MoreHorizontal, Shield, User, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -29,6 +39,7 @@ const Users: React.FC = () => {
   const [users, setUsers] = useState<UserProfile[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
+  const [deletingUserId, setDeletingUserId] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -134,6 +145,52 @@ const Users: React.FC = () => {
     }
   };
 
+  const deleteUser = async (userId: string) => {
+    try {
+      setDeletingUserId(userId);
+
+      // First, delete user-related data (roles, addresses, cart items, etc.)
+      await supabase.from('user_roles').delete().eq('user_id', userId);
+      await supabase.from('user_addresses').delete().eq('user_id', userId);
+      await supabase.from('cart_items').delete().eq('user_id', userId);
+      await supabase.from('wishlist').delete().eq('user_id', userId);
+      await supabase.from('wishlist_items').delete().eq('user_id', userId);
+
+      // Delete the profile
+      const { error: profileError } = await supabase
+        .from('profiles')
+        .delete()
+        .eq('id', userId);
+
+      if (profileError) {
+        console.error('Error deleting profile:', profileError);
+        toast({
+          title: "Error",
+          description: "Failed to delete user profile",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      toast({
+        title: "Success",
+        description: "User deleted successfully",
+      });
+
+      // Refresh users list
+      fetchUsers();
+    } catch (error) {
+      console.error('Error deleting user:', error);
+      toast({
+        title: "Error",
+        description: "Failed to delete user",
+        variant: "destructive",
+      });
+    } finally {
+      setDeletingUserId(null);
+    }
+  };
+
   const filteredUsers = users.filter(user =>
     user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
     `${user.first_name || ''} ${user.last_name || ''}`.toLowerCase().includes(searchTerm.toLowerCase())
@@ -236,6 +293,36 @@ const Users: React.FC = () => {
                                 <Shield size={16} className="mr-2" />
                                 {user.role === 'admin' ? 'Remove Admin' : 'Make Admin'}
                               </DropdownMenuItem>
+                              <AlertDialog>
+                                <AlertDialogTrigger asChild>
+                                  <DropdownMenuItem
+                                    className="text-red-600"
+                                    onSelect={(e) => e.preventDefault()}
+                                  >
+                                    <Trash2 size={16} className="mr-2" />
+                                    Delete User
+                                  </DropdownMenuItem>
+                                </AlertDialogTrigger>
+                                <AlertDialogContent>
+                                  <AlertDialogHeader>
+                                    <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                    <AlertDialogDescription>
+                                      This action cannot be undone. This will permanently delete the user account
+                                      and remove all associated data including orders, addresses, and preferences.
+                                    </AlertDialogDescription>
+                                  </AlertDialogHeader>
+                                  <AlertDialogFooter>
+                                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                    <AlertDialogAction
+                                      onClick={() => deleteUser(user.id)}
+                                      disabled={deletingUserId === user.id}
+                                      className="bg-red-600 hover:bg-red-700"
+                                    >
+                                      {deletingUserId === user.id ? "Deleting..." : "Delete User"}
+                                    </AlertDialogAction>
+                                  </AlertDialogFooter>
+                                </AlertDialogContent>
+                              </AlertDialog>
                             </DropdownMenuContent>
                           </DropdownMenu>
                         </TableCell>
