@@ -66,11 +66,11 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
   };
 
   return (
-    <div className="border-b pb-6 last:border-b-0 last:pb-0">
+    <div className="border-b border-gray-200 dark:border-gray-600 pb-6 last:border-b-0 last:pb-0">
       <div className="flex justify-between items-start mb-2">
         <div>
-          <div className="font-medium">{getUserDisplayName()}</div>
-          <div className="text-gray-500 text-sm">{formatDate(review.created_at)}</div>
+          <div className="font-medium text-gray-900 dark:text-white">{getUserDisplayName()}</div>
+          <div className="text-gray-500 dark:text-gray-400 text-sm">{formatDate(review.created_at)}</div>
         </div>
         
         {isOwner && !isMockReview && (
@@ -107,19 +107,19 @@ const ReviewItem: React.FC<ReviewItemProps> = ({
           ))}
         </div>
         {!isMockReview && (
-          <div className="px-2 py-0.5 bg-green-50 text-green-700 text-xs rounded border border-green-200">
+          <div className="px-2 py-0.5 bg-green-50 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs rounded border border-green-200 dark:border-green-700">
             Verified Purchase
           </div>
         )}
       </div>
       
-      <p className="text-gray-700 mb-3">{review.comment}</p>
+      <p className="text-gray-700 dark:text-gray-300 mb-3">{review.comment}</p>
       
       {review.image_url && (
         <img 
           src={getImageUrl(review.image_url)} 
           alt="Review image" 
-          className="w-32 h-32 object-cover rounded-lg border"
+          className="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
         />
       )}
     </div>

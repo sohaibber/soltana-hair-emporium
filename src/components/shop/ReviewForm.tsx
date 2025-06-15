@@ -160,22 +160,22 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
   };
 
   return (
-    <div className="bg-white p-6 rounded-lg border">
-      <h3 className="text-lg font-medium mb-4">
+    <div className="bg-white dark:bg-gray-700 p-6 rounded-lg border border-gray-200 dark:border-gray-600">
+      <h3 className="text-lg font-medium mb-4 text-gray-900 dark:text-white">
         {existingReview ? "Edit Your Review" : "Write a Review"}
       </h3>
       
       <form onSubmit={handleSubmit} className="space-y-4">
         {/* Rating */}
         <div>
-          <label className="block text-sm font-medium mb-2">Rating</label>
+          <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Rating</label>
           <div className="flex space-x-1">
             {[1, 2, 3, 4, 5].map((star) => (
               <button
                 key={star}
                 type="button"
                 className={`text-2xl transition-colors ${
-                  star <= rating ? 'text-amber-400' : 'text-gray-300'
+                  star <= rating ? 'text-amber-400' : 'text-gray-300 dark:text-gray-600'
                 } hover:text-amber-400`}
                 onClick={() => setRating(star)}
               >
@@ -187,26 +187,27 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
 
         {/* Comment */}
         <div>
-          <label className="block text-sm font-medium mb-2">Comment</label>
+          <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Comment</label>
           <Textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             placeholder="Share your experience with this product..."
             rows={4}
             required
+            className="bg-white dark:bg-gray-800 border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400"
           />
         </div>
 
         {/* Image Upload */}
         <div>
-          <label className="block text-sm font-medium mb-2">Add Photo (Optional)</label>
+          <label className="block text-sm font-medium mb-2 text-gray-900 dark:text-white">Add Photo (Optional)</label>
           
           {imageUrl ? (
             <div className="relative inline-block">
               <img 
                 src={getImageUrl(imageUrl)} 
                 alt="Review image" 
-                className="w-32 h-32 object-cover rounded-lg border"
+                className="w-32 h-32 object-cover rounded-lg border border-gray-200 dark:border-gray-600"
               />
               <Button
                 type="button"
@@ -234,6 +235,7 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
                   variant="outline"
                   disabled={uploading}
                   asChild
+                  className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
                 >
                   <span className="cursor-pointer">
                     <Upload size={16} className="mr-2" />
@@ -254,7 +256,12 @@ const ReviewForm: React.FC<ReviewFormProps> = ({
           >
             {submitting ? 'Saving...' : existingReview ? 'Update Review' : 'Submit Review'}
           </Button>
-          <Button type="button" variant="outline" onClick={onCancel}>
+          <Button 
+            type="button" 
+            variant="outline" 
+            onClick={onCancel}
+            className="border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600"
+          >
             Cancel
           </Button>
         </div>

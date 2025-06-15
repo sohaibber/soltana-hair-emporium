@@ -620,31 +620,31 @@ const ProductDetail = () => {
               <TabsTrigger value="specifications">Specifications</TabsTrigger>
               <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
             </TabsList>
-            <TabsContent value="details" className="bg-white p-6 rounded-lg border">
+            <TabsContent value="details" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="prose max-w-none">
-                <h3 className="text-xl font-medium mb-4">About this Product</h3>
-                <p className="mb-4">{product.description}</p>
-                <ul className="list-disc pl-5 space-y-1">
+                <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">About this Product</h3>
+                <p className="mb-4 text-gray-700 dark:text-gray-300">{product.description}</p>
+                <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
                   {product.details?.map((detail, index) => (
                     <li key={index}>{detail}</li>
                   ))}
                 </ul>
               </div>
             </TabsContent>
-            <TabsContent value="specifications" className="bg-white p-6 rounded-lg border">
-              <h3 className="text-xl font-medium mb-4">Specifications</h3>
+            <TabsContent value="specifications" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+              <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">Specifications</h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {product.specifications?.map((spec, index) => (
-                  <div key={index} className="flex border-b pb-2">
-                    <div className="font-medium w-1/3">{spec.name}</div>
-                    <div className="w-2/3">{spec.value}</div>
+                  <div key={index} className="flex border-b border-gray-200 dark:border-gray-600 pb-2">
+                    <div className="font-medium w-1/3 text-gray-900 dark:text-white">{spec.name}</div>
+                    <div className="w-2/3 text-gray-700 dark:text-gray-300">{spec.value}</div>
                   </div>
                 ))}
               </div>
             </TabsContent>
-            <TabsContent value="reviews" className="bg-white p-6 rounded-lg border">
+            <TabsContent value="reviews" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium">Customer Reviews</h3>
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">Customer Reviews</h3>
                 
                 {isAuthenticated && !userReview && !showReviewForm && (
                   <Button 
@@ -657,11 +657,11 @@ const ProductDetail = () => {
               </div>
               
               {!isAuthenticated && (
-                <div className="mb-6 p-4 bg-gray-50 rounded-lg">
-                  <p className="text-sm text-gray-600">
+                <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+                  <p className="text-sm text-gray-600 dark:text-gray-300">
                     Please <button 
                       onClick={() => navigate('/login')} 
-                      className="text-soltana-dark hover:underline"
+                      className="text-soltana-dark dark:text-primary hover:underline"
                     >
                       log in
                     </button> to write a review.
@@ -686,8 +686,8 @@ const ProductDetail = () => {
               <div className="space-y-6">
                 {reviewsLoading ? (
                   <div className="text-center py-8">
-                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-                    <p className="mt-2 text-gray-600">Loading reviews...</p>
+                    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">Loading reviews...</p>
                   </div>
                 ) : reviews.length > 0 ? (
                   reviews.map((review, index) => (
@@ -700,7 +700,7 @@ const ProductDetail = () => {
                     />
                   ))
                 ) : (
-                  <p className="text-gray-500 text-center py-8">
+                  <p className="text-gray-500 dark:text-gray-400 text-center py-8">
                     No reviews yet. Be the first to review this product!
                   </p>
                 )}
