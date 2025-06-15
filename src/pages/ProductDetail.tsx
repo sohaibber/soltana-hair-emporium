@@ -17,6 +17,7 @@ import ReviewItem from "@/components/shop/ReviewItem";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext"; // <-- Add this import for translations
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -89,6 +90,7 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
+  const { t } = useLanguage(); // <-- Use translation context
   const [product, setProduct] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -388,9 +390,9 @@ const ProductDetail = () => {
     return (
       <Layout>
         <div className="container mx-auto px-4 py-12 text-center">
-          <h1 className="text-2xl font-bold mb-4">Product Not Found</h1>
-          <p className="mb-6">The product you're looking for doesn't exist or has been removed.</p>
-          <Button onClick={() => navigate('/shop')}>Browse All Products</Button>
+          <h1 className="text-2xl font-bold mb-4">{t('product.notFound') || "Product Not Found"}</h1>
+          <p className="mb-6">{t('product.notFoundDesc') || "The product you're looking for doesn't exist or has been removed."}</p>
+          <Button onClick={() => navigate('/shop')}>{t('product.viewAllProducts')}</Button>
         </div>
       </Layout>
     );
@@ -483,10 +485,13 @@ const ProductDetail = () => {
           {/* Product Info */}
           <div>
             <h1 className="font-serif text-2xl md:text-3xl font-semibold mb-2">{product.name}</h1>
-            <div className="text-2xl font-semibold mb-4">${product.price.toFixed(2)}</div>
+            <div className="text-2xl font-semibold mb-4">
+              {t("product.price", { price: product.price.toFixed(2) }) || `$${product.price.toFixed(2)}`}
+            </div>
             <div className="flex items-center mb-4">
               <div className="flex text-amber-500 mr-2">
                 {[1, 2, 3, 4, 5].map((star) => (
+                  // ... star svg unchanged ...
                   <svg
                     key={star}
                     xmlns="http://www.w3.org/2000/svg"
@@ -503,7 +508,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-600">
-                ({reviews.length} reviews)
+                ({reviews.length} {t('product.reviews', { count: reviews.length }) || t('product.rating')})
               </span>
             </div>
             
@@ -512,8 +517,9 @@ const ProductDetail = () => {
             {/* Color Selection */}
             {product.colors.length > 0 && (
               <div className="mb-6">
-                <h3 className="font-medium mb-2">Color</h3>
+                <h3 className="font-medium mb-2">{t("product.color") || 'Color'}</h3>
                 <div className="flex flex-wrap gap-2">
+                  {/* ... color buttons unchanged ... */}
                   {product.colors.map((color) => (
                     <button
                       key={color}
@@ -533,7 +539,7 @@ const ProductDetail = () => {
             
             {/* Length Selection */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">Length</h3>
+              <h3 className="font-medium mb-2">{t("product.length") || "Length"}</h3>
               <div className="flex flex-wrap gap-2">
                 {product.lengths.map((length) => (
                   <button
@@ -553,7 +559,7 @@ const ProductDetail = () => {
             
             {/* Quantity */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">Quantity</h3>
+              <h3 className="font-medium mb-2">{t("product.quantity") || "Quantity"}</h3>
               <div className="flex items-center border rounded-md w-fit">
                 <button
                   className="px-3 py-2"
@@ -579,12 +585,12 @@ const ProductDetail = () => {
                 onClick={handleAddToCart}
                 className="flex-grow bg-soltana-dark text-white hover:bg-black"
               >
-                <ShoppingCart className="mr-2" size={16} /> Add to Cart
+                <ShoppingCart className="mr-2" size={16} />{t("shop.addToCart")}
               </Button>
               <Button 
                 variant="outline" 
                 size="icon" 
-                className={`rounded-full ${inWishlist ? 'text-red-500' : ''}`}
+                className={`rounded-full ${inWishlist ? "text-red-500" : ''}`}
                 onClick={handleWishlistToggle}
               >
                 <Heart size={16} fill={inWishlist ? "currentColor" : "none"} />
@@ -598,32 +604,42 @@ const ProductDetail = () => {
             <div className="border-t pt-4">
               <div className="flex items-center text-sm text-gray-600 mb-2">
                 <Check size={16} className="mr-2 text-green-500" />
-                In Stock & Ready to Ship
+                {t("product.inStock") || "In Stock & Ready to Ship"}
               </div>
               <div className="flex items-center text-sm text-gray-600 mb-2">
                 <Check size={16} className="mr-2 text-green-500" />
-                Free Shipping on Orders Over $100
+                {t("product.freeShipping") || "Free Shipping on Orders Over $100"}
               </div>
               <div className="flex items-center text-sm text-gray-600">
                 <Check size={16} className="mr-2 text-green-500" />
-                30-Day Returns
+                {t("product.returns") || "30-Day Returns"}
               </div>
             </div>
           </div>
         </div>
-        
+        {/* ... carousel, thumbnails, and grid layout ... */}
+
         {/* Product details tabs */}
         <div className="mb-16">
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="mb-6 justify-start">
-              <TabsTrigger value="details">Product Details</TabsTrigger>
-              <TabsTrigger value="specifications">Specifications</TabsTrigger>
-              <TabsTrigger value="reviews">Reviews ({reviews.length})</TabsTrigger>
+              <TabsTrigger value="details">{t("product.detailsTab") || "Product Details"}</TabsTrigger>
+              <TabsTrigger value="specifications">{t("product.specificationsTab") || "Specifications"}</TabsTrigger>
+              <TabsTrigger value="reviews">
+                {t("product.reviewsTab", { count: reviews.length }) || `Reviews (${reviews.length})`}
+              </TabsTrigger>
             </TabsList>
-            <TabsContent value="details" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+            <TabsContent
+              value="details"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
               <div className="prose max-w-none">
-                <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">About this Product</h3>
-                <p className="mb-4 text-gray-700 dark:text-gray-300">{product.description}</p>
+                <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
+                  {t("product.aboutThisProduct") || "About this Product"}
+                </h3>
+                <p className="mb-4 text-gray-700 dark:text-gray-300">
+                  {product.description}
+                </p>
                 <ul className="list-disc pl-5 space-y-1 text-gray-700 dark:text-gray-300">
                   {product.details?.map((detail, index) => (
                     <li key={index}>{detail}</li>
@@ -631,44 +647,60 @@ const ProductDetail = () => {
                 </ul>
               </div>
             </TabsContent>
-            <TabsContent value="specifications" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
-              <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">Specifications</h3>
+            <TabsContent
+              value="specifications"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
+              <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
+                {t("product.specificationsTab") || "Specifications"}
+              </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {product.specifications?.map((spec, index) => (
-                  <div key={index} className="flex border-b border-gray-200 dark:border-gray-600 pb-2">
-                    <div className="font-medium w-1/3 text-gray-900 dark:text-white">{spec.name}</div>
+                  <div
+                    key={index}
+                    className="flex border-b border-gray-200 dark:border-gray-600 pb-2"
+                  >
+                    <div className="font-medium w-1/3 text-gray-900 dark:text-white">
+                      {spec.name}
+                    </div>
                     <div className="w-2/3 text-gray-700 dark:text-gray-300">{spec.value}</div>
                   </div>
                 ))}
               </div>
             </TabsContent>
-            <TabsContent value="reviews" className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700">
+            <TabsContent
+              value="reviews"
+              className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700"
+            >
               <div className="flex justify-between items-center mb-6">
-                <h3 className="text-xl font-medium text-gray-900 dark:text-white">Customer Reviews</h3>
-                
+                <h3 className="text-xl font-medium text-gray-900 dark:text-white">
+                  {t("product.customerReviews") || "Customer Reviews"}
+                </h3>
                 {isAuthenticated && !userReview && !showReviewForm && (
-                  <Button 
+                  <Button
                     onClick={() => setShowReviewForm(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                   >
-                    Write a Review
+                    {t("product.writeReview") || "Write a Review"}
                   </Button>
                 )}
               </div>
-              
+
               {!isAuthenticated && (
                 <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    Please <button 
-                      onClick={() => navigate('/login')} 
+                    {t("product.loginToReview") || "Please "} 
+                    <button
+                      onClick={() => navigate('/login')}
                       className="text-soltana-dark dark:text-primary hover:underline"
                     >
-                      log in
-                    </button> to write a review.
+                      {t("nav.login")}
+                    </button>{" "}
+                    {t("product.toWriteReview") || "to write a review."}
                   </p>
                 </div>
               )}
-              
+
               {showReviewForm && (
                 <div className="mb-6">
                   <ReviewForm
@@ -682,12 +714,14 @@ const ProductDetail = () => {
                   />
                 </div>
               )}
-              
+
               <div className="space-y-6">
                 {reviewsLoading ? (
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
-                    <p className="mt-2 text-gray-600 dark:text-gray-400">Loading reviews...</p>
+                    <p className="mt-2 text-gray-600 dark:text-gray-400">
+                      {t("product.loadingReviews") || "Loading reviews..."}
+                    </p>
                   </div>
                 ) : reviews.length > 0 ? (
                   reviews.map((review, index) => (
@@ -701,7 +735,7 @@ const ProductDetail = () => {
                   ))
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                    No reviews yet. Be the first to review this product!
+                    {t("product.noReviews") || "No reviews yet. Be the first to review this product!"}
                   </p>
                 )}
               </div>
