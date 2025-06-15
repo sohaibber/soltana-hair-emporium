@@ -139,16 +139,16 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
 
   if (loading) {
     return (
-      <div className="py-8 mb-8 border-t">
-        <h2 className="font-serif text-2xl font-semibold mb-6">{displayTitle}</h2>
+      <div className="py-8 mb-8 border-t border-gray-200 dark:border-gray-800">
+        <h2 className="font-serif text-2xl font-semibold mb-6 text-gray-900 dark:text-white">{displayTitle}</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[1, 2, 3, 4].map(i => (
-            <div key={i} className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm animate-pulse">
-              <div className="aspect-square bg-gray-200"></div>
+            <div key={i} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm animate-pulse">
+              <div className="aspect-square bg-gray-200 dark:bg-gray-700"></div>
               <div className="p-3">
-                <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
-                <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
+                <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
               </div>
             </div>
           ))}
@@ -162,12 +162,12 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
   }
 
   return (
-    <div className="py-8 mb-8 border-t">
-      <h2 className="font-serif text-2xl font-semibold mb-6">{displayTitle}</h2>
+    <div className="py-8 mb-8 border-t border-gray-200 dark:border-gray-800 bg-transparent">
+      <h2 className="font-serif text-2xl font-semibold mb-6 text-gray-900 dark:text-white">{displayTitle}</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         {recommendations.map(product => (
           <Link key={product.id} to={`/product/${product.id}`} className="group">
-            <div className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover-lift">
+            <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md dark:hover:shadow-lg transition-all hover-lift">
               <div className="relative aspect-square overflow-hidden">
                 <img 
                   src={getImageUrl(product.image)} 
@@ -181,12 +181,12 @@ const ProductRecommendations: React.FC<ProductRecommendationsProps> = ({
                 )}
               </div>
               <div className="p-3">
-                <div className="text-xs text-gray-500 mb-1">{product.category}</div>
-                <h3 className="font-medium text-sm mb-1 truncate group-hover:text-primary transition-colors">
+                <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{product.category}</div>
+                <h3 className="font-medium text-sm mb-1 truncate group-hover:text-primary transition-colors text-gray-900 dark:text-white">
                   {product.name}
                 </h3>
                 <div className="flex justify-between items-center">
-                  <div className="font-semibold">${product.price.toFixed(2)}</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">${product.price.toFixed(2)}</div>
                   {product.rating && (
                     <div className="text-xs text-amber-500">★ {product.rating}</div>
                   )}
