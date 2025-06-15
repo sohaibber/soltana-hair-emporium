@@ -1,3 +1,4 @@
+
 import React from "react";
 import { Carousel, CarouselContent, CarouselItem, CarouselPrevious, CarouselNext } from "@/components/ui/carousel";
 import { useLanguage } from "@/context/LanguageContext";
@@ -38,13 +39,13 @@ const testimonials: TestimonialProps[] = [
 
 const TestimonialCard: React.FC<TestimonialProps> = ({ quote, author, image, rating }) => {
   return (
-    <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-100">
+    <div className="bg-card p-6 rounded-lg shadow-sm border border-border transition-colors duration-300">
       <div className="flex items-center mb-4">
         <div className="mr-4">
           <img src={image} alt={author} className="w-12 h-12 rounded-full object-cover" />
         </div>
         <div>
-          <div className="font-medium">{author}</div>
+          <div className="font-medium text-foreground">{author}</div>
           <div className="flex text-amber-400">
             {[...Array(5)].map((_, i) => (
               <svg 
@@ -61,7 +62,7 @@ const TestimonialCard: React.FC<TestimonialProps> = ({ quote, author, image, rat
           </div>
         </div>
       </div>
-      <blockquote className="italic text-gray-700">{quote}</blockquote>
+      <blockquote className="italic text-muted-foreground">{quote}</blockquote>
     </div>
   );
 };
@@ -70,11 +71,11 @@ const Testimonials: React.FC = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="py-12 md:py-16 bg-gradient-to-b from-white to-soltana-light">
+    <section className="py-12 md:py-16 bg-gradient-to-b from-background to-muted/30 dark:from-background dark:to-muted/10 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="text-center mb-10 md:mb-12">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2">{t('home.testimonials.title')}</h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-2 text-foreground">{t('home.testimonials.title')}</h2>
+          <p className="text-muted-foreground max-w-2xl mx-auto">
             {t('home.testimonials.subtitle')}
           </p>
         </div>
