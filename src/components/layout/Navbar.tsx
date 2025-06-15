@@ -22,7 +22,7 @@ const Navbar = () => {
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
-  const { t } = useLanguage();
+  const { t, isRTL } = useLanguage();
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -46,7 +46,7 @@ const Navbar = () => {
         <div className="flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button 
-            className="md:hidden text-soltana-dark p-2" 
+            className={`md:hidden text-soltana-dark p-2 ${isRTL ? 'order-3' : 'order-1'}`}
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -54,7 +54,7 @@ const Navbar = () => {
           </button>
 
           {/* Logo */}
-          <div className="flex-shrink-0">
+          <div className={`flex-shrink-0 ${isRTL ? 'order-1' : 'order-2'}`}>
             <Link to="/" className="flex items-center">
               <span className="font-serif font-bold text-2xl text-soltana-dark">
                 Soltana<span className="text-primary">Hair</span>
@@ -63,7 +63,7 @@ const Navbar = () => {
           </div>
 
           {/* Desktop Navigation */}
-          <div className="hidden md:flex space-x-8">
+          <div className={`hidden md:flex space-x-8 ${isRTL ? 'space-x-reverse order-2' : 'order-2'}`}>
             <Link to="/" className="font-medium hover:text-primary transition-colors">
               {t('nav.home')}
             </Link>
@@ -89,7 +89,7 @@ const Navbar = () => {
           </div>
 
           {/* Icons */}
-          <div className="flex items-center space-x-4">
+          <div className={`flex items-center space-x-4 ${isRTL ? 'space-x-reverse order-2' : 'order-3'}`}>
             {/* Language Selector */}
             <LanguageSelector />
             
@@ -108,18 +108,18 @@ const Navbar = () => {
                   <User size={20} />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="end" className="w-48 bg-white border shadow-lg">
+              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48 bg-white border shadow-lg">
                 {isAuthenticated ? (
                   <>
                     <DropdownMenuItem asChild>
                       <Link to="/account" className="flex items-center">
-                        <UserCircle size={16} className="mr-2" />
+                        <UserCircle size={16} className={isRTL ? "ml-2" : "mr-2"} />
                         {t('nav.account')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/orders" className="flex items-center">
-                        <ShoppingCart size={16} className="mr-2" />
+                        <ShoppingCart size={16} className={isRTL ? "ml-2" : "mr-2"} />
                         {t('nav.orders')}
                       </Link>
                     </DropdownMenuItem>
@@ -129,7 +129,7 @@ const Navbar = () => {
                         <DropdownMenuSeparator />
                         <DropdownMenuItem asChild>
                           <Link to="/admin" className="flex items-center text-orange-600">
-                            <Settings size={16} className="mr-2" />
+                            <Settings size={16} className={isRTL ? "ml-2" : "mr-2"} />
                             {t('nav.adminDashboard')}
                           </Link>
                         </DropdownMenuItem>
@@ -137,7 +137,7 @@ const Navbar = () => {
                     )}
                     <DropdownMenuSeparator />
                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
-                      <LogOut size={16} className="mr-2" />
+                      <LogOut size={16} className={isRTL ? "ml-2" : "mr-2"} />
                       {t('nav.logout')}
                     </DropdownMenuItem>
                   </>
@@ -145,13 +145,13 @@ const Navbar = () => {
                   <>
                     <DropdownMenuItem asChild>
                       <Link to="/login" className="flex items-center">
-                        <User size={16} className="mr-2" />
+                        <User size={16} className={isRTL ? "ml-2" : "mr-2"} />
                         {t('nav.login')}
                       </Link>
                     </DropdownMenuItem>
                     <DropdownMenuItem asChild>
                       <Link to="/register" className="flex items-center">
-                        <UserCircle size={16} className="mr-2" />
+                        <UserCircle size={16} className={isRTL ? "ml-2" : "mr-2"} />
                         {t('nav.register')}
                       </Link>
                     </DropdownMenuItem>
@@ -164,7 +164,7 @@ const Navbar = () => {
             <Link to="/wishlist" className="relative hover:text-primary transition-colors">
               <Heart size={20} />
               {isAuthenticated && wishlistItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className={`absolute -top-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
                   {wishlistItems > 99 ? '99+' : wishlistItems}
                 </span>
               )}
@@ -174,7 +174,7 @@ const Navbar = () => {
             <Link to="/cart" className="relative hover:text-primary transition-colors">
               <ShoppingCart size={20} />
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
+                <span className={`absolute -top-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
@@ -248,9 +248,10 @@ const Navbar = () => {
                 placeholder={t('common.searchPlaceholder')}
                 className="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
                 autoFocus
+                dir={isRTL ? 'rtl' : 'ltr'}
               />
               <button
-                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary"
+                className={`absolute top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary ${isRTL ? 'left-3' : 'right-3'}`}
                 onClick={toggleSearch}
               >
                 <X size={20} />
