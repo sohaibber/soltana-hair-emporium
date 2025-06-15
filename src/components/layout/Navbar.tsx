@@ -1,13 +1,13 @@
-
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { ShoppingCart, User, Menu, X, Search, Heart, LogOut, UserCircle, Settings } from "lucide-react";
+import { ShoppingCart, User, Menu, X, Heart, LogOut, UserCircle, Settings } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
 import { useLanguage } from "@/context/LanguageContext";
 import LanguageSelector from "./LanguageSelector";
+import ThemeToggle from "./ThemeToggle";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,7 +18,6 @@ import {
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const { totalItems } = useCart();
   const { totalItems: wishlistItems } = useWishlist();
   const { user, isAuthenticated, isAdmin, logout } = useAuth();
@@ -26,10 +25,6 @@ const Navbar = () => {
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
-  };
-
-  const toggleSearch = () => {
-    setIsSearchOpen(!isSearchOpen);
   };
 
   const handleLogout = async () => {
@@ -41,12 +36,12 @@ const Navbar = () => {
   };
 
   return (
-    <nav className="bg-white border-b border-soltana-neutral/20 sticky top-0 z-50">
+    <nav className="bg-white dark:bg-gray-900 border-b border-soltana-neutral/20 dark:border-gray-700 sticky top-0 z-50 transition-colors">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between">
           {/* Mobile Menu Button */}
           <button 
-            className={`md:hidden text-soltana-dark p-2 ${isRTL ? 'order-3' : 'order-1'}`}
+            className={`md:hidden text-soltana-dark dark:text-white p-2 ${isRTL ? 'order-3' : 'order-1'}`}
             onClick={toggleMenu}
             aria-label="Toggle menu"
           >
@@ -56,7 +51,7 @@ const Navbar = () => {
           {/* Logo */}
           <div className={`flex-shrink-0 ${isRTL ? 'order-1' : 'order-2'}`}>
             <Link to="/" className="flex items-center">
-              <span className="font-serif font-bold text-2xl text-soltana-dark">
+              <span className="font-serif font-bold text-2xl text-soltana-dark dark:text-white">
                 Soltana<span className="text-primary">Hair</span>
               </span>
             </Link>
@@ -64,16 +59,16 @@ const Navbar = () => {
 
           {/* Desktop Navigation */}
           <div className={`hidden md:flex space-x-8 ${isRTL ? 'space-x-reverse order-2' : 'order-2'}`}>
-            <Link to="/" className="font-medium hover:text-primary transition-colors">
+            <Link to="/" className="font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors">
               {t('nav.home')}
             </Link>
-            <Link to="/shop" className="font-medium hover:text-primary transition-colors">
+            <Link to="/shop" className="font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors">
               {t('nav.shop')}
             </Link>
-            <Link to="/about" className="font-medium hover:text-primary transition-colors">
+            <Link to="/about" className="font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors">
               {t('nav.about')}
             </Link>
-            <Link to="/contact" className="font-medium hover:text-primary transition-colors">
+            <Link to="/contact" className="font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors">
               {t('nav.contact')}
             </Link>
             {/* Admin Link - Only show for admin users */}
@@ -93,22 +88,17 @@ const Navbar = () => {
             {/* Language Selector */}
             <LanguageSelector />
             
-            <button 
-              onClick={toggleSearch}
-              className="hover:text-primary transition-colors"
-              aria-label={t('common.search')}
-            >
-              <Search size={20} />
-            </button>
+            {/* Theme Toggle */}
+            <ThemeToggle />
             
             {/* User Dropdown */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <button className="hover:text-primary transition-colors">
+                <button className="text-soltana-dark dark:text-white hover:text-primary transition-colors">
                   <User size={20} />
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48 bg-white border shadow-lg">
+              <DropdownMenuContent align={isRTL ? "start" : "end"} className="w-48 bg-white dark:bg-gray-800 border shadow-lg z-50">
                 {isAuthenticated ? (
                   <>
                     <DropdownMenuItem asChild>
@@ -161,20 +151,20 @@ const Navbar = () => {
             </DropdownMenu>
 
             {/* Wishlist - only show count for authenticated users */}
-            <Link to="/wishlist" className="relative hover:text-primary transition-colors">
+            <Link to="/wishlist" className="relative text-soltana-dark dark:text-white hover:text-primary transition-colors">
               <Heart size={20} />
               {isAuthenticated && wishlistItems > 0 && (
-                <span className={`absolute -top-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
+                <span className={`absolute -top-2 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
                   {wishlistItems > 99 ? '99+' : wishlistItems}
                 </span>
               )}
             </Link>
 
             {/* Cart - show count for all users */}
-            <Link to="/cart" className="relative hover:text-primary transition-colors">
+            <Link to="/cart" className="relative text-soltana-dark dark:text-white hover:text-primary transition-colors">
               <ShoppingCart size={20} />
               {totalItems > 0 && (
-                <span className={`absolute -top-2 bg-primary text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
+                <span className={`absolute -top-2 bg-primary text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center ${isRTL ? '-left-2' : '-right-2'}`}>
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
@@ -185,32 +175,32 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       {isMenuOpen && (
-        <div className="md:hidden bg-white border-t border-gray-200 py-4 animate-fade-in">
+        <div className="md:hidden bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 py-4 animate-fade-in transition-colors">
           <div className="container mx-auto px-4 space-y-4">
             <Link 
               to="/" 
-              className="block font-medium hover:text-primary transition-colors"
+              className="block font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.home')}
             </Link>
             <Link 
               to="/shop" 
-              className="block font-medium hover:text-primary transition-colors"
+              className="block font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.shop')}
             </Link>
             <Link 
               to="/about" 
-              className="block font-medium hover:text-primary transition-colors"
+              className="block font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.about')}
             </Link>
             <Link 
               to="/contact" 
-              className="block font-medium hover:text-primary transition-colors"
+              className="block font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors"
               onClick={() => setIsMenuOpen(false)}
             >
               {t('nav.contact')}
@@ -218,7 +208,7 @@ const Navbar = () => {
             {isAuthenticated && (
               <Link 
                 to="/wishlist" 
-                className="block font-medium hover:text-primary transition-colors"
+                className="block font-medium text-soltana-dark dark:text-white hover:text-primary transition-colors"
                 onClick={() => setIsMenuOpen(false)}
               >
                 {t('nav.wishlist')}
@@ -234,29 +224,6 @@ const Navbar = () => {
                 {t('nav.adminDashboard')}
               </Link>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* Search Bar */}
-      {isSearchOpen && (
-        <div className="border-t border-gray-200 py-4 animate-fade-in">
-          <div className="container mx-auto px-4">
-            <div className="relative">
-              <input
-                type="text"
-                placeholder={t('common.searchPlaceholder')}
-                className="w-full border border-gray-300 rounded-md py-2 px-4 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent"
-                autoFocus
-                dir={isRTL ? 'rtl' : 'ltr'}
-              />
-              <button
-                className={`absolute top-1/2 -translate-y-1/2 text-gray-500 hover:text-primary ${isRTL ? 'left-3' : 'right-3'}`}
-                onClick={toggleSearch}
-              >
-                <X size={20} />
-              </button>
-            </div>
           </div>
         </div>
       )}
