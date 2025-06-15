@@ -1,4 +1,3 @@
-
 import React, { useState } from "react";
 import Layout from "@/components/layout/Layout";
 import { Card, CardContent } from "@/components/ui/card";
@@ -7,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Mail, Phone, MapPin, Clock } from "lucide-react";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -35,17 +35,18 @@ const Contact: React.FC = () => {
     }, 1500);
   };
 
+  const { t } = useLanguage();
+
   return (
     <Layout>
       <div className="container mx-auto px-4 py-8 md:py-16">
-        <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-8 text-center">Contact Us</h1>
+        <h1 className="font-serif text-3xl md:text-4xl font-semibold mb-8 text-center">{t("contact.title")}</h1>
         
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           <div>
-            <h2 className="font-serif text-2xl font-semibold mb-6">Get in Touch</h2>
+            <h2 className="font-serif text-2xl font-semibold mb-6">{t("contact.getInTouch")}</h2>
             <p className="text-gray-700 mb-8">
-              Have questions about our products? Need advice on choosing the right extensions? 
-              Our team is here to help! Fill out the form, and we'll get back to you as soon as possible.
+              {t("contact.getInTouchDesc")}
             </p>
             
             <div className="space-y-6">
@@ -54,9 +55,9 @@ const Contact: React.FC = () => {
                   <Phone size={20} />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">Phone</h3>
+                  <h3 className="font-medium text-lg">{t("contact.phone")}</h3>
                   <p className="text-gray-600">+1 (555) 123-4567</p>
-                  <p className="text-gray-600 text-sm">Mon-Fri, 9am-5pm EST</p>
+                  <p className="text-gray-600 text-sm">{t("contact.phoneHours")}</p>
                 </div>
               </div>
               
@@ -65,9 +66,9 @@ const Contact: React.FC = () => {
                   <Mail size={20} />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">Email</h3>
+                  <h3 className="font-medium text-lg">{t("contact.email")}</h3>
                   <p className="text-gray-600">info@soltanahair.com</p>
-                  <p className="text-gray-600 text-sm">We'll respond within 24 hours</p>
+                  <p className="text-gray-600 text-sm">{t("contact.emailDesc")}</p>
                 </div>
               </div>
               
@@ -76,7 +77,7 @@ const Contact: React.FC = () => {
                   <MapPin size={20} />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">Address</h3>
+                  <h3 className="font-medium text-lg">{t("contact.address")}</h3>
                   <p className="text-gray-600">123 Beauty Lane</p>
                   <p className="text-gray-600">New York, NY 10001</p>
                 </div>
@@ -87,10 +88,10 @@ const Contact: React.FC = () => {
                   <Clock size={20} />
                 </div>
                 <div>
-                  <h3 className="font-medium text-lg">Business Hours</h3>
-                  <p className="text-gray-600">Monday-Friday: 9am-5pm EST</p>
-                  <p className="text-gray-600">Saturday: 10am-2pm EST</p>
-                  <p className="text-gray-600">Sunday: Closed</p>
+                  <h3 className="font-medium text-lg">{t("contact.businessHours")}</h3>
+                  <p className="text-gray-600">{t("contact.businessDay")}</p>
+                  <p className="text-gray-600">{t("contact.businessSat")}</p>
+                  <p className="text-gray-600">{t("contact.businessSun")}</p>
                 </div>
               </div>
             </div>
@@ -99,26 +100,26 @@ const Contact: React.FC = () => {
           <div>
             <Card>
               <CardContent className="pt-6">
-                <h2 className="font-serif text-xl font-semibold mb-4">Send us a Message</h2>
+                <h2 className="font-serif text-xl font-semibold mb-4">{t("contact.sendMessage")}</h2>
                 <form onSubmit={handleSubmit}>
                   <div className="space-y-4">
                     <div>
                       <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-1">
-                        Your Name
+                        {t("contact.yourName")}
                       </label>
                       <Input
                         id="name"
                         name="name"
                         value={formData.name}
                         onChange={handleChange}
-                        placeholder="Enter your name"
+                        placeholder={t("contact.yourNamePlaceholder")}
                         required
                       />
                     </div>
                     
                     <div>
                       <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-1">
-                        Email Address
+                        {t("contact.emailLabel")}
                       </label>
                       <Input
                         id="email"
@@ -126,42 +127,42 @@ const Contact: React.FC = () => {
                         type="email"
                         value={formData.email}
                         onChange={handleChange}
-                        placeholder="Enter your email"
+                        placeholder={t("contact.emailPlaceholder")}
                         required
                       />
                     </div>
                     
                     <div>
                       <label htmlFor="subject" className="block text-sm font-medium text-gray-700 mb-1">
-                        Subject
+                        {t("contact.subject")}
                       </label>
                       <Input
                         id="subject"
                         name="subject"
                         value={formData.subject}
                         onChange={handleChange}
-                        placeholder="Enter subject"
+                        placeholder={t("contact.subjectPlaceholder")}
                         required
                       />
                     </div>
                     
                     <div>
                       <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-1">
-                        Message
+                        {t("contact.message")}
                       </label>
                       <Textarea
                         id="message"
                         name="message"
                         value={formData.message}
                         onChange={handleChange}
-                        placeholder="Enter your message"
+                        placeholder={t("contact.messagePlaceholder")}
                         rows={5}
                         required
                       />
                     </div>
                     
                     <Button type="submit" className="w-full bg-soltana-dark hover:bg-black" disabled={isSubmitting}>
-                      {isSubmitting ? "Sending..." : "Send Message"}
+                      {isSubmitting ? t("contact.sending") : t("contact.sendButton")}
                     </Button>
                   </div>
                 </form>
@@ -171,40 +172,40 @@ const Contact: React.FC = () => {
         </div>
         
         <div className="mb-16">
-          <h2 className="font-serif text-2xl font-semibold mb-6 text-center">FAQ</h2>
+          <h2 className="font-serif text-2xl font-semibold mb-6 text-center">{t("contact.faqTitle")}</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-medium text-lg mb-2">How long do hair extensions last?</h3>
+                <h3 className="font-medium text-lg mb-2">{t("contact.faq1q")}</h3>
                 <p className="text-gray-600">
-                  With proper care, our premium Remy hair extensions can last 6-12 months with regular wear.
+                  {t("contact.faq1a")}
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-medium text-lg mb-2">Can I color the extensions?</h3>
+                <h3 className="font-medium text-lg mb-2">{t("contact.faq2q")}</h3>
                 <p className="text-gray-600">
-                  Yes, our human hair extensions can be dyed. We recommend professional coloring for best results.
+                  {t("contact.faq2a")}
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-medium text-lg mb-2">What is your return policy?</h3>
+                <h3 className="font-medium text-lg mb-2">{t("contact.faq3q")}</h3>
                 <p className="text-gray-600">
-                  We offer a 30-day satisfaction guarantee. Unopened products can be returned for a full refund.
+                  {t("contact.faq3a")}
                 </p>
               </CardContent>
             </Card>
             
             <Card>
               <CardContent className="pt-6">
-                <h3 className="font-medium text-lg mb-2">How do I care for my extensions?</h3>
+                <h3 className="font-medium text-lg mb-2">{t("contact.faq4q")}</h3>
                 <p className="text-gray-600">
-                  Use sulfate-free shampoo and conditioner, avoid excessive heat, and store properly when not in use.
+                  {t("contact.faq4a")}
                 </p>
               </CardContent>
             </Card>
@@ -216,3 +217,5 @@ const Contact: React.FC = () => {
 };
 
 export default Contact;
+
+// NOTE: Contact.tsx is getting long; please consider refactoring!

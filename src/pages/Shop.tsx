@@ -9,11 +9,13 @@ import { useCart } from "@/context/CartContext";
 import { supabase } from "@/integrations/supabase/client";
 import { Drawer, DrawerTrigger, DrawerContent, DrawerHeader, DrawerTitle, DrawerFooter } from "@/components/ui/drawer";
 import { toast } from "sonner";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Shop: React.FC = () => {
   const [searchParams] = useSearchParams();
   const initialCategory = searchParams.get("category") || "";
   const { addItem } = useCart();
+  const { t } = useLanguage();
 
   const [products, setProducts] = useState<ProductType[]>([]);
   const [filteredProducts, setFilteredProducts] = useState<ProductType[]>([]);
@@ -190,7 +192,7 @@ const Shop: React.FC = () => {
       <div className="container mx-auto px-4 py-8 md:py-12">
         <div className="flex justify-between items-center mb-8">
           <h1 className="font-serif font-semibold text-2xl md:text-3xl">
-            Shop Hair Extensions
+            {t("shop.title")}
           </h1>
           
           <div className="flex space-x-2">
@@ -198,12 +200,12 @@ const Shop: React.FC = () => {
             <Drawer open={isFilterDrawerOpen} onOpenChange={setIsFilterDrawerOpen}>
               <DrawerTrigger asChild>
                 <Button variant="outline" size="sm" className="md:hidden">
-                  <Filter size={16} className="mr-1" /> Filter
+                  <Filter size={16} className="mr-1" /> {t("shop.filter")}
                 </Button>
               </DrawerTrigger>
               <DrawerContent>
                 <DrawerHeader>
-                  <DrawerTitle>Filter Products</DrawerTitle>
+                  <DrawerTitle>{t("shop.filterProducts")}</DrawerTitle>
                 </DrawerHeader>
                 <div className="p-4">
                   <ProductFilters
@@ -217,7 +219,7 @@ const Shop: React.FC = () => {
                 </div>
                 <DrawerFooter>
                   <Button onClick={() => setIsFilterDrawerOpen(false)}>
-                    Apply Filters
+                    {t("shop.applyFilters")}
                   </Button>
                 </DrawerFooter>
               </DrawerContent>
@@ -232,7 +234,7 @@ const Shop: React.FC = () => {
                     : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200'
                 } transition-colors`}
                 onClick={() => setGridView(true)}
-                aria-label="Grid view"
+                aria-label={t("shop.gridView")}
               >
                 <Grid2X2 size={16} />
               </button>
@@ -243,7 +245,7 @@ const Shop: React.FC = () => {
                     : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200'
                 } transition-colors`}
                 onClick={() => setGridView(false)}
-                aria-label="List view"
+                aria-label={t("shop.listView")}
               >
                 <List size={16} />
               </button>
@@ -255,7 +257,7 @@ const Shop: React.FC = () => {
           {/* Sidebar Filters (Desktop) */}
           <div className="hidden md:block">
             <div className="sticky top-24">
-              <h3 className="font-medium mb-4">Filters</h3>
+              <h3 className="font-medium mb-4">{t("shop.filters")}</h3>
               <ProductFilters
                 filters={{ categories: allCategories, colors: allColors, lengths }}
                 activeFilters={filters}
@@ -286,8 +288,8 @@ const Shop: React.FC = () => {
             ) : filteredProducts.length === 0 ? (
               // No results
               <div className="text-center py-12">
-                <h3 className="font-medium text-lg mb-2">No products found</h3>
-                <p className="text-gray-600">Try adjusting your filters</p>
+                <h3 className="font-medium text-lg mb-2">{t("shop.noProductsFound")}</h3>
+                <p className="text-gray-600">{t("shop.tryAdjustingFilters")}</p>
               </div>
             ) : gridView ? (
               // Grid view: pass real rating
@@ -327,7 +329,9 @@ const Shop: React.FC = () => {
                         </div>
                         {/* NEW: show rating if exists */}
                         {withRating(product).rating && (
-                          <div className="text-xs text-amber-500">★ {withRating(product).rating}</div>
+                          <div className="text-xs text-amber-500">
+                            ★ {withRating(product).rating}
+                          </div>
                         )}
                       </div>
                       <Button 
@@ -336,7 +340,7 @@ const Shop: React.FC = () => {
                         className="mt-2 text-sm"
                         onClick={() => handleAddToCart(product)}
                       >
-                        <ShoppingCart size={14} className="mr-1" /> Add to Cart
+                        <ShoppingCart size={14} className="mr-1" /> {t("shop.addToCart")}
                       </Button>
                     </div>
                   </div>
