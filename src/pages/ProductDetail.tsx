@@ -486,12 +486,11 @@ const ProductDetail = () => {
           <div>
             <h1 className="font-serif text-2xl md:text-3xl font-semibold mb-2">{product.name}</h1>
             <div className="text-2xl font-semibold mb-4">
-              {t("product.price", { price: product.price.toFixed(2) }) || `$${product.price.toFixed(2)}`}
+              {t("product.price") ? `${t("product.price")} $${product.price.toFixed(2)}` : `$${product.price.toFixed(2)}`}
             </div>
             <div className="flex items-center mb-4">
               <div className="flex text-amber-500 mr-2">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  // ... star svg unchanged ...
                   <svg
                     key={star}
                     xmlns="http://www.w3.org/2000/svg"
@@ -508,7 +507,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-600">
-                ({reviews.length} {t('product.reviews', { count: reviews.length }) || t('product.rating')})
+                ({reviews.length} {t('product.reviews') ? t('product.reviews') : t('product.rating')})
               </span>
             </div>
             
@@ -626,7 +625,7 @@ const ProductDetail = () => {
               <TabsTrigger value="details">{t("product.detailsTab") || "Product Details"}</TabsTrigger>
               <TabsTrigger value="specifications">{t("product.specificationsTab") || "Specifications"}</TabsTrigger>
               <TabsTrigger value="reviews">
-                {t("product.reviewsTab", { count: reviews.length }) || `Reviews (${reviews.length})`}
+                {t("product.reviewsTab") ? `${t("product.reviewsTab")} (${reviews.length})` : `Reviews (${reviews.length})`}
               </TabsTrigger>
             </TabsList>
             <TabsContent
