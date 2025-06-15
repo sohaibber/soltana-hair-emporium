@@ -90,7 +90,14 @@ const ProductDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const { t } = useLanguage(); // <-- Use translation context
+  const { t } = useLanguage();
+  
+  // Helper wrapper to avoid displaying "product.price" key on UI
+  const safeT = (key: string, fallback: string) => {
+    const result = t(key);
+    return result && result !== key ? result : fallback;
+  };
+
   const [product, setProduct] = useState<ProductData | null>(null);
   const [loading, setLoading] = useState(true);
   const [activeImageIndex, setActiveImageIndex] = useState(0);
@@ -486,7 +493,7 @@ const ProductDetail = () => {
           <div>
             <h1 className="font-serif text-2xl md:text-3xl font-semibold mb-2">{product.name}</h1>
             <div className="text-2xl font-semibold mb-4">
-              {t("product.price") ? `${t("product.price")} $${product.price.toFixed(2)}` : `$${product.price.toFixed(2)}`}
+              {safeT("product.price", "Price")} ${product.price.toFixed(2)}
             </div>
             <div className="flex items-center mb-4">
               <div className="flex text-amber-500 mr-2">
@@ -507,7 +514,7 @@ const ProductDetail = () => {
                 ))}
               </div>
               <span className="text-sm text-gray-600">
-                ({reviews.length} {t('product.reviews') ? t('product.reviews') : t('product.rating')})
+                ({reviews.length} {safeT('product.reviews', safeT('product.rating', 'Reviews'))})
               </span>
             </div>
             
@@ -516,9 +523,8 @@ const ProductDetail = () => {
             {/* Color Selection */}
             {product.colors.length > 0 && (
               <div className="mb-6">
-                <h3 className="font-medium mb-2">{t("product.color") || 'Color'}</h3>
+                <h3 className="font-medium mb-2">{safeT("product.color", "Color")}</h3>
                 <div className="flex flex-wrap gap-2">
-                  {/* ... color buttons unchanged ... */}
                   {product.colors.map((color) => (
                     <button
                       key={color}
@@ -538,7 +544,7 @@ const ProductDetail = () => {
             
             {/* Length Selection */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">{t("product.length") || "Length"}</h3>
+              <h3 className="font-medium mb-2">{safeT("product.length", "Length")}</h3>
               <div className="flex flex-wrap gap-2">
                 {product.lengths.map((length) => (
                   <button
@@ -558,7 +564,7 @@ const ProductDetail = () => {
             
             {/* Quantity */}
             <div className="mb-6">
-              <h3 className="font-medium mb-2">{t("product.quantity") || "Quantity"}</h3>
+              <h3 className="font-medium mb-2">{safeT("product.quantity", "Quantity")}</h3>
               <div className="flex items-center border rounded-md w-fit">
                 <button
                   className="px-3 py-2"
@@ -603,15 +609,15 @@ const ProductDetail = () => {
             <div className="border-t pt-4">
               <div className="flex items-center text-sm text-gray-600 mb-2">
                 <Check size={16} className="mr-2 text-green-500" />
-                {t("product.inStock") || "In Stock & Ready to Ship"}
+                {safeT("product.inStock", "In Stock & Ready to Ship")}
               </div>
               <div className="flex items-center text-sm text-gray-600 mb-2">
                 <Check size={16} className="mr-2 text-green-500" />
-                {t("product.freeShipping") || "Free Shipping on Orders Over $100"}
+                {safeT("product.freeShipping", "Free Shipping on Orders Over $100")}
               </div>
               <div className="flex items-center text-sm text-gray-600">
                 <Check size={16} className="mr-2 text-green-500" />
-                {t("product.returns") || "30-Day Returns"}
+                {safeT("product.returns", "30-Day Returns")}
               </div>
             </div>
           </div>
@@ -622,10 +628,10 @@ const ProductDetail = () => {
         <div className="mb-16">
           <Tabs defaultValue="details" className="w-full">
             <TabsList className="mb-6 justify-start">
-              <TabsTrigger value="details">{t("product.detailsTab") || "Product Details"}</TabsTrigger>
-              <TabsTrigger value="specifications">{t("product.specificationsTab") || "Specifications"}</TabsTrigger>
+              <TabsTrigger value="details">{safeT("product.detailsTab", "Product Details")}</TabsTrigger>
+              <TabsTrigger value="specifications">{safeT("product.specificationsTab", "Specifications")}</TabsTrigger>
               <TabsTrigger value="reviews">
-                {t("product.reviewsTab") ? `${t("product.reviewsTab")} (${reviews.length})` : `Reviews (${reviews.length})`}
+                {safeT("product.reviewsTab", "Reviews")} ({reviews.length})
               </TabsTrigger>
             </TabsList>
             <TabsContent
