@@ -75,7 +75,7 @@ const Register: React.FC = () => {
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
           <div className="p-6">
             <h1 className="font-serif text-2xl font-semibold mb-6 text-center">
-              {t("register.title") || "Create an Account"}
+              {t("register.title")}
             </h1>
 
             {error && (
@@ -87,30 +87,30 @@ const Register: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <Label htmlFor="firstName">{t("register.firstName") || "First Name"}</Label>
+                  <Label htmlFor="firstName">{t("register.firstName")}</Label>
                   <Input
                     id="firstName"
                     name="firstName"
                     value={formData.firstName}
                     onChange={handleChange}
                     required
-                    placeholder={t("register.firstNamePlaceholder") || ""}
+                    placeholder={t("register.firstNamePlaceholder")}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="lastName">{t("register.lastName") || "Last Name"}</Label>
+                  <Label htmlFor="lastName">{t("register.lastName")}</Label>
                   <Input
                     id="lastName"
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleChange}
                     required
-                    placeholder={t("register.lastNamePlaceholder") || ""}
+                    placeholder={t("register.lastNamePlaceholder")}
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor="email">{t("register.emailLabel") || "Email Address"}</Label>
+                <Label htmlFor="email">{t("register.emailLabel")}</Label>
                 <Input
                   id="email"
                   name="email"
@@ -118,11 +118,11 @@ const Register: React.FC = () => {
                   value={formData.email}
                   onChange={handleChange}
                   required
-                  placeholder={t("register.emailPlaceholder") || ""}
+                  placeholder={t("register.emailPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password">{t("register.passwordLabel") || "Password"}</Label>
+                <Label htmlFor="password">{t("register.passwordLabel")}</Label>
                 <Input
                   id="password"
                   name="password"
@@ -131,11 +131,11 @@ const Register: React.FC = () => {
                   onChange={handleChange}
                   required
                   minLength={6}
-                  placeholder={t("register.passwordPlaceholder") || ""}
+                  placeholder={t("register.passwordPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="confirmPassword">{t("register.confirmPasswordLabel") || "Confirm Password"}</Label>
+                <Label htmlFor="confirmPassword">{t("register.confirmPasswordLabel")}</Label>
                 <Input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -143,7 +143,7 @@ const Register: React.FC = () => {
                   value={formData.confirmPassword}
                   onChange={handleChange}
                   required
-                  placeholder={t("register.confirmPasswordPlaceholder") || ""}
+                  placeholder={t("register.confirmPasswordPlaceholder")}
                 />
               </div>
 
@@ -157,13 +157,13 @@ const Register: React.FC = () => {
                   htmlFor="terms"
                   className="text-sm text-gray-600"
                 >
-                  {t("register.termsPrefix") || "I accept the "}
+                  {t("register.termsPrefix")}
                   <Link to="/terms" className="text-primary hover:underline">
-                    {t("register.termsLink") || "Terms of Service"}
+                    {t("register.termsLink")}
                   </Link>{" "}
-                  {t("register.and") || "and"}{" "}
+                  {t("register.and")}{" "}
                   <Link to="/privacy" className="text-primary hover:underline">
-                    {t("register.privacyLink") || "Privacy Policy"}
+                    {t("register.privacyLink")}
                   </Link>
                 </label>
               </div>
@@ -174,8 +174,8 @@ const Register: React.FC = () => {
                 disabled={isSubmitting}
               >
                 {isSubmitting
-                  ? (t("register.creatingAccount") || "Creating Account...")
-                  : (t("register.submitButton") || "Sign Up")}
+                  ? t("register.creatingAccount")
+                  : t("register.submitButton")}
               </Button>
             </form>
 
@@ -185,16 +185,16 @@ const Register: React.FC = () => {
                   <Separator />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">{t("register.or") || "or"}</span>
+                  <span className="bg-white px-2 text-gray-500">{t("register.or")}</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                {t("register.alreadyAccount") || "Already have an account?"}{" "}
+                {t("register.alreadyAccount")}{" "}
                 <Link to="/login" className="text-primary hover:underline">
-                  {t("register.loginLink") || t("nav.login") || "Log in"}
+                  {t("register.loginLink") || t("nav.login")}
                 </Link>
               </p>
             </div>
