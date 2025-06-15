@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
@@ -31,7 +32,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   
   return (
     <Link to={`/product/${product.id}`} className="group">
-      <div className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm hover:shadow-md transition-all hover-lift">
+      <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm hover:shadow-md dark:hover:shadow-lg transition-all hover-lift">
         <div className="relative aspect-square overflow-hidden">
           <img 
             src={getImageUrl(product.image)} 
@@ -45,10 +46,10 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           )}
         </div>
         <div className="p-4">
-          <div className="text-xs text-gray-500 mb-1">{product.category}</div>
-          <h3 className="font-medium mb-1 group-hover:text-primary transition-colors">{product.name}</h3>
+          <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{product.category}</div>
+          <h3 className="font-medium mb-1 text-gray-900 dark:text-white group-hover:text-primary transition-colors">{product.name}</h3>
           <div className="flex justify-between items-center">
-            <div className="font-semibold">${product.price.toFixed(2)}</div>
+            <div className="font-semibold text-gray-900 dark:text-white">${product.price.toFixed(2)}</div>
             {product.rating && (
               <div className="text-xs text-amber-500">★ {product.rating}</div>
             )}
@@ -137,25 +138,25 @@ const FeaturedProducts: React.FC = () => {
   // Fallback loading state
   if (loading) {
     return (
-      <section className="py-12 md:py-16 bg-soltana-light">
+      <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="font-serif text-2xl md:text-3xl font-semibold">{t('home.featured.title')}</h2>
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
             <Link 
               to="/shop" 
-              className="flex items-center text-sm font-medium hover:text-primary transition-colors"
+              className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors"
             >
               {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
             {[1, 2, 3, 4].map((_, index) => (
-              <div key={index} className="bg-white rounded-lg overflow-hidden border border-gray-100 shadow-sm animate-pulse">
-                <div className="aspect-square bg-gray-200"></div>
+              <div key={index} className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-100 dark:border-gray-700 shadow-sm animate-pulse">
+                <div className="aspect-square bg-gray-200 dark:bg-gray-700"></div>
                 <div className="p-4">
-                  <div className="h-3 bg-gray-200 rounded w-1/3 mb-2"></div>
-                  <div className="h-5 bg-gray-200 rounded w-3/4 mb-2"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/4"></div>
+                  <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-1/3 mb-2"></div>
+                  <div className="h-5 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mb-2"></div>
+                  <div className="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/4"></div>
                 </div>
               </div>
             ))}
@@ -167,13 +168,13 @@ const FeaturedProducts: React.FC = () => {
 
   if (products.length === 0) {
     return (
-      <section className="py-12 md:py-16 bg-soltana-light">
+      <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4">{t('home.featured.title')}</h2>
-          <p className="text-gray-600 mb-6">{t('product.noProducts')}</p>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4 text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
+          <p className="text-gray-600 dark:text-gray-400 mb-6">{t('product.noProducts')}</p>
           <Link 
             to="/shop" 
-            className="inline-flex items-center text-sm font-medium hover:text-primary transition-colors"
+            className="inline-flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors"
           >
             {t('product.viewAllProducts')} <ArrowRight size={16} className="ml-1" />
           </Link>
@@ -183,13 +184,13 @@ const FeaturedProducts: React.FC = () => {
   }
 
   return (
-    <section className="py-12 md:py-16 bg-soltana-light">
+    <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold">{t('home.featured.title')}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
           <Link 
             to="/shop" 
-            className="flex items-center text-sm font-medium hover:text-primary transition-colors"
+            className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors"
           >
             {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
           </Link>
