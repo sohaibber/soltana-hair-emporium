@@ -184,16 +184,24 @@ const Shop: React.FC = () => {
             </Drawer>
             
             {/* Grid/List View Toggle */}
-            <div className="flex rounded-md overflow-hidden border">
+            <div className="flex rounded-md overflow-hidden border dark:border-gray-700">
               <button
-                className={`p-2 ${gridView ? 'bg-gray-100' : 'bg-white'}`}
+                className={`p-2 ${
+                  gridView 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-primary' 
+                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200'
+                } transition-colors`}
                 onClick={() => setGridView(true)}
                 aria-label="Grid view"
               >
                 <Grid2X2 size={16} />
               </button>
               <button
-                className={`p-2 ${!gridView ? 'bg-gray-100' : 'bg-white'}`}
+                className={`p-2 ${
+                  !gridView 
+                    ? 'bg-gray-100 dark:bg-gray-700 text-primary'
+                    : 'bg-white dark:bg-gray-900 text-gray-700 dark:text-gray-200'
+                } transition-colors`}
                 onClick={() => setGridView(false)}
                 aria-label="List view"
               >
@@ -249,17 +257,31 @@ const Shop: React.FC = () => {
                 ))}
               </div>
             ) : (
-              // List view
+              // List view with proper dark mode support and image display
               <div className="space-y-4">
                 {filteredProducts.map(product => (
-                  <div key={product.id} className="flex bg-white border border-gray-100 rounded-lg overflow-hidden">
-                    <div className="w-1/3">
-                      <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+                  <div
+                    key={product.id}
+                    className="flex bg-white dark:bg-gray-800 border border-gray-100 dark:border-gray-700 rounded-lg overflow-hidden"
+                  >
+                    <div className="w-1/3 h-full min-h-[110px] flex items-center justify-center bg-gray-100 dark:bg-gray-900">
+                      <img
+                        src={product.image.startsWith('http')
+                          ? product.image
+                          : `https://gxwlahrzmkaydynbipie.supabase.co/storage/v1/object/public/product-images/${product.image}`
+                        }
+                        alt={product.name}
+                        className="w-full h-full object-cover"
+                      />
                     </div>
-                    <div className="w-2/3 p-4">
-                      <div className="text-xs text-gray-500 mb-1">{product.category}</div>
-                      <h3 className="font-medium mb-2">{product.name}</h3>
-                      <div className="mb-2 font-semibold">${product.price.toFixed(2)}</div>
+                    <div className="w-2/3 p-4 flex flex-col justify-between">
+                      <div>
+                        <div className="text-xs text-gray-500 dark:text-gray-400 mb-1">{product.category}</div>
+                        <h3 className="font-medium mb-2 text-gray-900 dark:text-white">{product.name}</h3>
+                        <div className="mb-2 font-semibold text-gray-900 dark:text-white">
+                          ${product.price.toFixed(2)}
+                        </div>
+                      </div>
                       <Button 
                         size="sm"
                         variant="outline" 
