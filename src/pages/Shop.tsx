@@ -21,36 +21,68 @@ const Shop: React.FC = () => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState<boolean>(false);
 
-  // Load products from database
+  // --- New: Add state for ratings map ---
+  const [productRatings, setProductRatings] = useState<{[productId: string]: number}>({});
+
+  // Load products and their real ratings
   useEffect(() => {
-    const fetchProducts = async () => {
+    const fetchProductsAndRatings = async () => {
       try {
         setLoading(true);
-        const { data, error } = await supabase
+        const { data: productsData, error: productsError } = await supabase
           .from('products')
           .select('*')
           .eq('is_active', true);
-        
-        if (error) {
-          console.error("Error fetching products:", error);
+
+        if (productsError) {
+          console.error("Error fetching products:", productsError);
           toast.error("Failed to load products");
           return;
         }
-        
-        // Transform the data to match our frontend model
-        const transformedProducts = data.map(product => ({
+
+        // Transform the product data
+        const transformedProducts = productsData.map(product => ({
           id: String(product.id),
           name: product.name,
           price: Number(product.price),
           image: product.image_urls?.[0] || "https://images.unsplash.com/photo-1580618672591-eb180b1a973f?q=80&w=500&auto=format&fit=crop",
           category: product.category || "Uncategorized",
           colors: product.tags as string[] || [],
-          rating: 4.5, // Default rating since we don't have this in DB yet
+          // Remove fake/mock rating
+          // rating: 4.5,
           badge: product.sale_price ? "Sale" : undefined
         }));
-        
+
         setProducts(transformedProducts);
         setFilteredProducts(transformedProducts);
+
+        // --- New: Fetch ratings from reviews table ---
+        const productIds = productsData.map(p => p.id);
+        if (productIds.length > 0) {
+          const { data: reviews, error: reviewsError } = await supabase
+            .from('reviews')
+            .select('product_id, rating')
+            .in('product_id', productIds);
+
+          if (reviewsError) {
+            console.error("Error fetching reviews:", reviewsError);
+          } else if (reviews && reviews.length > 0) {
+            // Calculate average ratings
+            const ratingsAccumulator: Record<string, {total: number, count: number}> = {};
+            for (const r of reviews) {
+              if (!ratingsAccumulator[r.product_id]) {
+                ratingsAccumulator[r.product_id] = { total: 0, count: 0 };
+              }
+              ratingsAccumulator[r.product_id].total += r.rating;
+              ratingsAccumulator[r.product_id].count += 1;
+            }
+            const map: {[productId: string]: number} = {};
+            Object.entries(ratingsAccumulator).forEach(([productId, stats]) => {
+              map[productId] = Math.round((stats.total / stats.count) * 10)/10;
+            });
+            setProductRatings(map);
+          }
+        }
       } catch (error) {
         console.error("Exception loading products:", error);
         toast.error("Failed to load products");
@@ -58,8 +90,8 @@ const Shop: React.FC = () => {
         setLoading(false);
       }
     };
-    
-    fetchProducts();
+
+    fetchProductsAndRatings();
   }, []);
 
   // Extract filter options from real data
@@ -143,6 +175,14 @@ const Shop: React.FC = () => {
       ...prev,
       priceRange: values
     }));
+  };
+
+  // --- Extract rating to attach to each product card ---
+  const withRating = (product: ProductType) => {
+    // get by numeric id (from DB) or string id
+    const productId = typeof product.id === "number" ? product.id : String(product.id);
+    const rating = productRatings[productId];
+    return { ...product, rating };
   };
 
   return (
@@ -250,14 +290,18 @@ const Shop: React.FC = () => {
                 <p className="text-gray-600">Try adjusting your filters</p>
               </div>
             ) : gridView ? (
-              // Grid view
+              // Grid view: pass real rating
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {filteredProducts.map(product => (
-                  <ProductCard key={product.id} product={product} showAddToCart />
+                  <ProductCard
+                    key={product.id}
+                    product={withRating(product)}
+                    showAddToCart
+                  />
                 ))}
               </div>
             ) : (
-              // List view with proper dark mode support and image display
+              // List view with dark mode and image fix, pass real rating
               <div className="space-y-4">
                 {filteredProducts.map(product => (
                   <div
@@ -281,6 +325,10 @@ const Shop: React.FC = () => {
                         <div className="mb-2 font-semibold text-gray-900 dark:text-white">
                           ${product.price.toFixed(2)}
                         </div>
+                        {/* NEW: show rating if exists */}
+                        {withRating(product).rating && (
+                          <div className="text-xs text-amber-500">★ {withRating(product).rating}</div>
+                        )}
                       </div>
                       <Button 
                         size="sm"
