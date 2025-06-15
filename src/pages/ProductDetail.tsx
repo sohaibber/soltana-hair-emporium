@@ -640,7 +640,7 @@ const ProductDetail = () => {
             >
               <div className="prose max-w-none">
                 <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-                  {t("product.aboutThisProduct") || "About this Product"}
+                  {safeT("product.aboutThisProduct", "About this Product")}
                 </h3>
                 <p className="mb-4 text-gray-700 dark:text-gray-300">
                   {product.description}
@@ -657,7 +657,7 @@ const ProductDetail = () => {
               className="bg-white dark:bg-gray-800 p-6 rounded-lg border border-gray-200 dark:border-gray-700"
             >
               <h3 className="text-xl font-medium mb-4 text-gray-900 dark:text-white">
-                {t("product.specificationsTab") || "Specifications"}
+                {safeT("product.specificationsTab", "Specifications")}
               </h3>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {product.specifications?.map((spec, index) => (
@@ -679,14 +679,14 @@ const ProductDetail = () => {
             >
               <div className="flex justify-between items-center mb-6">
                 <h3 className="text-xl font-medium text-gray-900 dark:text-white">
-                  {t("product.customerReviews") || "Customer Reviews"}
+                  {safeT("product.customerReviews", "Customer Reviews")}
                 </h3>
                 {isAuthenticated && !userReview && !showReviewForm && (
                   <Button
                     onClick={() => setShowReviewForm(true)}
                     className="bg-blue-600 hover:bg-blue-700 text-white font-medium"
                   >
-                    {t("product.writeReview") || "Write a Review"}
+                    {safeT("product.writeReview", "Write a Review")}
                   </Button>
                 )}
               </div>
@@ -694,14 +694,14 @@ const ProductDetail = () => {
               {!isAuthenticated && (
                 <div className="mb-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
                   <p className="text-sm text-gray-600 dark:text-gray-300">
-                    {t("product.loginToReview") || "Please "} 
+                    {safeT("product.loginToReview", "Please")}&nbsp;
                     <button
                       onClick={() => navigate('/login')}
                       className="text-soltana-dark dark:text-primary hover:underline"
                     >
-                      {t("nav.login")}
-                    </button>{" "}
-                    {t("product.toWriteReview") || "to write a review."}
+                      {safeT("nav.login", "Login")}
+                    </button>&nbsp;
+                    {safeT("product.toWriteReview", "to write a review.")}
                   </p>
                 </div>
               )}
@@ -725,7 +725,7 @@ const ProductDetail = () => {
                   <div className="text-center py-8">
                     <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 dark:border-gray-100 mx-auto"></div>
                     <p className="mt-2 text-gray-600 dark:text-gray-400">
-                      {t("product.loadingReviews") || "Loading reviews..."}
+                      {safeT("product.loadingReviews", "Loading reviews...")}
                     </p>
                   </div>
                 ) : reviews.length > 0 ? (
@@ -740,7 +740,7 @@ const ProductDetail = () => {
                   ))
                 ) : (
                   <p className="text-gray-500 dark:text-gray-400 text-center py-8">
-                    {t("product.noReviews") || "No reviews yet. Be the first to review this product!"}
+                    {safeT("product.noReviews", "No reviews yet. Be the first to review this product!")}
                   </p>
                 )}
               </div>
