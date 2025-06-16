@@ -18,7 +18,12 @@ const Login: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+
+  // Debug logging
+  console.log("Current language:", language);
+  console.log("Translation for login.title:", t("login.title"));
+  console.log("Translation function type:", typeof t);
 
   // Get redirect location from state or use default
   const from = location.state?.from?.pathname || "/account";
@@ -39,7 +44,7 @@ const Login: React.FC = () => {
       await login(email, password);
       navigate(from, { replace: true });
     } catch (err: any) {
-      setError(t("login.error") || t("login.defaultError") || "Invalid email or password. Please try again.");
+      setError(err.message || "Invalid email or password. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
@@ -51,7 +56,7 @@ const Login: React.FC = () => {
         <div className="max-w-md mx-auto bg-white rounded-lg shadow-sm border overflow-hidden">
           <div className="p-6">
             <h1 className="font-serif text-2xl font-semibold mb-6 text-center">
-              {t("login.title") || "Log In to Your Account"}
+              {t("login.title")}
             </h1>
 
             {error && (
@@ -62,21 +67,21 @@ const Login: React.FC = () => {
 
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
-                <Label htmlFor="email">{t("login.emailLabel") || "Email Address"}</Label>
+                <Label htmlFor="email">{t("login.emailLabel")}</Label>
                 <Input
                   id="email"
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder={t("login.emailPlaceholder") || ""}
+                  placeholder={t("login.emailPlaceholder")}
                 />
               </div>
               <div className="space-y-2">
                 <div className="flex justify-between">
-                  <Label htmlFor="password">{t("login.passwordLabel") || "Password"}</Label>
+                  <Label htmlFor="password">{t("login.passwordLabel")}</Label>
                   <Link to="/forgot-password" className="text-xs text-primary hover:underline">
-                    {t("login.forgotPassword") || "Forgot password?"}
+                    {t("login.forgotPassword")}
                   </Link>
                 </div>
                 <Input
@@ -85,7 +90,7 @@ const Login: React.FC = () => {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder={t("login.passwordPlaceholder") || ""}
+                  placeholder={t("login.passwordPlaceholder")}
                 />
               </div>
 
@@ -95,8 +100,8 @@ const Login: React.FC = () => {
                 disabled={isSubmitting}
               >
                 {isSubmitting 
-                  ? (t("login.loggingIn") || "Logging in...") 
-                  : (t("login.submitButton") || "Log In")
+                  ? t("login.loggingIn") 
+                  : t("login.submitButton")
                 }
               </Button>
             </form>
@@ -107,16 +112,16 @@ const Login: React.FC = () => {
                   <Separator />
                 </div>
                 <div className="relative flex justify-center text-xs uppercase">
-                  <span className="bg-white px-2 text-gray-500">{t("login.or") || "or"}</span>
+                  <span className="bg-white px-2 text-gray-500">{t("login.or")}</span>
                 </div>
               </div>
             </div>
 
             <div className="mt-6 text-center">
               <p className="text-sm text-gray-600">
-                {t("login.noAccount") || "Don't have an account?"}{" "}
+                {t("login.noAccount")}{" "}
                 <Link to="/register" className="text-primary hover:underline">
-                  {t("login.signupLink") || t("nav.register") || "Sign up"}
+                  {t("login.signupLink")}
                 </Link>
               </p>
             </div>

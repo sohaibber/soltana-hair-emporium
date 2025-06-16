@@ -25,7 +25,47 @@ const translations = {
     'nav.orders': 'Orders',
     'nav.admin': 'Admin',
     'nav.adminDashboard': 'Admin Dashboard',
-    
+
+    // Login page
+    'login.title': 'Log In to Your Account',
+    'login.emailLabel': 'Email Address',
+    'login.emailPlaceholder': 'Enter your email',
+    'login.passwordLabel': 'Password',
+    'login.passwordPlaceholder': 'Enter your password',
+    'login.forgotPassword': 'Forgot password?',
+    'login.submitButton': 'Log In',
+    'login.loggingIn': 'Logging in...',
+    'login.or': 'or',
+    'login.noAccount': "Don't have an account?",
+    'login.signupLink': 'Sign up',
+    'login.error': 'Invalid email or password. Please try again.',
+    'login.defaultError': 'Login failed. Please try again.',
+
+    // Register page
+    'register.title': 'Create Your Account',
+    'register.firstName': 'First Name',
+    'register.firstNamePlaceholder': 'Enter your first name',
+    'register.lastName': 'Last Name',
+    'register.lastNamePlaceholder': 'Enter your last name',
+    'register.emailLabel': 'Email Address',
+    'register.emailPlaceholder': 'Enter your email',
+    'register.passwordLabel': 'Password',
+    'register.passwordPlaceholder': 'Enter your password (min 6 characters)',
+    'register.confirmPasswordLabel': 'Confirm Password',
+    'register.confirmPasswordPlaceholder': 'Confirm your password',
+    'register.termsPrefix': 'I agree to the',
+    'register.termsLink': 'Terms of Service',
+    'register.and': 'and',
+    'register.privacyLink': 'Privacy Policy',
+    'register.submitButton': 'Create Account',
+    'register.creatingAccount': 'Creating account...',
+    'register.or': 'or',
+    'register.alreadyAccount': 'Already have an account?',
+    'register.loginLink': 'Log in',
+    'register.errors.passwordMismatch': 'Passwords do not match',
+    'register.errors.acceptTerms': 'You must accept the terms and privacy policy',
+    'register.errors.default': 'Registration failed. Please try again.',
+
     // Home page
     'home.hero.title': 'Luxury Hair Extensions',
     'home.hero.subtitle': 'for Every Queen',
@@ -42,7 +82,7 @@ const translations = {
     'home.newsletter.subscribe': 'Subscribe',
     'home.newsletter.subscribing': 'Subscribing...',
     'home.newsletter.success': 'Thank you for subscribing to our newsletter!',
-    
+
     // Why Choose Us section
     'home.whyChooseUs.title': 'Why Choose',
     'home.whyChooseUs.titleHighlight': 'SoltanaHair',
@@ -63,7 +103,7 @@ const translations = {
     'home.whyChooseUs.cta.description': 'Join thousands of satisfied customers who have discovered the SoltanaHair difference.',
     'home.whyChooseUs.cta.shopExtensions': 'Shop Extensions',
     'home.whyChooseUs.cta.learnMore': 'Learn More',
-    
+
     // Product
     'product.sale': 'Sale',
     'product.rating': 'Rating',
@@ -71,7 +111,7 @@ const translations = {
     'product.youMayLike': 'You may also like',
     'product.noProducts': 'No products available yet. Check back soon!',
     'product.viewAllProducts': 'View All Products',
-    
+
     // Footer
     'footer.brand.description': 'Premium quality hair extensions for every queen. Elevate your look with our luxury hair products.',
     'footer.shop': 'Shop',
@@ -92,13 +132,13 @@ const translations = {
     'footer.privacyPolicy': 'Privacy Policy',
     'footer.terms': 'Terms of Service',
     'footer.copyright': 'All rights reserved.',
-    
+
     // Common
     'common.loading': 'Loading...',
     'common.search': 'Search',
     'common.searchPlaceholder': 'Search for products...',
     'common.language': 'Language',
-    
+
     // Instagram section
     'instagram.followUs': 'Follow Us on Instagram',
     'instagram.handle': '@soltanahair',
@@ -184,7 +224,47 @@ const translations = {
     'nav.orders': 'Commandes',
     'nav.admin': 'Admin',
     'nav.adminDashboard': 'Tableau de bord Admin',
-    
+
+    // Login page
+    'login.title': 'Connectez-vous à votre compte',
+    'login.emailLabel': 'Adresse email',
+    'login.emailPlaceholder': 'Entrez votre email',
+    'login.passwordLabel': 'Mot de passe',
+    'login.passwordPlaceholder': 'Entrez votre mot de passe',
+    'login.forgotPassword': 'Mot de passe oublié?',
+    'login.submitButton': 'Se connecter',
+    'login.loggingIn': 'Connexion...',
+    'login.or': 'ou',
+    'login.noAccount': "Vous n'avez pas de compte?",
+    'login.signupLink': 'S\'inscrire',
+    'login.error': 'Email ou mot de passe invalide. Veuillez réessayer.',
+    'login.defaultError': 'Connexion échouée. Veuillez réessayer.',
+
+    // Register page
+    'register.title': 'Créer votre compte',
+    'register.firstName': 'Prénom',
+    'register.firstNamePlaceholder': 'Entrez votre prénom',
+    'register.lastName': 'Nom',
+    'register.lastNamePlaceholder': 'Entrez votre nom',
+    'register.emailLabel': 'Adresse email',
+    'register.emailPlaceholder': 'Entrez votre email',
+    'register.passwordLabel': 'Mot de passe',
+    'register.passwordPlaceholder': 'Entrez votre mot de passe (min 6 caractères)',
+    'register.confirmPasswordLabel': 'Confirmer le mot de passe',
+    'register.confirmPasswordPlaceholder': 'Confirmez votre mot de passe',
+    'register.termsPrefix': 'J\'accepte les',
+    'register.termsLink': 'Conditions de service',
+    'register.and': 'et',
+    'register.privacyLink': 'Politique de confidentialité',
+    'register.submitButton': 'Créer un compte',
+    'register.creatingAccount': 'Création du compte...',
+    'register.or': 'ou',
+    'register.alreadyAccount': 'Vous avez déjà un compte?',
+    'register.loginLink': 'Se connecter',
+    'register.errors.passwordMismatch': 'Les mots de passe ne correspondent pas',
+    'register.errors.acceptTerms': 'Vous devez accepter les conditions et la politique de confidentialité',
+    'register.errors.default': 'Inscription échouée. Veuillez réessayer.',
+
     // Home page
     'home.hero.title': 'Extensions de Cheveux de Luxe',
     'home.hero.subtitle': 'pour Chaque Reine',
@@ -201,7 +281,7 @@ const translations = {
     'home.newsletter.subscribe': 'S\'abonner',
     'home.newsletter.subscribing': 'Abonnement...',
     'home.newsletter.success': 'Merci de vous être abonné à notre newsletter!',
-    
+
     // Why Choose Us section
     'home.whyChooseUs.title': 'Pourquoi Choisir',
     'home.whyChooseUs.titleHighlight': 'SoltanaHair',
@@ -222,7 +302,7 @@ const translations = {
     'home.whyChooseUs.cta.description': 'Rejoignez des milliers de clients satisfaits qui ont découvert la différence SoltanaHair.',
     'home.whyChooseUs.cta.shopExtensions': 'Acheter Extensions',
     'home.whyChooseUs.cta.learnMore': 'En Savoir Plus',
-    
+
     // Product
     'product.sale': 'Solde',
     'product.rating': 'Note',
@@ -230,7 +310,7 @@ const translations = {
     'product.youMayLike': 'Vous pourriez aussi aimer',
     'product.noProducts': 'Aucun produit disponible pour le moment. Revenez bientôt!',
     'product.viewAllProducts': 'Voir Tous les Produits',
-    
+
     // Footer
     'footer.brand.description': 'Extensions de cheveux de qualité premium pour chaque reine. Sublimez votre look avec nos produits capillaires de luxe.',
     'footer.shop': 'Boutique',
@@ -251,13 +331,13 @@ const translations = {
     'footer.privacyPolicy': 'Politique de Confidentialité',
     'footer.terms': 'Conditions de Service',
     'footer.copyright': 'Tous droits réservés.',
-    
+
     // Common
     'common.loading': 'Chargement...',
     'common.search': 'Rechercher',
     'common.searchPlaceholder': 'Rechercher des produits...',
     'common.language': 'Langue',
-    
+
     // Instagram section
     'instagram.followUs': 'Suivez-nous sur Instagram',
     'instagram.handle': '@soltanahair',
@@ -343,7 +423,47 @@ const translations = {
     'nav.orders': 'الطلبات',
     'nav.admin': 'المدير',
     'nav.adminDashboard': 'لوحة التحكم',
-    
+
+    // Login page
+    'login.title': 'تسجيل الدخول إلى حسابك',
+    'login.emailLabel': 'البريد الإلكتروني',
+    'login.emailPlaceholder': 'أدخل بريدك الإلكتروني',
+    'login.passwordLabel': 'كلمة المرور',
+    'login.passwordPlaceholder': 'أدخل كلمة المرور',
+    'login.forgotPassword': 'نسيت كلمة المرور؟',
+    'login.submitButton': 'تسجيل الدخول',
+    'login.loggingIn': 'جاري تسجيل الدخول...',
+    'login.or': 'أو',
+    'login.noAccount': 'ليس لديك حساب؟',
+    'login.signupLink': 'إنشاء حساب',
+    'login.error': 'البريد الإلكتروني أو كلمة المرور غير صحيحة. حاول مرة أخرى.',
+    'login.defaultError': 'فشل تسجيل الدخول. حاول مرة أخرى.',
+
+    // Register page
+    'register.title': 'إنشاء حسابك',
+    'register.firstName': 'الاسم الأول',
+    'register.firstNamePlaceholder': 'أدخل اسمك الأول',
+    'register.lastName': 'اسم العائلة',
+    'register.lastNamePlaceholder': 'أدخل اسم العائلة',
+    'register.emailLabel': 'البريد الإلكتروني',
+    'register.emailPlaceholder': 'أدخل بريدك الإلكتروني',
+    'register.passwordLabel': 'كلمة المرور',
+    'register.passwordPlaceholder': 'أدخل كلمة المرور (6 أحرف على الأقل)',
+    'register.confirmPasswordLabel': 'تأكيد كلمة المرور',
+    'register.confirmPasswordPlaceholder': 'أكد كلمة المرور',
+    'register.termsPrefix': 'أوافق على',
+    'register.termsLink': 'شروط الخدمة',
+    'register.and': 'و',
+    'register.privacyLink': 'سياسة الخصوصية',
+    'register.submitButton': 'إنشاء حساب',
+    'register.creatingAccount': 'جاري إنشاء الحساب...',
+    'register.or': 'أو',
+    'register.alreadyAccount': 'لديك حساب بالفعل؟',
+    'register.loginLink': 'تسجيل الدخول',
+    'register.errors.passwordMismatch': 'كلمات المرور غير متطابقة',
+    'register.errors.acceptTerms': 'يجب قبول الشروط وسياسة الخصوصية',
+    'register.errors.default': 'فشل التسجيل. حاول مرة أخرى.',
+
     // Home page
     'home.hero.title': 'وصلات الشعر الفاخرة',
     'home.hero.subtitle': 'لكل ملكة',
@@ -360,7 +480,7 @@ const translations = {
     'home.newsletter.subscribe': 'اشتراك',
     'home.newsletter.subscribing': 'جاري الاشتراك...',
     'home.newsletter.success': 'شكراً لك على الاشتراك في نشرتنا الإخبارية!',
-    
+
     // Why Choose Us section
     'home.whyChooseUs.title': 'لماذا تختارين',
     'home.whyChooseUs.titleHighlight': 'سلطانة هير',
@@ -381,7 +501,7 @@ const translations = {
     'home.whyChooseUs.cta.description': 'انضمي إلى آلاف العميلات السعيدات اللواتي اكتشفن الفرق مع سلطانة هير.',
     'home.whyChooseUs.cta.shopExtensions': 'تسوقي الوصلات',
     'home.whyChooseUs.cta.learnMore': 'اعرفي المزيد',
-    
+
     // Product
     'product.sale': 'تخفيض',
     'product.rating': 'التقييم',
@@ -389,7 +509,7 @@ const translations = {
     'product.youMayLike': 'قد يعجبك أيضاً',
     'product.noProducts': 'لا توجد منتجات متاحة حالياً. تفقدي لاحقاً!',
     'product.viewAllProducts': 'عرض جميع المنتجات',
-    
+
     // Footer
     'footer.brand.description': 'وصلات الشعر عالية الجودة لكل ملكة. ارتقي بإطلالتك مع منتجات الشعر الفاخرة.',
     'footer.shop': 'المتجر',
@@ -410,13 +530,13 @@ const translations = {
     'footer.privacyPolicy': 'سياسة الخصوصية',
     'footer.terms': 'شروط الخدمة',
     'footer.copyright': 'جميع الحقوق محفوظة.',
-    
+
     // Common
     'common.loading': 'جاري التحميل...',
     'common.search': 'بحث',
     'common.searchPlaceholder': 'البحث عن المنتجات...',
     'common.language': 'اللغة',
-    
+
     // Instagram section
     'instagram.followUs': 'تابعونا على إنستغرام',
     'instagram.handle': '@soltanahair',
@@ -507,7 +627,9 @@ export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) 
   const [language, setLanguage] = useState<Language>('en');
 
   const t = (key: string): string => {
-    return translations[language][key as keyof typeof translations['en']] || key;
+    const translation = translations[language][key as keyof typeof translations['en']];
+    console.log(`Translation for ${key}:`, translation);
+    return translation || key;
   };
 
   const isRTL = language === 'ar';
