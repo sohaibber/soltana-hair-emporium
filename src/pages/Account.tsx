@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import Layout from "@/components/layout/Layout";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { User } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { Input } from "@/components/ui/input";
@@ -23,6 +24,7 @@ interface Profile {
 
 const Account: React.FC = () => {
   const { user, isAuthenticated, logout } = useAuth();
+  const { t } = useLanguage();
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -118,21 +120,21 @@ const Account: React.FC = () => {
             <div className="bg-white rounded-lg border shadow-sm p-6">
               <Tabs defaultValue="details">
                 <TabsList className="mb-6">
-                  <TabsTrigger value="details">Account Details</TabsTrigger>
-                  <TabsTrigger value="address">Addresses</TabsTrigger>
-                  <TabsTrigger value="password">Change Password</TabsTrigger>
+                  <TabsTrigger value="details">{t("account.details")}</TabsTrigger>
+                  <TabsTrigger value="address">{t("account.address")}</TabsTrigger>
+                  <TabsTrigger value="password">{t("account.password")}</TabsTrigger>
                 </TabsList>
                 
                 <TabsContent value="details" className="space-y-6">
-                  <h2 className="text-xl font-medium">Personal Information</h2>
+                  <h2 className="text-xl font-medium">{t("account.personalInfo")}</h2>
                   
                   {loading ? (
-                    <div className="py-4 text-center">Loading profile information...</div>
+                    <div className="py-4 text-center">{t("account.loading")}</div>
                   ) : (
                     <form onSubmit={handleUpdateProfile} className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name</Label>
+                          <Label htmlFor="firstName">{t("account.firstName")}</Label>
                           <Input
                             id="firstName"
                             name="firstName"
@@ -141,7 +143,7 @@ const Account: React.FC = () => {
                           />
                         </div>
                         <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name</Label>
+                          <Label htmlFor="lastName">{t("account.lastName")}</Label>
                           <Input
                             id="lastName"
                             name="lastName"
@@ -152,21 +154,21 @@ const Account: React.FC = () => {
                       </div>
                       
                       <div className="space-y-2">
-                        <Label htmlFor="email">Email Address</Label>
+                        <Label htmlFor="email">{t("account.emailAddress")}</Label>
                         <Input
                           id="email"
                           name="email"
                           value={formData.email}
                           disabled
                         />
-                        <p className="text-xs text-gray-500">Email cannot be updated</p>
+                        <p className="text-xs text-gray-500">{t("account.emailCannotUpdate")}</p>
                       </div>
                       
                       <Button 
                         type="submit" 
                         disabled={isUpdating}
                       >
-                        {isUpdating ? "Updating..." : "Update Profile"}
+                        {isUpdating ? t("account.updating") : t("account.updateProfile")}
                       </Button>
                     </form>
                   )}
@@ -177,38 +179,38 @@ const Account: React.FC = () => {
                 </TabsContent>
                 
                 <TabsContent value="password" className="space-y-6">
-                  <h2 className="text-xl font-medium">Change Password</h2>
+                  <h2 className="text-xl font-medium">{t("account.password")}</h2>
                   
                   <form className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="currentPassword">Current Password</Label>
+                      <Label htmlFor="currentPassword">{t("account.currentPassword")}</Label>
                       <Input
                         id="currentPassword"
                         name="currentPassword"
                         type="password"
-                        placeholder="Enter current password"
+                        placeholder={t("account.currentPasswordPlaceholder")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="newPassword">New Password</Label>
+                      <Label htmlFor="newPassword">{t("account.newPassword")}</Label>
                       <Input
                         id="newPassword"
                         name="newPassword"
                         type="password"
-                        placeholder="Enter new password"
+                        placeholder={t("account.newPasswordPlaceholder")}
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="confirmPassword">Confirm New Password</Label>
+                      <Label htmlFor="confirmPassword">{t("account.confirmPassword")}</Label>
                       <Input
                         id="confirmPassword"
                         name="confirmPassword"
                         type="password"
-                        placeholder="Confirm new password"
+                        placeholder={t("account.confirmPasswordPlaceholder")}
                       />
                     </div>
                     
-                    <Button>Update Password</Button>
+                    <Button>{t("account.updatePassword")}</Button>
                   </form>
                 </TabsContent>
               </Tabs>
