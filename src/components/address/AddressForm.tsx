@@ -7,6 +7,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface AddressFormData {
   label: string;
@@ -29,6 +30,7 @@ interface AddressFormProps {
 
 const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialData }) => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [formData, setFormData] = useState<AddressFormData>({
     label: initialData?.label || "",
@@ -104,20 +106,20 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="label">Address Label</Label>
+        <Label htmlFor="label">{t("address.label")}</Label>
         <Input
           id="label"
           name="label"
           value={formData.label}
           onChange={handleChange}
-          placeholder="e.g., Home, Work, Office"
+          placeholder={t("address.labelPlaceholder")}
           required
         />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="firstName">First Name</Label>
+          <Label htmlFor="firstName">{t("address.firstName")}</Label>
           <Input
             id="firstName"
             name="firstName"
@@ -127,7 +129,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="lastName">Last Name</Label>
+          <Label htmlFor="lastName">{t("address.lastName")}</Label>
           <Input
             id="lastName"
             name="lastName"
@@ -139,7 +141,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="phone">Phone Number</Label>
+        <Label htmlFor="phone">{t("address.phone")}</Label>
         <Input
           id="phone"
           name="phone"
@@ -151,7 +153,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="address">Street Address</Label>
+        <Label htmlFor="address">{t("address.streetAddress")}</Label>
         <Input
           id="address"
           name="address"
@@ -163,7 +165,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="city">City</Label>
+          <Label htmlFor="city">{t("address.city")}</Label>
           <Input
             id="city"
             name="city"
@@ -173,7 +175,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="state">State/Province</Label>
+          <Label htmlFor="state">{t("address.state")}</Label>
           <Input
             id="state"
             name="state"
@@ -183,7 +185,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="zipCode">ZIP/Postal Code</Label>
+          <Label htmlFor="zipCode">{t("address.zipCode")}</Label>
           <Input
             id="zipCode"
             name="zipCode"
@@ -195,7 +197,7 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="country">Country</Label>
+        <Label htmlFor="country">{t("address.country")}</Label>
         <Input
           id="country"
           name="country"
@@ -211,15 +213,15 @@ const AddressForm: React.FC<AddressFormProps> = ({ onSuccess, onCancel, initialD
           checked={formData.isDefault}
           onCheckedChange={handleCheckboxChange}
         />
-        <Label htmlFor="isDefault">Set as default address</Label>
+        <Label htmlFor="isDefault">{t("address.setDefault")}</Label>
       </div>
 
       <div className="flex gap-2 pt-4">
         <Button type="submit" disabled={isSubmitting}>
-          {isSubmitting ? "Saving..." : (initialData?.id ? "Update Address" : "Add Address")}
+          {isSubmitting ? t("address.saving") : (initialData?.id ? t("address.updateAddress") : t("address.addAddress"))}
         </Button>
         <Button type="button" variant="outline" onClick={onCancel}>
-          Cancel
+          {t("address.cancel")}
         </Button>
       </div>
     </form>

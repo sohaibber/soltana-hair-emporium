@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -46,6 +45,31 @@ const translations = {
     'account.confirmPassword': 'Confirm New Password',
     'account.confirmPasswordPlaceholder': 'Confirm new password',
     'account.updatePassword': 'Update Password',
+
+    // Address translations
+    'address.savedAddresses': 'Saved Addresses',
+    'address.addNewAddress': 'Add New Address',
+    'address.editAddress': 'Edit Address',
+    'address.addFirstAddress': 'Add Your First Address',
+    'address.noAddresses': "You don't have any saved addresses yet.",
+    'address.deleteConfirm': 'Are you sure you want to delete this address?',
+    'address.label': 'Address Label',
+    'address.labelPlaceholder': 'e.g., Home, Work, Office',
+    'address.firstName': 'First Name',
+    'address.lastName': 'Last Name',
+    'address.phone': 'Phone Number',
+    'address.streetAddress': 'Street Address',
+    'address.city': 'City',
+    'address.state': 'State/Province',
+    'address.zipCode': 'ZIP/Postal Code',
+    'address.country': 'Country',
+    'address.setDefault': 'Set as default address',
+    'address.default': 'Default',
+    'address.saving': 'Saving...',
+    'address.addAddress': 'Add Address',
+    'address.updateAddress': 'Update Address',
+    'address.cancel': 'Cancel',
+    'address.loading': 'Loading addresses...',
 
     // Login page
     'login.title': 'Log In to Your Account',
@@ -123,6 +147,31 @@ const translations = {
     'account.confirmPasswordPlaceholder': 'Confirmez le nouveau mot de passe',
     'account.updatePassword': 'Mettre à jour le mot de passe',
 
+    // Address translations
+    'address.savedAddresses': 'Adresses enregistrées',
+    'address.addNewAddress': 'Ajouter une nouvelle adresse',
+    'address.editAddress': 'Modifier l\'adresse',
+    'address.addFirstAddress': 'Ajoutez votre première adresse',
+    'address.noAddresses': 'Vous n\'avez aucune adresse enregistrée pour le moment.',
+    'address.deleteConfirm': 'Êtes-vous sûr de vouloir supprimer cette adresse?',
+    'address.label': 'Libellé de l\'adresse',
+    'address.labelPlaceholder': 'ex: Domicile, Travail, Bureau',
+    'address.firstName': 'Prénom',
+    'address.lastName': 'Nom',
+    'address.phone': 'Numéro de téléphone',
+    'address.streetAddress': 'Adresse de la rue',
+    'address.city': 'Ville',
+    'address.state': 'État/Province',
+    'address.zipCode': 'Code postal',
+    'address.country': 'Pays',
+    'address.setDefault': 'Définir comme adresse par défaut',
+    'address.default': 'Par défaut',
+    'address.saving': 'Enregistrement...',
+    'address.addAddress': 'Ajouter une adresse',
+    'address.updateAddress': 'Mettre à jour l\'adresse',
+    'address.cancel': 'Annuler',
+    'address.loading': 'Chargement des adresses...',
+
     // Login page
     'login.title': 'Connectez-vous à votre compte',
     'login.emailLabel': 'Adresse email',
@@ -198,6 +247,31 @@ const translations = {
     'account.confirmPassword': 'تأكيد كلمة المرور الجديدة',
     'account.confirmPasswordPlaceholder': 'أكد كلمة المرور الجديدة',
     'account.updatePassword': 'تحديث كلمة المرور',
+
+    // Address translations
+    'address.savedAddresses': 'العناوين المحفوظة',
+    'address.addNewAddress': 'إضافة عنوان جديد',
+    'address.editAddress': 'تعديل العنوان',
+    'address.addFirstAddress': 'أضف عنوانك الأول',
+    'address.noAddresses': 'لا توجد عناوين محفوظة حتى الآن.',
+    'address.deleteConfirm': 'هل أنت متأكد من حذف هذا العنوان؟',
+    'address.label': 'تسمية العنوان',
+    'address.labelPlaceholder': 'مثل: المنزل، العمل، المكتب',
+    'address.firstName': 'الاسم الأول',
+    'address.lastName': 'اسم العائلة',
+    'address.phone': 'رقم الهاتف',
+    'address.streetAddress': 'عنوان الشارع',
+    'address.city': 'المدينة',
+    'address.state': 'الولاية/المحافظة',
+    'address.zipCode': 'الرمز البريدي',
+    'address.country': 'البلد',
+    'address.setDefault': 'تعيين كعنوان افتراضي',
+    'address.default': 'افتراضي',
+    'address.saving': 'جاري الحفظ...',
+    'address.addAddress': 'إضافة عنوان',
+    'address.updateAddress': 'تحديث العنوان',
+    'address.cancel': 'إلغاء',
+    'address.loading': 'جاري تحميل العناوين...',
 
     // Login page
     'login.title': 'تسجيل الدخول إلى حسابك',

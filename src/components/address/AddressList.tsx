@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Pencil, Trash2, MapPin } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import { toast } from "sonner";
 import AddressForm from "./AddressForm";
 
@@ -25,6 +26,7 @@ interface Address {
 
 const AddressList: React.FC = () => {
   const { user } = useAuth();
+  const { t } = useLanguage();
   const [addresses, setAddresses] = useState<Address[]>([]);
   const [loading, setLoading] = useState(true);
   const [showAddForm, setShowAddForm] = useState(false);
@@ -56,7 +58,7 @@ const AddressList: React.FC = () => {
   }, [user]);
 
   const handleDelete = async (addressId: string) => {
-    if (!confirm("Are you sure you want to delete this address?")) return;
+    if (!confirm(t("address.deleteConfirm"))) return;
 
     try {
       const { error } = await supabase
@@ -85,7 +87,7 @@ const AddressList: React.FC = () => {
   };
 
   if (loading) {
-    return <div className="py-4">Loading addresses...</div>;
+    return <div className="py-4">{t("address.loading")}</div>;
   }
 
   if (showAddForm || editingAddress) {
@@ -93,7 +95,7 @@ const AddressList: React.FC = () => {
       <div className="space-y-4">
         <div className="flex items-center justify-between">
           <h3 className="text-lg font-medium">
-            {editingAddress ? "Edit Address" : "Add New Address"}
+            {editingAddress ? t("address.editAddress") : t("address.addNewAddress")}
           </h3>
         </div>
         <AddressForm
@@ -120,22 +122,22 @@ const AddressList: React.FC = () => {
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-lg font-medium">Saved Addresses</h3>
+        <h3 className="text-lg font-medium">{t("address.savedAddresses")}</h3>
         <Button onClick={() => setShowAddForm(true)}>
           <MapPin className="w-4 h-4 mr-2" />
-          Add New Address
+          {t("address.addNewAddress")}
         </Button>
       </div>
 
       {addresses.length === 0 ? (
         <div className="bg-gray-50 p-6 text-center rounded">
-          <p className="text-gray-600">You don't have any saved addresses yet.</p>
+          <p className="text-gray-600">{t("address.noAddresses")}</p>
           <Button 
             className="mt-4" 
             variant="outline" 
             onClick={() => setShowAddForm(true)}
           >
-            Add Your First Address
+            {t("address.addFirstAddress")}
           </Button>
         </div>
       ) : (
@@ -147,7 +149,7 @@ const AddressList: React.FC = () => {
                   <CardTitle className="text-base flex items-center gap-2">
                     {address.label}
                     {address.is_default && (
-                      <Badge variant="secondary">Default</Badge>
+                      <Badge variant="secondary">{t("address.default")}</Badge>
                     )}
                   </CardTitle>
                   <div className="flex gap-1">
