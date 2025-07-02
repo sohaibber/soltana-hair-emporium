@@ -36,6 +36,35 @@ const translations = {
     'home.hero.description': 'Discover our luxurious collection of 100% real human hair extensions. From clip-ins to tape-ins, find your perfect match for effortless beauty and confidence.',
     'home.hero.shopNow': 'Shop Now',
     'home.hero.ourStory': 'Our Story',
+    
+    // Why Choose Us section
+    'home.whyChooseUs.title': 'Why Choose',
+    'home.whyChooseUs.titleHighlight': 'Soltana Hair',
+    'home.whyChooseUs.subtitle': 'We are committed to providing the highest quality hair extensions with exceptional service and ethical practices.',
+
+    'home.whyChooseUs.premiumQuality.title': 'Premium Quality',
+    'home.whyChooseUs.premiumQuality.description': '100% real human hair sourced from the finest donors worldwide.',
+
+    'home.whyChooseUs.ethicallySourced.title': 'Ethically Sourced',
+    'home.whyChooseUs.ethicallySourced.description': 'Fair trade practices ensuring donors are compensated fairly.',
+
+    'home.whyChooseUs.expertCraftsmanship.title': 'Expert Craftsmanship',
+    'home.whyChooseUs.expertCraftsmanship.description': 'Handcrafted by skilled artisans with years of experience.',
+
+    'home.whyChooseUs.fastShipping.title': 'Fast Shipping',
+    'home.whyChooseUs.fastShipping.description': 'Quick and secure delivery worldwide with tracking.',
+
+    'home.whyChooseUs.colorPerfection.title': 'Color Perfection',
+    'home.whyChooseUs.colorPerfection.description': 'Professional color matching for seamless blending.',
+
+    'home.whyChooseUs.expertSupport.title': 'Expert Support',
+    'home.whyChooseUs.expertSupport.description': '24/7 customer support from hair extension specialists.',
+
+    'home.whyChooseUs.cta.title': 'Ready to Transform Your Look?',
+    'home.whyChooseUs.cta.description': 'Join thousands of satisfied customers who trust Soltana Hair for their beauty transformation.',
+    'home.whyChooseUs.cta.shopExtensions': 'Shop Extensions',
+    'home.whyChooseUs.cta.learnMore': 'Learn More',
+
     'home.newsletter.title': 'Stay in Touch',
     'home.newsletter.description': 'Be the first to know about new collections, exclusive offers, and hair care tips.',
     'home.newsletter.placeholder': 'Enter your email address',
@@ -244,6 +273,35 @@ const translations = {
     'home.hero.description': 'Découvrez notre collection luxueuse d\'extensions de cheveux 100% naturels. Des clip-ins aux tape-ins, trouvez votre match parfait pour une beauté sans effort et pleine de confiance.',
     'home.hero.shopNow': 'Acheter maintenant',
     'home.hero.ourStory': 'Notre histoire',
+
+    // Why Choose Us section
+    'home.whyChooseUs.title': 'Pourquoi Choisir',
+    'home.whyChooseUs.titleHighlight': 'Soltana Hair',
+    'home.whyChooseUs.subtitle': 'Nous nous engageons à fournir des extensions de cheveux de la plus haute qualité avec un service exceptionnel et des pratiques éthiques.',
+
+    'home.whyChooseUs.premiumQuality.title': 'Qualité Premium',
+    'home.whyChooseUs.premiumQuality.description': 'Cheveux humains 100% naturels provenant des meilleurs donateurs mondiaux.',
+
+    'home.whyChooseUs.ethicallySourced.title': 'Source Éthique',
+    'home.whyChooseUs.ethicallySourced.description': 'Pratiques de commerce équitable garantissant une compensation équitable des donateurs.',
+
+    'home.whyChooseUs.expertCraftsmanship.title': 'Artisanat Expert',
+    'home.whyChooseUs.expertCraftsmanship.description': 'Fabriqué à la main par des artisans qualifiés avec des années d\'expérience.',
+
+    'home.whyChooseUs.fastShipping.title': 'Livraison Rapide',
+    'home.whyChooseUs.fastShipping.description': 'Livraison rapide et sécurisée dans le monde entier avec suivi.',
+
+    'home.whyChooseUs.colorPerfection.title': 'Perfection des Couleurs',
+    'home.whyChooseUs.colorPerfection.description': 'Correspondance de couleurs professionnelle pour un mélange parfait.',
+
+    'home.whyChooseUs.expertSupport.title': 'Support Expert',
+    'home.whyChooseUs.expertSupport.description': 'Support client 24/7 de spécialistes en extensions de cheveux.',
+
+    'home.whyChooseUs.cta.title': 'Prêt à Transformer Votre Look?',
+    'home.whyChooseUs.cta.description': 'Rejoignez des milliers de clients satisfaits qui font confiance à Soltana Hair pour leur transformation beauté.',
+    'home.whyChooseUs.cta.shopExtensions': 'Acheter Extensions',
+    'home.whyChooseUs.cta.learnMore': 'En Savoir Plus',
+
     'home.newsletter.title': 'Restez en contact',
     'home.newsletter.description': 'Soyez le premier à connaître les nouvelles collections, offres exclusives et conseils de soins capillaires.',
     'home.newsletter.placeholder': 'Entrez votre adresse email',
@@ -452,6 +510,35 @@ const translations = {
     'home.hero.description': 'اكتشفي مجموعتنا الفاخرة من وصلات الشعر الطبيعي 100%. من الكليبس إلى التيب إن، اعثري على التطابق المثالي لجمال بلا مجهود وثقة.',
     'home.hero.shopNow': 'تسوقي الآن',
     'home.hero.ourStory': 'قصتنا',
+
+    // Why Choose Us section
+    'home.whyChooseUs.title': 'لماذا تختارين',
+    'home.whyChooseUs.titleHighlight': 'سولتانا هير',
+    'home.whyChooseUs.subtitle': 'نحن ملتزمون بتوفير أعلى جودة من وصلات الشعر مع خدمة استثنائية وممارسات أخلاقية.',
+
+    'home.whyChooseUs.premiumQuality.title': 'جودة مميزة',
+    'home.whyChooseUs.premiumQuality.description': 'شعر بشري طبيعي 100% من أفضل المتبرعين حول العالم.',
+
+    'home.whyChooseUs.ethicallySourced.title': 'مصدر أخلاقي',
+    'home.whyChooseUs.ethicallySourced.description': 'ممارسات التجارة العادلة التي تضمن تعويض المتبرعين بشكل عادل.',
+
+    'home.whyChooseUs.expertCraftsmanship.title': 'حرفية خبيرة',
+    'home.whyChooseUs.expertCraftsmanship.description': 'مصنوعة يدوياً من قبل حرفيين مهرة بسنوات من الخبرة.',
+
+    'home.whyChooseUs.fastShipping.title': 'شحن سريع',
+    'home.whyChooseUs.fastShipping.description': 'توصيل سريع وآمن في جميع أنحاء العالم مع التتبع.',
+
+    'home.whyChooseUs.colorPerfection.title': 'مطابقة الألوان المثالية',
+    'home.whyChooseUs.colorPerfection.description': 'مطابقة ألوان احترافية للدمج السلس.',
+
+    'home.whyChooseUs.expertSupport.title': 'دعم خبير',
+    'home.whyChooseUs.expertSupport.description': 'دعم عملاء على مدار الساعة من متخصصي وصلات الشعر.',
+
+    'home.whyChooseUs.cta.title': 'جاهزة لتغيير إطلالتك؟',
+    'home.whyChooseUs.cta.description': 'انضمي لآلاف العملاء الراضين الذين يثقون في سولتانا هير لتحولاتهم الجمالية.',
+    'home.whyChooseUs.cta.shopExtensions': 'تسوقي الوصلات',
+    'home.whyChooseUs.cta.learnMore': 'اعرفي أكثر',
+
     'home.newsletter.title': 'ابقي على تواصل',
     'home.newsletter.description': 'كوني أول من يعلم بالمجموعات الجديدة والعروض الحصرية ونصائح العناية بالشعر.',
     'home.newsletter.placeholder': 'أدخلي عنوان بريدك الإلكتروني',
