@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -36,6 +35,11 @@ const translations = {
     'home.hero.description': 'Discover our luxurious collection of 100% real human hair extensions. From clip-ins to tape-ins, find your perfect match for effortless beauty and confidence.',
     'home.hero.shopNow': 'Shop Now',
     'home.hero.ourStory': 'Our Story',
+
+    // Featured Products section
+    'home.featured.title': 'Featured Products',
+    'home.featured.subtitle': 'Discover our most popular hair extensions',
+    'home.featured.viewAll': 'View All Products',
     
     // Why Choose Us section
     'home.whyChooseUs.title': 'Why Choose',
@@ -64,6 +68,15 @@ const translations = {
     'home.whyChooseUs.cta.description': 'Join thousands of satisfied customers who trust Soltana Hair for their beauty transformation.',
     'home.whyChooseUs.cta.shopExtensions': 'Shop Extensions',
     'home.whyChooseUs.cta.learnMore': 'Learn More',
+
+    // Testimonials section
+    'home.testimonials.title': 'What Our Customers Say',
+    'home.testimonials.subtitle': 'Read real reviews from women who have transformed their look with our premium hair extensions.',
+
+    // Category Banner section
+    'home.categories.title': 'Shop By Category',
+    'home.categories.subtitle': 'Find the perfect extensions for your hair type and style',
+    'home.categories.shopNow': 'Shop Now',
 
     'home.newsletter.title': 'Stay in Touch',
     'home.newsletter.description': 'Be the first to know about new collections, exclusive offers, and hair care tips.',
@@ -274,6 +287,11 @@ const translations = {
     'home.hero.shopNow': 'Acheter maintenant',
     'home.hero.ourStory': 'Notre histoire',
 
+    // Featured Products section
+    'home.featured.title': 'Produits Vedettes',
+    'home.featured.subtitle': 'Découvrez nos extensions de cheveux les plus populaires',
+    'home.featured.viewAll': 'Voir Tous les Produits',
+
     // Why Choose Us section
     'home.whyChooseUs.title': 'Pourquoi Choisir',
     'home.whyChooseUs.titleHighlight': 'Soltana Hair',
@@ -301,6 +319,15 @@ const translations = {
     'home.whyChooseUs.cta.description': 'Rejoignez des milliers de clients satisfaits qui font confiance à Soltana Hair pour leur transformation beauté.',
     'home.whyChooseUs.cta.shopExtensions': 'Acheter Extensions',
     'home.whyChooseUs.cta.learnMore': 'En Savoir Plus',
+
+    // Testimonials section
+    'home.testimonials.title': 'Ce que Disent Nos Clientes',
+    'home.testimonials.subtitle': 'Lisez de vrais avis de femmes qui ont transformé leur look avec nos extensions de cheveux premium.',
+
+    // Category Banner section
+    'home.categories.title': 'Acheter par Catégorie',
+    'home.categories.subtitle': 'Trouvez les extensions parfaites pour votre type de cheveux et votre style',
+    'home.categories.shopNow': 'Acheter Maintenant',
 
     'home.newsletter.title': 'Restez en contact',
     'home.newsletter.description': 'Soyez le premier à connaître les nouvelles collections, offres exclusives et conseils de soins capillaires.',
@@ -511,6 +538,11 @@ const translations = {
     'home.hero.shopNow': 'تسوقي الآن',
     'home.hero.ourStory': 'قصتنا',
 
+    // Featured Products section
+    'home.featured.title': 'المنتجات المميزة',
+    'home.featured.subtitle': 'اكتشفي وصلات الشعر الأكثر شعبية لدينا',
+    'home.featured.viewAll': 'عرض جميع المنتجات',
+
     // Why Choose Us section
     'home.whyChooseUs.title': 'لماذا تختارين',
     'home.whyChooseUs.titleHighlight': 'سولتانا هير',
@@ -538,6 +570,15 @@ const translations = {
     'home.whyChooseUs.cta.description': 'انضمي لآلاف العملاء الراضين الذين يثقون في سولتانا هير لتحولاتهم الجمالية.',
     'home.whyChooseUs.cta.shopExtensions': 'تسوقي الوصلات',
     'home.whyChooseUs.cta.learnMore': 'اعرفي أكثر',
+
+    // Testimonials section
+    'home.testimonials.title': 'ما تقوله عملاؤنا',
+    'home.testimonials.subtitle': 'اقرئي آراء حقيقية من نساء غيّرن إطلالتهن مع وصلات الشعر المميزة لدينا.',
+
+    // Category Banner section
+    'home.categories.title': 'تسوقي حسب الفئة',
+    'home.categories.subtitle': 'اعثري على الوصلات المثالية لنوع شعرك وأسلوبك',
+    'home.categories.shopNow': 'تسوقي الآن',
 
     'home.newsletter.title': 'ابقي على تواصل',
     'home.newsletter.description': 'كوني أول من يعلم بالمجموعات الجديدة والعروض الحصرية ونصائح العناية بالشعر.',
