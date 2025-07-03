@@ -133,6 +133,9 @@ const translations = {
     'product.toWriteReview': 'to write a review.',
     'product.loadingReviews': 'Loading reviews...',
     'product.noReviews': 'No reviews yet. Be the first to review this product!',
+    'product.youMayLike': 'You May Also Like',
+    'product.viewMore': 'View More Products',
+    'product.sale': 'Sale',
 
     // About page
     'about.title': 'About Soltana Hair',
@@ -408,6 +411,9 @@ const translations = {
     'product.toWriteReview': 'pour écrire un avis.',
     'product.loadingReviews': 'Chargement des avis...',
     'product.noReviews': 'Aucun avis pour le moment. Soyez le premier à évaluer ce produit!',
+    'product.youMayLike': 'Vous Pourriez Aussi Aimer',
+    'product.viewMore': 'Voir Plus de Produits',
+    'product.sale': 'Solde',
 
     // About page
     'about.title': 'À propos de Soltana Hair',
@@ -683,6 +689,9 @@ const translations = {
     'product.toWriteReview': 'لكتابة تقييم.',
     'product.loadingReviews': 'جاري تحميل التقييمات...',
     'product.noReviews': 'لا توجد تقييمات حتى الآن. كوني أول من يقيم هذا المنتج!',
+    'product.youMayLike': 'قد يعجبك أيضاً',
+    'product.viewMore': 'عرض المزيد من المنتجات',
+    'product.sale': 'تخفيض',
 
     // About page
     'about.title': 'حول سولتانا هير',
