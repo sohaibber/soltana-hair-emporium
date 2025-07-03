@@ -7,12 +7,13 @@ import Layout from "@/components/layout/Layout";
 import { useWishlist } from "@/context/WishlistContext";
 import { useCart } from "@/context/CartContext";
 import { useAuth } from "@/context/AuthContext";
-import { supabase } from "@/integrations/supabase/client";
+import { useLanguage } from "@/context/LanguageContext";
 
 const Wishlist: React.FC = () => {
   const { items, totalItems, removeItem, clearWishlist } = useWishlist();
   const { addItem } = useCart();
   const { isAuthenticated } = useAuth();
+  const { t } = useLanguage();
 
   const handleAddToCart = (item: any) => {
     addItem({
@@ -37,47 +38,49 @@ const Wishlist: React.FC = () => {
     <Layout>
       <div className="container mx-auto px-4 py-8 md:py-12">
         <h1 className="font-serif text-2xl md:text-3xl font-semibold mb-6">
-          Your Wishlist
+          {t('wishlist.title')}
         </h1>
 
         {!isAuthenticated ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
             <User size={48} className="mx-auto text-gray-400 mb-4" />
-            <h2 className="font-serif text-xl font-medium mb-2">Login to save your favorites</h2>
+            <h2 className="font-serif text-xl font-medium mb-2">{t('wishlist.loginToSave')}</h2>
             <p className="text-gray-600 mb-6">
-              Create an account or login to save items to your wishlist and access them from any device.
+              {t('wishlist.createAccount')}
             </p>
             <div className="space-x-4">
               <Button asChild>
-                <Link to="/login">Login</Link>
+                <Link to="/login">{t('wishlist.login')}</Link>
               </Button>
               <Button variant="outline" asChild>
-                <Link to="/register">Create Account</Link>
+                <Link to="/register">{t('wishlist.createAccountBtn')}</Link>
               </Button>
             </div>
           </div>
         ) : items.length === 0 ? (
           <div className="text-center py-12 bg-white rounded-lg shadow-sm border">
             <Heart size={48} className="mx-auto text-gray-400 mb-4" />
-            <h2 className="font-serif text-xl font-medium mb-2">Your wishlist is empty</h2>
+            <h2 className="font-serif text-xl font-medium mb-2">{t('wishlist.empty')}</h2>
             <p className="text-gray-600 mb-6">
-              Save your favorite items to come back to them later.
+              {t('wishlist.emptyDesc')}
             </p>
             <Button asChild>
-              <Link to="/shop">Browse Products</Link>
+              <Link to="/shop">{t('wishlist.browseProducts')}</Link>
             </Button>
           </div>
         ) : (
           <div className="space-y-6">
             <div className="flex justify-between items-center">
-              <p className="text-gray-600">{totalItems} {totalItems === 1 ? 'item' : 'items'} in your wishlist</p>
+              <p className="text-gray-600">
+                {totalItems} {totalItems === 1 ? t('wishlist.itemsCount') : t('wishlist.itemsCountPlural')} {t('wishlist.inYourWishlist')}
+              </p>
               <Button 
                 variant="outline" 
                 size="sm" 
                 onClick={clearWishlist} 
                 className="text-gray-600"
               >
-                <Trash2 size={14} className="mr-1" /> Clear Wishlist
+                <Trash2 size={14} className="mr-1" /> {t('wishlist.clearWishlist')}
               </Button>
             </div>
             
@@ -106,7 +109,7 @@ const Wishlist: React.FC = () => {
                           className="flex-1"
                           variant="outline"
                         >
-                          <ShoppingCart size={14} className="mr-1" /> Add to Cart
+                          <ShoppingCart size={14} className="mr-1" /> {t('wishlist.addToCart')}
                         </Button>
                         <Button 
                           variant="ghost" 
@@ -128,7 +131,7 @@ const Wishlist: React.FC = () => {
                 to="/shop"
                 className="inline-flex items-center text-sm font-medium text-gray-600 hover:text-gray-900"
               >
-                <ArrowRight size={14} className="mr-1 rotate-180" /> Continue Shopping
+                <ArrowRight size={14} className="mr-1 rotate-180" /> {t('wishlist.continueShopping')}
               </Link>
             </div>
           </div>
