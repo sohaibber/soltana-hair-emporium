@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from "react";
 import { Navigate } from "react-router-dom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -85,7 +86,7 @@ const Account: React.FC = () => {
         .eq('id', user?.id);
         
       if (error) {
-        toast.error("Failed to update profile");
+        toast.error(t("account.updateFailed"));
         throw error;
       }
       
@@ -96,7 +97,7 @@ const Account: React.FC = () => {
         last_name: formData.lastName,
       } : null);
       
-      toast.success("Profile updated successfully");
+      toast.success(t("account.updateSuccess"));
     } catch (error) {
       console.error('Update error:', error);
     } finally {
