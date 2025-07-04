@@ -1,1084 +1,412 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useCallback } from 'react';
 
-export type Language = 'en' | 'fr' | 'ar';
-
-interface LanguageContextType {
-  language: Language;
-  setLanguage: (lang: Language) => void;
-  t: (key: string) => string;
-  isRTL: boolean;
+interface LanguageContextProps {
+  language: string;
+  setLanguage: (language: string) => void;
+  t: (key: string) => string | undefined;
 }
 
-const translations = {
+const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
+
+interface Translation {
+  [key: string]: string;
+}
+
+interface Translations {
+  [language: string]: {
+    nav: {
+      home: string;
+      shop: string;
+      about: string;
+      contact: string;
+      login: string;
+      register: string;
+      logout: string;
+      account: string;
+    };
+    home: {
+      title: string;
+      subtitle: string;
+      shopNow: string;
+      learnMore: string;
+      featuredProducts: string;
+      newArrivals: string;
+      bestSellers: string;
+    };
+    shop: {
+      title: string;
+      sortBy: string;
+      priceLowToHigh: string;
+      priceHighToLow: string;
+      newest: string;
+      oldest: string;
+      addToCart: string;
+      items: string;
+    };
+    product: {
+      price: string;
+      reviews: string;
+      rating: string;
+      color: string;
+      length: string;
+      quantity: string;
+      inStock: string;
+      freeShipping: string;
+      returns: string;
+      detailsTab: string;
+      specificationsTab: string;
+      reviewsTab: string;
+      aboutThisProduct: string;
+      customerReviews: string;
+      writeReview: string;
+      loginToReview: string;
+      toWriteReview: string;
+      loadingReviews: string;
+      noReviews: string;
+      notFound: string;
+      notFoundDesc: string;
+      viewAllProducts: string;
+      youMayLike: string;
+      viewMore: string;
+      sale: string;
+    };
+    footer: {
+      aboutUs: string;
+      contactUs: string;
+      privacyPolicy: string;
+      termsOfService: string;
+      copyright: string;
+    };
+    auth: {
+      loginTitle: string;
+      registerTitle: string;
+      email: string;
+      password: string;
+      firstName: string;
+      lastName: string;
+      loginButton: string;
+      registerButton: string;
+      forgotPassword: string;
+      resetPassword: string;
+    };
+    checkout: {
+      title: string;
+      shippingAddress: string;
+      billingAddress: string;
+      paymentDetails: string;
+      orderSummary: string;
+      placeOrder: string;
+    };
+    account: {
+      title: string;
+      profile: string;
+      orders: string;
+      settings: string;
+      logout: string;
+    };
+  };
+}
+
+const translations: Translations = {
   en: {
-    'common.language': 'Language',
-    'common.loading': 'Loading...',
-    'common.error': 'Error',
-    'common.success': 'Success',
-    'common.cancel': 'Cancel',
-    'common.save': 'Save',
-    'common.edit': 'Edit',
-    'common.delete': 'Delete',
-    'common.add': 'Add',
-    'common.remove': 'Remove',
-    'common.submit': 'Submit',
-    'common.close': 'Close',
-    'common.search': 'Search',
-    'common.filter': 'Filter',
-    'common.sort': 'Sort',
-    'common.view': 'View',
-    'common.back': 'Back',
-    'common.next': 'Next',
-    'common.previous': 'Previous',
-    'common.continue': 'Continue',
-    'common.yes': 'Yes',
-    'common.no': 'No',
-    'common.ok': 'OK',
-    'common.required': 'Required',
-    'common.optional': 'Optional',
-    'common.select': 'Select',
-    'common.clear': 'Clear',
-    'common.apply': 'Apply',
-    'common.reset': 'Reset',
-
-    // Navigation
-    'nav.home': 'Home',
-    'nav.shop': 'Shop',
-    'nav.about': 'About',
-    'nav.contact': 'Contact',
-    'nav.cart': 'Cart',
-    'nav.wishlist': 'Wishlist',
-    'nav.account': 'Account',
-    'nav.login': 'Login',
-    'nav.register': 'Sign Up',
-    'nav.logout': 'Logout',
-    'nav.orders': 'Orders',
-    'nav.admin': 'Admin',
-    'nav.adminDashboard': 'Admin Dashboard',
-
-    // Home Page Hero
-    'home.hero.title': 'Transform Your Look with Premium Hair Extensions',
-    'home.hero.subtitle': 'Discover Beauty',
-    'home.hero.description': 'Discover our collection of high-quality, ethically sourced hair extensions that blend seamlessly with your natural hair.',
-    'home.hero.shopNow': 'Shop Now',
-    'home.hero.ourStory': 'Our Story',
-
-    // Home Page Featured
-    'home.featured.title': 'Featured Products',
-    'home.featured.subtitle': 'Discover our most popular hair extensions',
-    'home.featured.viewAll': 'View All Products',
-
-    // Home Page Why Choose Us
-    'home.whyChooseUs.title': 'Why Choose',
-    'home.whyChooseUs.titleHighlight': 'Soltana Hair',
-    'home.whyChooseUs.subtitle': 'We pride ourselves on delivering exceptional quality and service that sets us apart from the competition.',
-    'home.whyChooseUs.premiumQuality.title': 'Premium Quality',
-    'home.whyChooseUs.premiumQuality.description': 'Hand-selected, ethically sourced hair extensions that last.',
-    'home.whyChooseUs.ethicallySourced.title': 'Ethically Sourced',
-    'home.whyChooseUs.ethicallySourced.description': 'We work with suppliers who share our commitment to ethical practices.',
-    'home.whyChooseUs.expertCraftsmanship.title': 'Expert Craftsmanship',
-    'home.whyChooseUs.expertCraftsmanship.description': 'Every piece is crafted with precision and attention to detail.',
-    'home.whyChooseUs.fastShipping.title': 'Fast Shipping',
-    'home.whyChooseUs.fastShipping.description': 'Free worldwide shipping on orders over $100.',
-    'home.whyChooseUs.colorPerfection.title': 'Color Perfection',
-    'home.whyChooseUs.colorPerfection.description': 'Professional color matching for seamless blending.',
-    'home.whyChooseUs.expertSupport.title': 'Expert Support',
-    'home.whyChooseUs.expertSupport.description': '24/7 styling advice and customer support.',
-    'home.whyChooseUs.cta.title': 'Ready to Transform Your Hair?',
-    'home.whyChooseUs.cta.description': 'Join thousands of satisfied customers who trust Soltana Hair for their beauty needs.',
-    'home.whyChooseUs.cta.shopExtensions': 'Shop Extensions',
-    'home.whyChooseUs.cta.learnMore': 'Learn More',
-
-    // Home Page Testimonials
-    'home.testimonials.title': 'What Our Customers Say',
-    'home.testimonials.subtitle': 'Real reviews from our satisfied customers',
-
-    // Home Page Instagram
-    'home.instagram.title': 'Follow Us on Instagram',
-    'home.instagram.subtitle': 'See how our customers style their Soltana Hair',
-    'instagram.followUs': 'Follow Us',
-    'instagram.handle': '@soltanahair',
-
-    // Home Page Newsletter
-    'home.newsletter.title': 'Stay Updated',
-    'home.newsletter.subtitle': 'Subscribe to get special offers, free giveaways, and exclusive deals.',
-    'home.newsletter.description': 'Get the latest updates on new products and exclusive offers.',
-    'home.newsletter.placeholder': 'Enter your email address',
-    'home.newsletter.button': 'Subscribe',
-    'home.newsletter.subscribe': 'Subscribe Now',
-    'home.newsletter.success': 'Thank you for subscribing!',
-
-    // Footer
-    'footer.brand.description': 'Premium hair extensions that enhance your natural beauty with ethically sourced, high-quality hair.',
-    'footer.shop': 'Shop',
-    'footer.allProducts': 'All Products',
-    'footer.clipIns': 'Clip-in Extensions',
-    'footer.tapeIns': 'Tape-in Extensions',
-    'footer.ponytails': 'Ponytails',
-    'footer.wigs': 'Wigs',
-    'footer.company': 'Company',
-    'footer.aboutUs': 'About Us',
-    'footer.contact': 'Contact',
-    'footer.careers': 'Careers',
-    'footer.press': 'Press',
-    'footer.help': 'Help',
-    'footer.shipping': 'Shipping',
-    'footer.returns': 'Returns',
-    'footer.faq': 'FAQ',
-    'footer.privacyPolicy': 'Privacy Policy',
-    'footer.terms': 'Terms of Service',
-    'footer.copyright': 'All rights reserved.',
-
-    // Login page
-    'login.title': 'Login to Your Account',
-    'login.emailLabel': 'Email Address',
-    'login.emailPlaceholder': 'Enter your email address',
-    'login.passwordLabel': 'Password',
-    'login.passwordPlaceholder': 'Enter your password',
-    'login.forgotPassword': 'Forgot Password?',
-    'login.submitButton': 'Login',
-    'login.loggingIn': 'Logging in...',
-    'login.or': 'or',
-    'login.noAccount': "Don't have an account?",
-    'login.signupLink': 'Sign up here',
-    'login.error.invalidCredentials': 'Invalid email or password',
-    'login.error.general': 'Login failed. Please try again.',
-
-    // Register page
-    'register.title': 'Create Your Account',
-    'register.firstName': 'First Name',
-    'register.firstNamePlaceholder': 'Enter your first name',
-    'register.lastName': 'Last Name',
-    'register.lastNamePlaceholder': 'Enter your last name',
-    'register.emailLabel': 'Email Address',
-    'register.emailPlaceholder': 'Enter your email address',
-    'register.passwordLabel': 'Password',
-    'register.passwordPlaceholder': 'Enter your password',
-    'register.confirmPasswordLabel': 'Confirm Password',
-    'register.confirmPasswordPlaceholder': 'Confirm your password',
-    'register.termsPrefix': 'I agree to the',
-    'register.termsLink': 'Terms of Service',
-    'register.and': 'and',
-    'register.privacyLink': 'Privacy Policy',
-    'register.submitButton': 'Create Account',
-    'register.creatingAccount': 'Creating account...',
-    'register.or': 'or',
-    'register.alreadyAccount': 'Already have an account?',
-    'register.loginLink': 'Login here',
-    'register.errors.passwordMismatch': 'Passwords do not match',
-    'register.errors.acceptTerms': 'You must accept the terms and privacy policy',
-    'register.errors.default': 'Registration failed. Please try again.',
-
-    // Shop page
-    'shop.title': 'Our Collection',
-    'shop.subtitle': 'Discover our premium hair extensions',
-    'shop.filter': 'Filter',
-    'shop.filterProducts': 'Filter Products',
-    'shop.applyFilters': 'Apply Filters',
-    'shop.clearFilters': 'Clear Filters',
-    'shop.gridView': 'Grid View',
-    'shop.listView': 'List View',
-    'shop.filters': 'Filters',
-    'shop.sortBy': 'Sort by',
-    'shop.sortBy.featured': 'Featured',
-    'shop.sortBy.priceLowHigh': 'Price: Low to High',
-    'shop.sortBy.priceHighLow': 'Price: High to Low',
-    'shop.sortBy.newest': 'Newest',
-    'shop.sortBy.oldest': 'Oldest',
-    'shop.sortBy.nameAZ': 'Name: A-Z',
-    'shop.sortBy.nameZA': 'Name: Z-A',
-    'shop.category': 'Category',
-    'shop.category.all': 'All Categories',
-    'shop.priceRange': 'Price Range',
-    'shop.color': 'Color',
-    'shop.length': 'Length',
-    'shop.noProductsFound': 'No Products Found',
-    'shop.tryAdjustingFilters': 'Try adjusting your filters to see more products.',
-    'shop.addToCart': 'Add to Cart',
-    'shop.addToWishlist': 'Add to Wishlist',
-    'shop.removeFromWishlist': 'Remove from Wishlist',
-    'shop.quickView': 'Quick View',
-    'shop.viewDetails': 'View Details',
-    'shop.inStock': 'In Stock',
-    'shop.outOfStock': 'Out of Stock',
-    'shop.lowStock': 'Low Stock',
-    'shop.sale': 'Sale',
-    'shop.new': 'New',
-    'shop.popular': 'Popular',
-    'shop.resultsCount': 'Showing {count} results',
-    'shop.loadMore': 'Load More',
-
-    // Product Detail
-    'product.price': 'Price',
-    'product.rating': 'Reviews',
-    'product.reviews': 'Reviews',
-    'product.color': 'Color',
-    'product.length': 'Length',
-    'product.quantity': 'Quantity',
-    'product.inStock': 'In Stock & Ready to Ship',
-    'product.freeShipping': 'Free Shipping on Orders Over $100',
-    'product.returns': '30-Day Returns',
-    'product.detailsTab': 'Product Details',
-    'product.specificationsTab': 'Specifications',
-    'product.reviewsTab': 'Reviews',
-    'product.aboutThisProduct': 'About this Product',
-    'product.customerReviews': 'Customer Reviews',
-    'product.writeReview': 'Write a Review',
-    'product.loginToReview': 'Please',
-    'product.toWriteReview': 'to write a review.',
-    'product.loadingReviews': 'Loading reviews...',
-    'product.noReviews': 'No reviews yet. Be the first to review this product!',
-    'product.notFound': 'Product Not Found',
-    'product.notFoundDesc': 'The product you\'re looking for doesn\'t exist or has been removed.',
-    'product.viewAllProducts': 'View All Products',
-    'product.selectColor': 'Select Color',
-    'product.selectLength': 'Select Length',
-    'product.addToCart': 'Add to Cart',
-    'product.addToWishlist': 'Add to Wishlist',
-    'product.removeFromWishlist': 'Remove from Wishlist',
-    'product.shareProduct': 'Share Product',
-    'product.description': 'Description',
-    'product.specifications': 'Specifications',
-    'product.careInstructions': 'Care Instructions',
-    'product.relatedProducts': 'Related Products',
-    'product.youMayAlsoLike': 'You May Also Like',
-    'product.addedToCart': 'Added to cart!',
-    'product.addedToWishlist': 'Added to wishlist!',
-    'product.removedFromWishlist': 'Removed from wishlist!',
-    'product.selectOptions': 'Please select all options',
-    'product.stockAvailable': '{count} in stock',
-    'product.estimatedDelivery': 'Estimated delivery: {date}',
-
-    // Cart
-    'cart.title': 'Your Shopping Cart',
-    'cart.empty': 'Your cart is empty',
-    'cart.emptyDesc': "Looks like you haven't added any products to your cart yet.",
-    'cart.continueShopping': 'Continue Shopping',
-    'cart.itemsCount': '{count} item',
-    'cart.itemsCountPlural': '{count} items',
-    'cart.subtotal': 'Subtotal',
-    'cart.shipping': 'Shipping',
-    'cart.tax': 'Tax',
-    'cart.total': 'Total',
-    'cart.freeShipping': 'Free',
-    'cart.freeShippingNote': 'Free shipping on orders over $100',
-    'cart.proceedToCheckout': 'Proceed to Checkout',
-    'cart.updateCart': 'Update Cart',
-    'cart.removeItem': 'Remove item',
-    'cart.increaseQuantity': 'Increase quantity',
-    'cart.decreaseQuantity': 'Decrease quantity',
-    'cart.orderSummary': 'Order Summary',
-    'cart.frequentlyBoughtTogether': 'Frequently Bought Together',
-
-    // Wishlist
-    'wishlist.title': 'My Wishlist',
-    'wishlist.empty': 'Your wishlist is empty',
-    'wishlist.emptyDesc': 'Save items you love for later by adding them to your wishlist.',
-    'wishlist.loginToSave': 'Login to Save Items',
-    'wishlist.createAccount': 'Create an account to save your favorite items and access them from any device.',
-    'wishlist.login': 'Login',
-    'wishlist.createAccountBtn': 'Create Account',
-    'wishlist.itemsCount': 'item',
-    'wishlist.itemsCountPlural': 'items',
-    'wishlist.inYourWishlist': 'in your wishlist',
-    'wishlist.addToCart': 'Add to Cart',
-    'wishlist.removeFromWishlist': 'Remove from Wishlist',
-    'wishlist.clearWishlist': 'Clear Wishlist',
-    'wishlist.browseProducts': 'Browse Products',
-    'wishlist.continueShopping': 'Continue Shopping',
-
-    // Account
-    'account.title': 'My Account',
-    'account.welcome': 'Welcome back',
-    'account.details': 'Account Details',
-    'account.orders': 'Order History',
-    'account.addresses': 'Addresses',
-    'account.wishlist': 'Wishlist',
-    'account.settings': 'Settings',
-    'account.logout': 'Logout',
-    'account.personalInfo': 'Personal Information',
-    'account.firstName': 'First Name',
-    'account.lastName': 'Last Name',
-    'account.emailAddress': 'Email Address',
-    'account.emailCannotUpdate': 'Email address cannot be changed',
-    'account.updateProfile': 'Update Profile',
-    'account.updating': 'Updating...',
-    'account.updateSuccess': 'Profile updated successfully!',
-    'account.updateFailed': 'Failed to update profile',
-    'account.loading': 'Loading...',
-    'account.address': 'Address Book',
-    'account.password': 'Password',
-    'account.currentPassword': 'Current Password',
-    'account.currentPasswordPlaceholder': 'Enter current password',
-    'account.newPassword': 'New Password',
-    'account.newPasswordPlaceholder': 'Enter new password',
-    'account.confirmPassword': 'Confirm Password',
-    'account.confirmPasswordPlaceholder': 'Confirm new password',
-    'account.updatePassword': 'Update Password',
-    'account.sidebar.overview': 'Overview',
-    'account.sidebar.orders': 'Orders',
-    'account.sidebar.addresses': 'Addresses',
-    'account.sidebar.wishlist': 'Wishlist',
-    'account.sidebar.settings': 'Settings',
-
-    // Orders
-    'orders.title': 'Order History',
-    'orders.empty': 'No orders found',
-    'orders.emptyDesc': "You haven't placed any orders yet.",
-    'orders.orderNumber': 'Order #{number}',
-    'orders.orderDate': 'Order Date',
-    'orders.orderStatus': 'Status',
-    'orders.orderTotal': 'Total',
-    'orders.viewOrder': 'View Order',
-    'orders.trackOrder': 'Track Order',
-    'orders.reorder': 'Reorder',
-    'orders.status.pending': 'Pending',
-    'orders.status.processing': 'Processing',
-    'orders.status.shipped': 'Shipped',
-    'orders.status.delivered': 'Delivered',
-    'orders.status.cancelled': 'Cancelled',
-    'orders.orderDetails': 'Order Details',
-    'orders.shippingAddress': 'Shipping Address',
-    'orders.billingAddress': 'Billing Address',
-    'orders.paymentMethod': 'Payment Method',
-    'orders.orderItems': 'Order Items',
-
-    // Order Confirmation
-    'orderConfirmation.title': 'Order Confirmation',
-    'orderConfirmation.thankYou': 'Thank You for Your Order!',
-    'orderConfirmation.orderPlaced': 'Your order has been successfully placed.',
-    'orderConfirmation.confirmationEmail': 'We have sent a confirmation email with all details.',
-    'orderConfirmation.orderSummary': 'Order Summary',
-    'orderConfirmation.orderNumber': 'Order Number',
-    'orderConfirmation.orderDate': 'Order Date',
-    'orderConfirmation.orderStatus': 'Order Status',
-    'orderConfirmation.totalAmount': 'Total Amount',
-    'orderConfirmation.shippingTo': 'Shipping to',
-    'orderConfirmation.viewYourOrders': 'View Your Orders',
-    'orderConfirmation.continueShopping': 'Continue Shopping',
-    'orderConfirmation.needAssistance': 'Need assistance? Contact our customer service at',
-
-    // Checkout
-    'checkout.title': 'Checkout',
-    'checkout.shippingAddress': 'Shipping Address',
-    'checkout.billingAddress': 'Billing Address',
-    'checkout.paymentMethod': 'Payment Method',
-    'checkout.orderSummary': 'Order Summary',
-    'checkout.placeOrder': 'Place Order',
-    'checkout.processing': 'Processing...',
-    'checkout.sameAsShipping': 'Same as shipping address',
-    'checkout.addNewAddress': 'Add New Address',
-    'checkout.selectAddress': 'Select Address',
-    'checkout.cardNumber': 'Card Number',
-    'checkout.expiryDate': 'Expiry Date',
-    'checkout.cvv': 'CVV',
-    'checkout.nameOnCard': 'Name on Card',
-    'checkout.saveCard': 'Save card for future purchases',
-    'checkout.secureCheckout': 'Secure Checkout',
-    'checkout.orderTotal': 'Order Total',
-    'checkout.estimatedDelivery': 'Estimated Delivery',
-
-    // Address
-    'address.title': 'Address Book',
-    'address.addNew': 'Add New Address',
-    'address.edit': 'Edit Address',
-    'address.delete': 'Delete Address',
-    'address.setDefault': 'Set as Default',
-    'address.default': 'Default',
-    'address.firstName': 'First Name',
-    'address.lastName': 'Last Name',
-    'address.company': 'Company',
-    'address.address': 'Address',
-    'address.address2': 'Address Line 2',
-    'address.city': 'City',
-    'address.state': 'State/Province',
-    'address.zipCode': 'ZIP/Postal Code',
-    'address.country': 'Country',
-    'address.phone': 'Phone Number',
-    'address.label': 'Address Label',
-    'address.labelPlaceholder': 'e.g., Home, Work, etc.',
-    'address.save': 'Save Address',
-    'address.cancel': 'Cancel',
-    'address.confirmDelete': 'Are you sure you want to delete this address?',
-    'address.deleteSuccess': 'Address deleted successfully',
-    'address.saveSuccess': 'Address saved successfully',
-    'address.updateSuccess': 'Address updated successfully',
-
-    // About page
-    'about.title': 'About Us',
-    'about.storyAlt': 'Our story image',
-    'about.ourStory': 'Our Story',
-    'about.ourStoryParagraph1': 'Founded in 2020, Soltana Hair began as a passion project to provide women with premium quality hair extensions that enhance natural beauty. Our journey started with a simple belief: every woman deserves to feel confident and beautiful.',
-    'about.ourStoryParagraph2': 'We source our hair from ethical suppliers worldwide, ensuring that every strand meets our rigorous quality standards. Our team of experts hand-selects each piece to guarantee the finest texture, color, and durability.',
-    'about.ourStoryParagraph3': 'Today, we are proud to serve thousands of customers globally, helping them achieve their dream hair with our premium extensions and exceptional customer service.',
-    'about.ourValues': 'Our Values',
-    'about.value.quality': 'Quality First',
-    'about.value.qualityDesc': 'We never compromise on quality. Every product undergoes strict quality control to ensure you receive only the best.',
-    'about.value.ethics': 'Ethical Sourcing',
-    'about.value.ethicsDesc': 'We work with suppliers who share our commitment to ethical practices and fair compensation.',
-    'about.value.innovation': 'Innovation',
-    'about.value.innovationDesc': 'We continuously innovate our products and services to meet the evolving needs of our customers.',
-    'about.commitmentTitle': 'Our Commitment to You',
-    'about.commitmentDesc': 'We are committed to providing you with not just premium hair extensions, but an exceptional experience from the moment you visit our website to the day your order arrives at your door. Your satisfaction is our priority.',
-    'about.joinFamilyTitle': 'Join the Soltana Family',
-    'about.joinFamilyDesc': 'Experience the difference that quality makes. Join thousands of satisfied customers who have made Soltana Hair their trusted choice for premium hair extensions.',
-    'about.shopCollection': 'Shop Our Collection',
-
-    // Contact page
-    'contact.title': 'Contact Us',
-    'contact.getInTouch': 'Get in Touch',
-    'contact.getInTouchDesc': 'We would love to hear from you! Whether you have questions about our products, need styling advice, or want to share your Soltana Hair experience, our team is here to help.',
-    'contact.phone': 'Phone',
-    'contact.phoneHours': 'Monday-Friday 9AM-6PM EST',
-    'contact.email': 'Email',
-    'contact.emailDesc': 'We typically respond within 24 hours',
-    'contact.address': 'Address',
-    'contact.businessHours': 'Business Hours',
-    'contact.businessDay': 'Monday-Friday: 9:00 AM - 6:00 PM',
-    'contact.businessSat': 'Saturday: 10:00 AM - 4:00 PM',
-    'contact.businessSun': 'Sunday: Closed',
-    'contact.sendMessage': 'Send us a Message',
-    'contact.yourName': 'Your Name',
-    'contact.yourNamePlaceholder': 'Enter your full name',
-    'contact.emailLabel': 'Email',
-    'contact.emailPlaceholder': 'Enter your email address',
-    'contact.subject': 'Subject',
-    'contact.subjectPlaceholder': 'What is this regarding?',
-    'contact.message': 'Message',
-    'contact.messagePlaceholder': 'Tell us how we can help you...',
-    'contact.sendButton': 'Send Message',
-    'contact.sending': 'Sending...',
-    'contact.messageSent': 'Message sent successfully! We\'ll get back to you soon.',
-    'contact.faqTitle': 'Frequently Asked Questions',
-    'contact.faq1q': 'How long do your hair extensions last?',
-    'contact.faq1a': 'With proper care, our premium extensions can last 6-12 months or longer.',
-    'contact.faq2q': 'Do you offer color matching services?',
-    'contact.faq2a': 'Yes! We offer professional color matching to ensure perfect blending with your natural hair.',
-    'contact.faq3q': 'What is your return policy?',
-    'contact.faq3a': 'We offer a 30-day return policy for unopened products in original packaging.',
-    'contact.faq4q': 'Do you ship internationally?',
-    'contact.faq4a': 'Yes, we ship worldwide with tracking and insurance included.',
-
-    // Error Pages
-    'error.404.title': '404 - Page Not Found',
-    'error.404.message': 'Oops! The page you\'re looking for doesn\'t exist.',
-    'error.404.button': 'Return to Home',
-    'error.500.title': '500 - Server Error',
-    'error.500.message': 'Something went wrong on our end. Please try again later.',
-    'error.general': 'An error occurred. Please try again.',
-
-    // Admin
-    'admin.dashboard': 'Admin Dashboard',
-    'admin.products': 'Products',
-    'admin.orders': 'Orders',
-    'admin.users': 'Users',
-    'admin.analytics': 'Analytics',
-    'admin.settings': 'Settings',
-    'admin.addProduct': 'Add Product',
-    'admin.editProduct': 'Edit Product',
-    'admin.deleteProduct': 'Delete Product',
-    'admin.productName': 'Product Name',
-    'admin.productDescription': 'Product Description',
-    'admin.productPrice': 'Product Price',
-    'admin.productCategory': 'Product Category',
-    'admin.productStock': 'Stock Quantity',
-    'admin.productImages': 'Product Images',
-    'admin.saveProduct': 'Save Product',
-    'admin.login': 'Admin Login',
-    'admin.accessCode': 'Access Code',
-    'admin.enterAccessCode': 'Enter admin access code',
-
-    // Reviews
-    'reviews.title': 'Customer Reviews',
-    'reviews.writeReview': 'Write a Review',
-    'reviews.rating': 'Rating',
-    'reviews.reviewTitle': 'Review Title',
-    'reviews.reviewText': 'Your Review',
-    'reviews.submitReview': 'Submit Review',
-    'reviews.helpful': 'Helpful',
-    'reviews.notHelpful': 'Not Helpful',
-    'reviews.verified': 'Verified Purchase',
-    'reviews.noReviews': 'No reviews yet',
-    'reviews.beFirst': 'Be the first to review this product',
-    'reviews.stars': '{count} stars',
-    'reviews.outOf5': 'out of 5',
-
-    // Search
-    'search.placeholder': 'Search products...',
-    'search.results': 'Search Results',
-    'search.noResults': 'No results found',
-    'search.noResultsDesc': 'Try adjusting your search terms',
-    'search.suggestions': 'Suggested searches',
-    'search.popular': 'Popular searches',
-
-    // Notifications
-    'notification.itemAddedToCart': 'Item added to cart',
-    'notification.itemRemovedFromCart': 'Item removed from cart',
-    'notification.itemAddedToWishlist': 'Item added to wishlist',
-    'notification.itemRemovedFromWishlist': 'Item removed from wishlist',
-    'notification.profileUpdated': 'Profile updated successfully',
-    'notification.addressSaved': 'Address saved successfully',
-    'notification.orderPlaced': 'Order placed successfully',
-    'notification.error': 'Something went wrong',
+    nav: {
+      home: "Home",
+      shop: "Shop",
+      about: "About",
+      contact: "Contact",
+      login: "Login",
+      register: "Register",
+      logout: "Logout",
+      account: "Account",
+    },
+    home: {
+      title: "Welcome to Our Store",
+      subtitle: "Discover the best products at the best prices.",
+      shopNow: "Shop Now",
+      learnMore: "Learn More",
+      featuredProducts: "Featured Products",
+      newArrivals: "New Arrivals",
+      bestSellers: "Best Sellers",
+    },
+    shop: {
+      title: "Shop",
+      sortBy: "Sort By",
+      priceLowToHigh: "Price: Low to High",
+      priceHighToLow: "Price: High to Low",
+      newest: "Newest",
+      oldest: "Oldest",
+      addToCart: "Add to Cart",
+      items: "items",
+    },
+    product: {
+      price: "Price",
+      reviews: "Reviews",
+      rating: "Reviews",
+      color: "Color",
+      length: "Length",
+      quantity: "Quantity",
+      inStock: "In Stock & Ready to Ship",
+      freeShipping: "Free Shipping on Orders Over $100",
+      returns: "30-Day Returns",
+      detailsTab: "Product Details",
+      specificationsTab: "Specifications",
+      reviewsTab: "Reviews",
+      aboutThisProduct: "About this Product",
+      customerReviews: "Customer Reviews",
+      writeReview: "Write a Review",
+      loginToReview: "Please",
+      toWriteReview: "to write a review.",
+      loadingReviews: "Loading reviews...",
+      noReviews: "No reviews yet. Be the first to review this product!",
+      notFound: "Product Not Found",
+      notFoundDesc: "The product you're looking for doesn't exist or has been removed.",
+      viewAllProducts: "View All Products",
+      youMayLike: "You May Also Like",
+      viewMore: "View More Products",
+      sale: "Sale"
+    },
+    footer: {
+      aboutUs: "About Us",
+      contactUs: "Contact Us",
+      privacyPolicy: "Privacy Policy",
+      termsOfService: "Terms of Service",
+      copyright: "© 2023 Our Store. All rights reserved.",
+    },
+    auth: {
+      loginTitle: "Login",
+      registerTitle: "Register",
+      email: "Email",
+      password: "Password",
+      firstName: "First Name",
+      lastName: "Last Name",
+      loginButton: "Login",
+      registerButton: "Register",
+      forgotPassword: "Forgot Password?",
+      resetPassword: "Reset Password",
+    },
+    checkout: {
+      title: "Checkout",
+      shippingAddress: "Shipping Address",
+      billingAddress: "Billing Address",
+      paymentDetails: "Payment Details",
+      orderSummary: "Order Summary",
+      placeOrder: "Place Order",
+    },
+    account: {
+      title: "My Account",
+      profile: "Profile",
+      orders: "Orders",
+      settings: "Settings",
+      logout: "Logout",
+    },
   },
   fr: {
-    'common.language': 'Langue',
-    'common.loading': 'Chargement...',
-    'common.error': 'Erreur',
-    'common.success': 'Succès',
-    'common.cancel': 'Annuler',
-    'common.save': 'Enregistrer',
-    'common.edit': 'Modifier',
-    'common.delete': 'Supprimer',
-    'common.add': 'Ajouter',
-    'common.remove': 'Retirer',
-    'common.submit': 'Soumettre',
-    'common.close': 'Fermer',
-    'common.search': 'Rechercher',
-    'common.filter': 'Filtrer',
-    'common.sort': 'Trier',
-    'common.view': 'Voir',
-    'common.back': 'Retour',
-    'common.next': 'Suivant',
-    'common.previous': 'Précédent',
-    'common.continue': 'Continuer',
-    'common.yes': 'Oui',
-    'common.no': 'Non',
-    'common.ok': 'OK',
-    'common.required': 'Obligatoire',
-    'common.optional': 'Optionnel',
-    'common.select': 'Sélectionner',
-    'common.clear': 'Effacer',
-    'common.apply': 'Appliquer',
-    'common.reset': 'Réinitialiser',
-
-    'nav.home': 'Accueil',
-    'nav.shop': 'Boutique',
-    'nav.about': 'À propos',
-    'nav.contact': 'Contact',
-    'nav.cart': 'Panier',
-    'nav.wishlist': 'Liste de souhaits',
-    'nav.account': 'Compte',
-    'nav.login': 'Connexion',
-    'nav.register': 'S\'inscrire',
-    'nav.logout': 'Déconnexion',
-    'nav.orders': 'Commandes',
-    'nav.admin': 'Admin',
-    'nav.adminDashboard': 'Tableau de bord Admin',
-
-    'home.hero.title': 'Transformez Votre Look avec des Extensions de Cheveux Premium',
-    'home.hero.subtitle': 'Découvrez la Beauté',
-    'home.hero.description': 'Découvrez notre collection d\'extensions de cheveux de haute qualité, provenant de sources éthiques qui se mélangent parfaitement avec vos cheveux naturels.',
-    'home.hero.shopNow': 'Voir la Collection',
-    'home.hero.ourStory': 'Notre Histoire',
-
-    'home.featured.title': 'Produits en Vedette',
-    'home.featured.subtitle': 'Découvrez nos extensions de cheveux les plus populaires',
-    'home.featured.viewAll': 'Voir Tous les Produits',
-
-    'home.whyChooseUs.title': 'Pourquoi Choisir',
-    'home.whyChooseUs.titleHighlight': 'Soltana Hair',
-    'home.whyChooseUs.subtitle': 'Nous sommes fiers de fournir une qualité et un service exceptionnels qui nous distinguent de la concurrence.',
-    'home.whyChooseUs.premiumQuality.title': 'Qualité Premium',
-    'home.whyChooseUs.premiumQuality.description': 'Extensions de cheveux sélectionnées à la main, provenant de sources éthiques qui durent.',
-    'home.whyChooseUs.ethicallySourced.title': 'Sources Éthiques',
-    'home.whyChooseUs.ethicallySourced.description': 'Nous travaillons avec des fournisseurs qui partagent notre engagement envers les pratiques éthiques.',
-    'home.whyChooseUs.expertCraftsmanship.title': 'Artisanat Expert',
-    'home.whyChooseUs.expertCraftsmanship.description': 'Chaque pièce est fabriquée avec précision et attention aux détails.',
-    'home.whyChooseUs.fastShipping.title': 'Livraison Rapide',
-    'home.whyChooseUs.fastShipping.description': 'Livraison gratuite dans le monde entier sur les commandes de plus de 100$.',
-    'home.whyChooseUs.colorPerfection.title': 'Perfection des Couleurs',
-    'home.whyChooseUs.colorPerfection.description': 'Correspondance de couleur professionnelle pour un mélange parfait.',
-    'home.whyChooseUs.expertSupport.title': 'Support Expert',
-    'home.whyChooseUs.expertSupport.description': 'Conseils de coiffure 24/7 et support client.',
-    'home.whyChooseUs.cta.title': 'Prêt à Transformer Vos Cheveux?',
-    'home.whyChooseUs.cta.description': 'Rejoignez des milliers de clients satisfaits qui font confiance à Soltana Hair pour leurs besoins de beauté.',
-    'home.whyChooseUs.cta.shopExtensions': 'Voir les Extensions',
-    'home.whyChooseUs.cta.learnMore': 'En Savoir Plus',
-
-    'home.testimonials.title': 'Ce Que Disent Nos Clients',
-    'home.testimonials.subtitle': 'Vrais avis de nos clients satisfaits',
-
-    'home.instagram.title': 'Suivez-nous sur Instagram',
-    'home.instagram.subtitle': 'Voyez comment nos clients coiffent leurs Soltana Hair',
-    'instagram.followUs': 'Suivez-nous',
-    'instagram.handle': '@soltanahair',
-
-    'home.newsletter.title': 'Restez Informé',
-    'home.newsletter.subtitle': 'Abonnez-vous pour recevoir des offres spéciales, des cadeaux gratuits et des offres exclusives.',
-    'home.newsletter.description': 'Recevez les dernières mises à jour sur les nouveaux produits et les offres exclusives.',
-    'home.newsletter.placeholder': 'Entrez votre adresse e-mail',
-    'home.newsletter.button': 'S\'abonner',
-    'home.newsletter.subscribe': 'S\'abonner Maintenant',
-    'home.newsletter.success': 'Merci de vous être abonné!',
-
-    'footer.brand.description': 'Extensions de cheveux premium qui rehaussent votre beauté naturelle avec des cheveux de haute qualité provenant de sources éthiques.',
-    'footer.shop': 'Boutique',
-    'footer.allProducts': 'Tous les Produits',
-    'footer.clipIns': 'Extensions à Clips',
-    'footer.tapeIns': 'Extensions à Bandes',
-    'footer.ponytails': 'Queues de Cheval',
-    'footer.wigs': 'Perruques',
-    'footer.company': 'Entreprise',
-    'footer.aboutUs': 'À Propos de Nous',
-    'footer.contact': 'Contact',
-    'footer.careers': 'Carrières',
-    'footer.press': 'Presse',
-    'footer.help': 'Aide',
-    'footer.shipping': 'Livraison',
-    'footer.returns': 'Retours',
-    'footer.faq': 'FAQ',
-    'footer.privacyPolicy': 'Politique de Confidentialité',
-    'footer.terms': 'Conditions d\'Utilisation',
-    'footer.copyright': 'Tous droits réservés.',
-
-    // Login page
-    'login.title': 'Connexion à votre compte',
-    'login.emailLabel': 'Adresse e-mail',
-    'login.emailPlaceholder': 'Entrez votre adresse e-mail',
-    'login.passwordLabel': 'Mot de passe',
-    'login.passwordPlaceholder': 'Entrez votre mot de passe',
-    'login.forgotPassword': 'Mot de passe oublié?',
-    'login.submitButton': 'Se connecter',
-    'login.loggingIn': 'Connexion en cours...',
-    'login.or': 'ou',
-    'login.noAccount': 'Vous n\'avez pas de compte?',
-    'login.signupLink': 'Inscrivez-vous ici',
-    'login.error.invalidCredentials': 'E-mail ou mot de passe invalide',
-    'login.error.general': 'Échec de la connexion. Veuillez réessayer.',
-
-    // Register page
-    'register.title': 'Créer votre compte',
-    'register.firstName': 'Prénom',
-    'register.firstNamePlaceholder': 'Entrez votre prénom',
-    'register.lastName': 'Nom de famille',
-    'register.lastNamePlaceholder': 'Entrez votre nom de famille',
-    'register.emailLabel': 'Adresse e-mail',
-    'register.emailPlaceholder': 'Entrez votre adresse e-mail',
-    'register.passwordLabel': 'Mot de passe',
-    'register.passwordPlaceholder': 'Entrez votre mot de passe',
-    'register.confirmPasswordLabel': 'Confirmer le mot de passe',
-    'register.confirmPasswordPlaceholder': 'Confirmez votre mot de passe',
-    'register.termsPrefix': 'J\'accepte les',
-    'register.termsLink': 'Conditions d\'utilisation',
-    'register.and': 'et',
-    'register.privacyLink': 'Politique de confidentialité',
-    'register.submitButton': 'Créer un compte',
-    'register.creatingAccount': 'Création du compte...',
-    'register.or': 'ou',
-    'register.alreadyAccount': 'Vous avez déjà un compte?',
-    'register.loginLink': 'Connectez-vous ici',
-    'register.errors.passwordMismatch': 'Les mots de passe ne correspondent pas',
-    'register.errors.acceptTerms': 'Vous devez accepter les conditions et la politique de confidentialité',
-    'register.errors.default': 'Échec de l\'inscription. Veuillez réessayer.',
-
-    // Shop page
-    'shop.title': 'Notre Collection',
-    'shop.subtitle': 'Découvrez nos extensions de cheveux premium',
-    'shop.filter': 'Filtrer',
-    'shop.filterProducts': 'Filtrer les Produits',
-    'shop.applyFilters': 'Appliquer les Filtres',
-    'shop.clearFilters': 'Effacer les Filtres',
-    'shop.gridView': 'Vue en Grille',
-    'shop.listView': 'Vue en Liste',
-    'shop.filters': 'Filtres',
-    'shop.sortBy': 'Trier par',
-    'shop.sortBy.featured': 'En vedette',
-    'shop.sortBy.priceLowHigh': 'Prix: Bas à Élevé',
-    'shop.sortBy.priceHighLow': 'Prix: Élevé à Bas',
-    'shop.sortBy.newest': 'Plus récent',
-    'shop.sortBy.oldest': 'Plus ancien',
-    'shop.sortBy.nameAZ': 'Nom: A-Z',
-    'shop.sortBy.nameZA': 'Nom: Z-A',
-    'shop.category': 'Catégorie',
-    'shop.category.all': 'Toutes les Catégories',
-    'shop.priceRange': 'Gamme de Prix',
-    'shop.color': 'Couleur',
-    'shop.length': 'Longueur',
-    'shop.noProductsFound': 'Aucun Produit Trouvé',
-    'shop.tryAdjustingFilters': 'Essayez d\'ajuster vos filtres pour voir plus de produits.',
-    'shop.addToCart': 'Ajouter au Panier',
-    'shop.addToWishlist': 'Ajouter à la Liste de Souhaits',
-    'shop.removeFromWishlist': 'Retirer de la Liste de Souhaits',
-    'shop.quickView': 'Aperçu Rapide',
-    'shop.viewDetails': 'Voir les Détails',
-    'shop.inStock': 'En Stock',
-    'shop.outOfStock': 'Rupture de Stock',
-    'shop.lowStock': 'Stock Faible',
-    'shop.sale': 'Solde',
-    'shop.new': 'Nouveau',
-    'shop.popular': 'Populaire',
-    'shop.resultsCount': 'Affichage de {count} résultats',
-    'shop.loadMore': 'Charger Plus',
-
-    // Product Detail
-    'product.price': 'Prix',
-    'product.rating': 'Avis',
-    'product.reviews': 'Avis',
-    'product.color': 'Couleur',
-    'product.length': 'Longueur',
-    'product.quantity': 'Quantité',
-    'product.inStock': 'En stock et prêt à expédier',
-    'product.freeShipping': 'Livraison gratuite sur les commandes de plus de 100$',
-    'product.returns': 'Retours 30 jours',
-    'product.detailsTab': 'Détails du produit',
-    'product.specificationsTab': 'Spécifications',
-    'product.reviewsTab': 'Avis',
-    'product.aboutThisProduct': 'À propos de ce produit',
-    'product.customerReviews': 'Avis clients',
-    'product.writeReview': 'Écrire un avis',
-    'product.loginToReview': 'Veuillez',
-    'product.toWriteReview': 'pour écrire un avis.',
-    'product.loadingReviews': 'Chargement des avis...',
-    'product.noReviews': 'Aucun avis pour le moment. Soyez le premier à évaluer ce produit!',
-    'product.notFound': 'Produit introuvable',
-    'product.notFoundDesc': 'Le produit que vous recherchez n\'existe pas ou a été supprimé.',
-    'product.viewAllProducts': 'Voir tous les produits',
-    'product.selectColor': 'Sélectionner la Couleur',
-    'product.selectLength': 'Sélectionner la Longueur',
-    'product.addToCart': 'Ajouter au Panier',
-    'product.addToWishlist': 'Ajouter à la Liste de Souhaits',
-    'product.removeFromWishlist': 'Retirer de la Liste de Souhaits',
-    'product.shareProduct': 'Partager le Produit',
-    'product.description': 'Description',
-    'product.specifications': 'Spécifications',
-    'product.careInstructions': 'Instructions d\'Entretien',
-    'product.relatedProducts': 'Produits Connexes',
-    'product.youMayAlsoLike': 'Vous Pourriez Aussi Aimer',
-    'product.addedToCart': 'Ajouté au panier!',
-    'product.addedToWishlist': 'Ajouté à la liste de souhaits!',
-    'product.removedFromWishlist': 'Retiré de la liste de souhaits!',
-    'product.selectOptions': 'Veuillez sélectionner toutes les options',
-    'product.stockAvailable': '{count} en stock',
-    'product.estimatedDelivery': 'Livraison estimée: {date}',
-
-    // About page
-    'about.title': 'À Propos de Nous',
-    'about.storyAlt': 'Image de notre histoire',
-    'about.ourStory': 'Notre Histoire',
-    'about.ourStoryParagraph1': 'Fondée en 2020, Soltana Hair a commencé comme un projet passionné pour fournir aux femmes des extensions de cheveux de qualité premium qui rehaussent la beauté naturelle. Notre voyage a commencé avec une simple croyance: chaque femme mérite de se sentir confiante et belle.',
-    'about.ourStoryParagraph2': 'Nous nous approvisionnons en cheveux auprès de fournisseurs éthiques du monde entier, garantissant que chaque mèche répond à nos normes de qualité rigoureuses. Notre équipe d\'experts sélectionne manuellement chaque pièce pour garantir la meilleure texture, couleur et durabilité.',
-    'about.ourStoryParagraph3': 'Aujourd\'hui, nous sommes fiers de servir des milliers de clients dans le monde, les aidant à obtenir leurs cheveux de rêve avec nos extensions premium et notre service client exceptionnel.',
-    'about.ourValues': 'Nos Valeurs',
-    'about.value.quality': 'Qualité d\'Abord',
-    'about.value.qualityDesc': 'Nous ne faisons jamais de compromis sur la qualité. Chaque produit subit un contrôle qualité strict pour vous assurer de recevoir seulement le meilleur.',
-    'about.value.ethics': 'Approvisionnement Éthique',
-    'about.value.ethicsDesc': 'Nous travaillons avec des fournisseurs qui partagent notre engagement envers les pratiques éthiques et la compensation équitable.',
-    'about.value.innovation': 'Innovation',
-    'about.value.innovationDesc': 'Nous innovons continuellement nos produits et services pour répondre aux besoins évolutifs de nos clients.',
-    'about.commitmentTitle': 'Notre Engagement Envers Vous',
-    'about.commitmentDesc': 'Nous nous engageons à vous fournir non seulement des extensions de cheveux premium, mais une expérience exceptionnelle du moment où vous visitez notre site web jusqu\'au jour où votre commande arrive à votre porte. Votre satisfaction est notre priorité.',
-    'about.joinFamilyTitle': 'Rejoignez la Famille Soltana',
-    'about.joinFamilyDesc': 'Découvrez la différence que fait la qualité. Rejoignez des milliers de clients satisfaits qui ont fait de Soltana Hair leur choix de confiance pour les extensions de cheveux premium.',
-    'about.shopCollection': 'Voir Notre Collection',
-
-    // Contact page
-    'contact.title': 'Contactez-Nous',
-    'contact.getInTouch': 'Entrez en Contact',
-    'contact.getInTouchDesc': 'Nous aimerions avoir de vos nouvelles! Que vous ayez des questions sur nos produits, besoin de conseils de coiffure, ou que vous vouliez partager votre expérience Soltana Hair, notre équipe est là pour vous aider.',
-    'contact.phone': 'Téléphone',
-    'contact.phoneHours': 'Lundi-Vendredi 9h-18h EST',
-    'contact.email': 'E-mail',
-    'contact.emailDesc': 'Nous répondons généralement dans les 24 heures',
-    'contact.address': 'Adresse',
-    'contact.businessHours': 'Heures d\'Ouverture',
-    'contact.businessDay': 'Lundi-Vendredi: 9h00 - 18h00',
-    'contact.businessSat': 'Samedi: 10h00 - 16h00',
-    'contact.businessSun': 'Dimanche: Fermé',
-    'contact.sendMessage': 'Envoyez-nous un Message',
-    'contact.yourName': 'Votre Nom',
-    'contact.yourNamePlaceholder': 'Entrez votre nom complet',
-    'contact.emailLabel': 'E-mail',
-    'contact.emailPlaceholder': 'Entrez votre adresse e-mail',
-    'contact.subject': 'Sujet',
-    'contact.subjectPlaceholder': 'De quoi s\'agit-il?',
-    'contact.message': 'Message',
-    'contact.messagePlaceholder': 'Dites-nous comment nous pouvons vous aider...',
-    'contact.sendButton': 'Envoyer le Message',
-    'contact.sending': 'Envoi en cours...',
-    'contact.messageSent': 'Message envoyé avec succès! Nous vous répondrons bientôt.',
-    'contact.faqTitle': 'Questions Fréquemment Posées',
-    'contact.faq1q': 'Combien de temps durent vos extensions de cheveux?',
-    'contact.faq1a': 'Avec un soin approprié, nos extensions premium peuvent durer 6-12 mois ou plus.',
-    'contact.faq2q': 'Offrez-vous des services de correspondance de couleur?',
-    'contact.faq2a': 'Oui! Nous offrons une correspondance de couleur professionnelle pour assurer un mélange parfait avec vos cheveux naturels.',
-    'contact.faq3q': 'Quelle est votre politique de retour?',
-    'contact.faq3a': 'Nous offrons une politique de retour de 30 jours pour les produits non ouverts dans leur emballage d\'origine.',
-    'contact.faq4q': 'Expédiez-vous à l\'international?',
-    'contact.faq4a': 'Oui, nous expédions dans le monde entier avec suivi et assurance inclus.',
+    nav: {
+      home: "Accueil",
+      shop: "Boutique",
+      about: "À Propos",
+      contact: "Contact",
+      login: "Se Connecter",
+      register: "S'inscrire",
+      logout: "Déconnexion",
+      account: "Compte",
+    },
+    home: {
+      title: "Bienvenue dans Notre Magasin",
+      subtitle: "Découvrez les meilleurs produits aux meilleurs prix.",
+      shopNow: "Achetez Maintenant",
+      learnMore: "En Savoir Plus",
+      featuredProducts: "Produits Phares",
+      newArrivals: "Nouveaux Arrivages",
+      bestSellers: "Meilleures Ventes",
+    },
+    shop: {
+      title: "Boutique",
+      sortBy: "Trier Par",
+      priceLowToHigh: "Prix: Bas à Haut",
+      priceHighToLow: "Prix: Haut à Bas",
+      newest: "Le Plus Récent",
+      oldest: "Le Plus Ancien",
+      addToCart: "Ajouter au Panier",
+      items: "articles",
+    },
+    product: {
+      price: "Prix",
+      reviews: "Avis",
+      rating: "Avis",
+      color: "Couleur",
+      length: "Longueur",
+      quantity: "Quantité",
+      inStock: "En Stock et Prêt à Expédier",
+      freeShipping: "Livraison Gratuite sur Commandes de Plus de 100$",
+      returns: "Retours 30 Jours",
+      detailsTab: "Détails du Produit",
+      specificationsTab: "Spécifications",
+      reviewsTab: "Avis",
+      aboutThisProduct: "À Propos de ce Produit",
+      customerReviews: "Avis des Clients",
+      writeReview: "Écrire un Avis",
+      loginToReview: "Veuillez",
+      toWriteReview: "pour écrire un avis.",
+      loadingReviews: "Chargement des avis...",
+      noReviews: "Aucun avis pour le moment. Soyez le premier à évaluer ce produit!",
+      notFound: "Produit Non Trouvé",
+      notFoundDesc: "Le produit que vous recherchez n'existe pas ou a été supprimé.",
+      viewAllProducts: "Voir Tous les Produits",
+      youMayLike: "Vous Pourriez Aussi Aimer",
+      viewMore: "Voir Plus de Produits",
+      sale: "Solde"
+    },
+    footer: {
+      aboutUs: "À Propos de Nous",
+      contactUs: "Contactez-Nous",
+      privacyPolicy: "Politique de Confidentialité",
+      termsOfService: "Conditions d'Utilisation",
+      copyright: "© 2023 Notre Magasin. Tous droits réservés.",
+    },
+    auth: {
+      loginTitle: "Se Connecter",
+      registerTitle: "S'inscrire",
+      email: "Courriel",
+      password: "Mot de Passe",
+      firstName: "Prénom",
+      lastName: "Nom de Famille",
+      loginButton: "Se Connecter",
+      registerButton: "S'inscrire",
+      forgotPassword: "Mot de Passe Oublié?",
+      resetPassword: "Réinitialiser le Mot de Passe",
+    },
+    checkout: {
+      title: "Paiement",
+      shippingAddress: "Adresse de Livraison",
+      billingAddress: "Adresse de Facturation",
+      paymentDetails: "Détails de Paiement",
+      orderSummary: "Récapitulatif de la Commande",
+      placeOrder: "Passer la Commande",
+    },
+    account: {
+      title: "Mon Compte",
+      profile: "Profil",
+      orders: "Commandes",
+      settings: "Paramètres",
+      logout: "Déconnexion",
+    },
   },
   ar: {
-    'common.language': 'اللغة',
-    'common.loading': 'جاري التحميل...',
-    'common.error': 'خطأ',
-    'common.success': 'نجح',
-    'common.cancel': 'إلغاء',
-    'common.save': 'حفظ',
-    'common.edit': 'تعديل',
-    'common.delete': 'حذف',
-    'common.add': 'إضافة',
-    'common.remove': 'إزالة',
-    'common.submit': 'إرسال',
-    'common.close': 'إغلاق',
-    'common.search': 'بحث',
-    'common.filter': 'فلتر',
-    'common.sort': 'ترتيب',
-    'common.view': 'عرض',
-    'common.back': 'رجوع',
-    'common.next': 'التالي',
-    'common.previous': 'السابق',
-    'common.continue': 'متابعة',
-    'common.yes': 'نعم',
-    'common.no': 'لا',
-    'common.ok': 'موافق',
-    'common.required': 'مطلوب',
-    'common.optional': 'اختياري',
-    'common.select': 'اختيار',
-    'common.clear': 'مسح',
-    'common.apply': 'تطبيق',
-    'common.reset': 'إعادة تعيين',
-
-    'nav.home': 'الرئيسية',
-    'nav.shop': 'المتجر',
-    'nav.about': 'من نحن',
-    'nav.contact': 'اتصل بنا',
-    'nav.cart': 'السلة',
-    'nav.wishlist': 'المفضلة',
-    'nav.account': 'الحساب',
-    'nav.login': 'تسجيل الدخول',
-    'nav.register': 'إنشاء حساب',
-    'nav.logout': 'تسجيل الخروج',
-    'nav.orders': 'الطلبات',
-    'nav.admin': 'المدير',
-    'nav.adminDashboard': 'لوحة التحكم',
-
-    'home.hero.title': 'غيّري إطلالتك مع وصلات الشعر المميزة',
-    'home.hero.subtitle': 'اكتشفي الجمال',
-    'home.hero.description': 'اكتشفي مجموعتنا من وصلات الشعر عالية الجودة والمصدر الأخلاقي التي تمتزج بسلاسة مع شعرك الطبيعي.',
-    'home.hero.shopNow': 'تسوقي الآن',
-    'home.hero.ourStory': 'قصتنا',
-
-    'home.featured.title': 'المنتجات المميزة',
-    'home.featured.subtitle': 'اكتشفي وصلات الشعر الأكثر شعبية لدينا',
-    'home.featured.viewAll': 'عرض جميع المنتجات',
-
-    'home.whyChooseUs.title': 'لماذا تختارين',
-    'home.whyChooseUs.titleHighlight': 'سولتانا هير',
-    'home.whyChooseUs.subtitle': 'نحن فخورون بتقديم جودة وخدمة استثنائية تميزنا عن المنافسة.',
-    'home.whyChooseUs.premiumQuality.title': 'جودة مميزة',
-    'home.whyChooseUs.premiumQuality.description': 'وصلات شعر مختارة يدوياً ومصدر أخلاقي تدوم طويلاً.',
-    'home.whyChooseUs.ethicallySourced.title': 'مصادر أخلاقية',
-    'home.whyChooseUs.ethicallySourced.description': 'نعمل مع موردين يشاركوننا التزامنا بالممارسات الأخلاقية.',
-    'home.whyChooseUs.expertCraftsmanship.title': 'حرفية خبيرة',
-    'home.whyChooseUs.expertCraftsmanship.description': 'كل قطعة مصنوعة بدقة واهتمام بالتفاصيل.',
-    'home.whyChooseUs.fastShipping.title': 'شحن سريع',
-    'home.whyChooseUs.fastShipping.description': 'شحن مجاني عالمياً على الطلبات فوق 100$.',
-    'home.whyChooseUs.colorPerfection.title': 'كمال الألوان',
-    'home.whyChooseUs.colorPerfection.description': 'مطابقة ألوان احترافية للدمج المثالي.',
-    'home.whyChooseUs.expertSupport.title': 'دعم خبير',
-    'home.whyChooseUs.expertSupport.description': 'نصائح تصفيف 24/7 ودعم عملاء.',
-    'home.whyChooseUs.cta.title': 'مستعدة لتحويل شعرك؟',
-    'home.whyChooseUs.cta.description': 'انضمي لآلاف العميلات الراضيات اللواتي يثقن بسولتانا هير لاحتياجاتهن الجمالية.',
-    'home.whyChooseUs.cta.shopExtensions': 'تسوقي الوصلات',
-    'home.whyChooseUs.cta.learnMore': 'اعرفي المزيد',
-
-    'home.testimonials.title': 'ماذا تقول عميلاتنا',
-    'home.testimonials.subtitle': 'آراء حقيقية من عميلاتنا الراضيات',
-
-    'home.instagram.title': 'تابعينا على إنستغرام',
-    'home.instagram.subtitle': 'شاهدي كيف تصفف عميلاتنا شعر سولتانا هير',
-    'instagram.followUs': 'تابعينا',
-    'instagram.handle': '@soltanahair',
-
-    'home.newsletter.title': 'ابقي على اطلاع',
-    'home.newsletter.subtitle': 'اشتركي للحصول على عروض خاصة وهدايا مجانية وصفقات حصرية.',
-    'home.newsletter.description': 'احصلي على آخر التحديثات حول المنتجات الجديدة والعروض الحصرية.',
-    'home.newsletter.placeholder': 'أدخلي عنوان بريدك الإلكتروني',
-    'home.newsletter.button': 'اشتراك',
-    'home.newsletter.subscribe': 'اشتركي الآن',
-    'home.newsletter.success': 'شكراً لاشتراكك!',
-
-    'footer.brand.description': 'وصلات شعر مميزة تعزز جمالك الطبيعي بشعر عالي الجودة من مصادر أخلاقية.',
-    'footer.shop': 'المتجر',
-    'footer.allProducts': 'جميع المنتجات',
-    'footer.clipIns': 'وصلات بكليبس',
-    'footer.tapeIns': 'وصلات بشريط',
-    'footer.ponytails': 'ذيول الحصان',
-    'footer.wigs': 'الباروكات',
-    'footer.company': 'الشركة',
-    'footer.aboutUs': 'من نحن',
-    'footer.contact': 'اتصل بنا',
-    'footer.careers': 'الوظائف',
-    'footer.press': 'الصحافة',
-    'footer.help': 'المساعدة',
-    'footer.shipping': 'الشحن',
-    'footer.returns': 'الإرجاع',
-    'footer.faq': 'الأسئلة الشائعة',
-    'footer.privacyPolicy': 'سياسة الخصوصية',
-    'footer.terms': 'شروط الخدمة',
-    'footer.copyright': 'جميع الحقوق محفوظة.',
-
-    // Login page
-    'login.title': 'تسجيل الدخول إلى حسابك',
-    'login.emailLabel': 'عنوان البريد الإلكتروني',
-    'login.emailPlaceholder': 'أدخل عنوان بريدك الإلكتروني',
-    'login.passwordLabel': 'كلمة المرور',
-    'login.passwordPlaceholder': 'أدخل كلمة المرور',
-    'login.forgotPassword': 'نسيت كلمة المرور؟',
-    'login.submitButton': 'تسجيل الدخول',
-    'login.loggingIn': 'جاري تسجيل الدخول...',
-    'login.or': 'أو',
-    'login.noAccount': 'ليس لديك حساب؟',
-    'login.signupLink': 'سجل هنا',
-    'login.error.invalidCredentials': 'بريد إلكتروني أو كلمة مرور غير صحيحة',
-    'login.error.general': 'فشل في تسجيل الدخول. يرجى المحاولة مرة أخرى.',
-
-    // Register page
-    'register.title': 'إنشاء حسابك',
-    'register.firstName': 'الاسم الأول',
-    'register.firstNamePlaceholder': 'أدخل اسمك الأول',
-    'register.lastName': 'اسم العائلة',
-    'register.lastNamePlaceholder': 'أدخل اسم العائلة',
-    'register.emailLabel': 'عنوان البريد الإلكتروني',
-    'register.emailPlaceholder': 'أدخل عنوان بريدك الإلكتروني',
-    'register.passwordLabel': 'كلمة المرور',
-    'register.passwordPlaceholder': 'أدخل كلمة المرور',
-    'register.confirmPasswordLabel': 'تأكيد كلمة المرور',
-    'register.confirmPasswordPlaceholder': 'أكد كلمة المرور',
-    'register.termsPrefix': 'أوافق على',
-    'register.termsLink': 'شروط الخدمة',
-    'register.and': 'و',
-    'register.privacyLink': 'سياسة الخصوصية',
-    'register.submitButton': 'إنشاء حساب',
-    'register.creatingAccount': 'جاري إنشاء الحساب...',
-    'register.or': 'أو',
-    'register.alreadyAccount': 'لديك حساب بالفعل؟',
-    'register.loginLink': 'سجل الدخول هنا',
-    'register.errors.passwordMismatch': 'كلمات المرور غير متطابقة',
-    'register.errors.acceptTerms': 'يجب عليك قبول الشروط وسياسة الخصوصية',
-    'register.errors.default': 'فشل في التسجيل. يرجى المحاولة مرة أخرى.',
-
-    // Shop page
-    'shop.title': 'مجموعتنا',
-    'shop.subtitle': 'اكتشفي وصلات الشعر المميزة لدينا',
-    'shop.filter': 'فلتر',
-    'shop.filterProducts': 'فلترة المنتجات',
-    'shop.applyFilters': 'تطبيق الفلاتر',
-    'shop.clearFilters': 'مسح الفلاتر',
-    'shop.gridView': 'عرض شبكي',
-    'shop.listView': 'عرض قائمة',
-    'shop.filters': 'الفلاتر',
-    'shop.sortBy': 'ترتيب حسب',
-    'shop.sortBy.featured': 'مميز',
-    'shop.sortBy.priceLowHigh': 'السعر: من الأقل للأعلى',
-    'shop.sortBy.priceHighLow': 'السعر: من الأعلى للأقل',
-    'shop.sortBy.newest': 'الأحدث',
-    'shop.sortBy.oldest': 'الأقدم',
-    'shop.sortBy.nameAZ': 'الاسم: أ-ي',
-    'shop.sortBy.nameZA': 'الاسم: ي-أ',
-    'shop.category': 'الفئة',
-    'shop.category.all': 'جميع الفئات',
-    'shop.priceRange': 'نطاق السعر',
-    'shop.color': 'اللون',
-    'shop.length': 'الطول',
-    'shop.noProductsFound': 'لم يتم العثور على منتجات',
-    'shop.tryAdjustingFilters': 'جربي تعديل الفلاتر لرؤية المزيد من المنتجات.',
-    'shop.addToCart': 'أضيفي للسلة',
-    'shop.addToWishlist': 'أضيفي للمفضلة',
-    'shop.removeFromWishlist': 'إزالة من المفضلة',
-    'shop.quickView': 'نظرة سريعة',
-    'shop.viewDetails': 'عرض التفاصيل',
-    'shop.inStock': 'متوفر',
-    'shop.outOfStock': 'غير متوفر',
-    'shop.lowStock': 'مخزون قليل',
-    'shop.sale': 'تخفيض',
-    'shop.new': 'جديد',
-    'shop.popular': 'شائع',
-    'shop.resultsCount': 'عرض {count} نتيجة',
-    'shop.loadMore': 'تحميل المزيد',
-
-    // Product Detail
-    'product.price': 'السعر',
-    'product.rating': 'التقييمات',
-    'product.reviews': 'التقييمات',
-    'product.color': 'اللون',
-    'product.length': 'الطول',
-    'product.quantity': 'الكمية',
-    'product.inStock': 'متوفر وجاهز للشحن',
-    'product.freeShipping': 'شحن مجاني على الطلبات فوق 100$',
-    'product.returns': 'إرجاع خلال 30 يوماً',
-    'product.detailsTab': 'تفاصيل المنتج',
-    'product.specificationsTab': 'المواصفات',
-    'product.reviewsTab': 'التقييمات',
-    'product.aboutThisProduct': 'حول هذا المنتج',
-    'product.customerReviews': 'تقييمات العملاء',
-    'product.writeReview': 'اكتب تقييماً',
-    'product.loginToReview': 'يرجى',
-    'product.toWriteReview': 'لكتابة تقييم.',
-    'product.loadingReviews': 'جاري تحميل التقييمات...',
-    'product.noReviews': 'لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج!',
-    'product.notFound': 'المنتج غير موجود',
-    'product.notFoundDesc': 'المنتج الذي تبحث عنه غير موجود أو تم حذفه.',
-    'product.viewAllProducts': 'عرض جميع المنتجات',
-
-    // About page
-    'about.title': 'من نحن',
-    'about.storyAlt': 'صورة قصتنا',
-    'about.ourStory': 'قصتنا',
-    'about.ourStoryParagraph1': 'تأسست سولتانا هير في عام 2020 كمشروع شغف لتزويد النساء بوصلات الشعر عالية الجودة التي تعزز الجمال الطبيعي. بدأت رحلتنا بإيمان بسيط: كل امرأة تستحق أن تشعر بالثقة والجمال.',
-    'about.ourStoryParagraph2': 'نحن نحصل على شعرنا من موردين أخلاقيين حول العالم، مما يضمن أن كل خصلة تلبي معايير الجودة الصارمة لدينا. فريق خبرائنا يختار كل قطعة يدوياً لضمان أفضل ملمس ولون ومتانة.',
-    'about.ourStoryParagraph3': 'اليوم، نحن فخورون بخدمة آلاف العملاء عالمياً، مساعدتهم في تحقيق شعر أحلامهم مع وصلاتنا المميزة وخدمة العملاء الاستثنائية.',
-    'about.ourValues': 'قيمنا',
-    'about.value.quality': 'الجودة أولاً',
-    'about.value.qualityDesc': 'نحن لا نساوم أبداً على الجودة. كل منتج يخضع لمراقبة جودة صارمة لضمان حصولك على الأفضل فقط.',
-    'about.value.ethics': 'المصادر الأخلاقية',
-    'about.value.ethicsDesc': 'نحن نعمل مع موردين يشاركوننا التزامنا بالممارسات الأخلاقية والتعويض العادل.',
-    'about.value.innovation': 'الابتكار',
-    'about.value.innovationDesc': 'نحن نبتكر باستمرار منتجاتنا وخدماتنا لتلبية الاحتياجات المتطورة لعملائنا.',
-    'about.commitmentTitle': 'التزامنا تجاهك',
-    'about.commitmentDesc': 'نحن ملتزمون بتزويدك ليس فقط بوصلات الشعر المميزة، ولكن بتجربة استثنائية من لحظة زيارتك لموقعنا حتى يوم وصول طلبك إلى بابك. رضاك هو أولويتنا.',
-    'about.joinFamilyTitle': 'انضمي لعائلة سولتانا',
-    'about.joinFamilyDesc': 'اختبري الفرق الذي تصنعه الجودة. انضمي لآلاف العملاء الراضين الذين جعلوا سولتانا هير خيارهم الموثوق للوصلات المميزة.',
-    'about.shopCollection': 'تسوقي مجموعتنا',
-
-    // Contact page
-    'contact.title': 'اتصل بنا',
-    'contact.getInTouch': 'تواصل معنا',
-    'contact.getInTouchDesc': 'نود أن نسمع منك! سواء كان لديك أسئلة حول منتجاتنا، تحتاجين نصائح للتصفيف، أو تريدين مشاركة تجربتك مع سولتانا هير، فريقنا هنا لمساعدتك.',
-    'contact.phone': 'الهاتف',
-    'contact.phoneHours': 'الاثنين-الجمعة 9ص-6م بتوقيت شرق أمريكا',
-    'contact.email': 'البريد الإلكتروني',
-    'contact.emailDesc': 'نرد عادة خلال 24 ساعة',
-    'contact.address': 'العنوان',
-    'contact.businessHours': 'ساعات العمل',
-    'contact.businessDay': 'الاثنين-الجمعة: 9:00 ص - 6:00 م',
-    'contact.businessSat': 'السبت: 10:00 ص - 4:00 م',
-    'contact.businessSun': 'الأحد: مغلق',
-    'contact.sendMessage': 'أرسل لنا رسالة',
-    'contact.yourName': 'اسمك',
-    'contact.yourNamePlaceholder': 'أدخل اسمك الكامل',
-    'contact.emailLabel': 'البريد الإلكتروني',
-    'contact.emailPlaceholder': 'أدخل عنوان بريدك الإلكتروني',
-    'contact.subject': 'الموضوع',
-    'contact.subjectPlaceholder': 'ما هو هذا بخصوص؟',
-    'contact.message': 'الرسالة',
-    'contact.messagePlaceholder': 'أخبرنا كيف يمكننا مساعدتك...',
-    'contact.sendButton': 'إرسال الرسالة',
-    'contact.sending': 'جاري الإرسال...',
-    'contact.messageSent': 'تم إرسال الرسالة بنجاح! سنرد عليك قريباً.',
-    'contact.faqTitle': 'الأسئلة الشائعة',
-    'contact.faq1q': 'كم تدوم وصلات الشعر لديكم؟',
-    'contact.faq1a': 'مع العناية المناسبة، يمكن أن تدوم وصلاتنا المميزة 6-12 شهراً أو أكثر.',
-    'contact.faq2q': 'هل تقدمون خدمات مطابقة الألوان؟',
-    'contact.faq2a': 'نعم! نقدم مطابقة ألوان احترافية لضمان الدمج المثالي مع شعرك الطبيعي.',
-    'contact.faq3q': 'ما هي سياسة الإرجاع لديكم؟',
-    'contact.faq3a': 'نقدم سياسة إرجاع لمدة 30 يوماً للمنتجات غير المفتوحة في عبوتها الأصلية.',
-    'contact.faq4q': 'هل تشحنون دولياً؟',
-    'contact.faq4a': 'نعم، نشحن لجميع أنحاء العالم مع التتبع والتأمين مشمولين.',
-  }
+    nav: {
+      home: "الرئيسية",
+      shop: "المتجر",
+      about: "حول",
+      contact: "اتصل بنا",
+      login: "تسجيل الدخول",
+      register: "تسجيل",
+      logout: "تسجيل الخروج",
+      account: "الحساب",
+    },
+    home: {
+      title: "مرحباً بكم في متجرنا",
+      subtitle: "اكتشف أفضل المنتجات بأفضل الأسعار.",
+      shopNow: "تسوق الآن",
+      learnMore: "اعرف المزيد",
+      featuredProducts: "المنتجات المميزة",
+      newArrivals: "الوافدين الجدد",
+      bestSellers: "الأكثر مبيعاً",
+    },
+    shop: {
+      title: "المتجر",
+      sortBy: "رتب حسب",
+      priceLowToHigh: "السعر: من الأقل إلى الأعلى",
+      priceHighToLow: "السعر: من الأعلى إلى الأقل",
+      newest: "الأحدث",
+      oldest: "الأقدم",
+      addToCart: "أضف إلى السلة",
+      items: "العناصر",
+    },
+    product: {
+      price: "السعر",
+      reviews: "التقييمات",
+      rating: "التقييمات",
+      color: "اللون",
+      length: "الطول",
+      quantity: "الكمية",
+      inStock: "متوفر وجاهز للشحن",
+      freeShipping: "شحن مجاني للطلبات فوق 100 دولار",
+      returns: "إرجاع خلال 30 يوماً",
+      detailsTab: "تفاصيل المنتج",
+      specificationsTab: "المواصفات",
+      reviewsTab: "التقييمات",
+      aboutThisProduct: "حول هذا المنتج",
+      customerReviews: "تقييمات العملاء",
+      writeReview: "اكتب تقييماً",
+      loginToReview: "يرجى",
+      toWriteReview: "لكتابة تقييم.",
+      loadingReviews: "جاري تحميل التقييمات...",
+      noReviews: "لا توجد تقييمات بعد. كن أول من يقيم هذا المنتج!",
+      notFound: "المنتج غير موجود",
+      notFoundDesc: "المنتج الذي تبحث عنه غير موجود أو تم حذفه.",
+      viewAllProducts: "عرض جميع المنتجات",
+      youMayLike: "قد يعجبك أيضاً",
+      viewMore: "عرض المزيد من المنتجات",
+      sale: "تخفيض"
+    },
+    footer: {
+      aboutUs: "معلومات عنا",
+      contactUs: "اتصل بنا",
+      privacyPolicy: "سياسة الخصوصية",
+      termsOfService: "شروط الخدمة",
+      copyright: "حقوق الطبع والنشر © 2023 متجرنا. جميع الحقوق محفوظة.",
+    },
+    auth: {
+      loginTitle: "تسجيل الدخول",
+      registerTitle: "تسجيل",
+      email: "البريد الإلكتروني",
+      password: "كلمة المرور",
+      firstName: "الاسم الأول",
+      lastName: "اسم العائلة",
+      loginButton: "تسجيل الدخول",
+      registerButton: "تسجيل",
+      forgotPassword: "هل نسيت كلمة المرور؟",
+      resetPassword: "إعادة تعيين كلمة المرور",
+    },
+    checkout: {
+      title: "الدفع",
+      shippingAddress: "عنوان الشحن",
+      billingAddress: "عنوان الفاتورة",
+      paymentDetails: "تفاصيل الدفع",
+      orderSummary: "ملخص الطلب",
+      placeOrder: "إتمام الطلب",
+    },
+    account: {
+      title: "حسابي",
+      profile: "الملف الشخصي",
+      orders: "الطلبات",
+      settings: "الإعدادات",
+      logout: "تسجيل الخروج",
+    },
+  },
 };
 
-const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
+export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [language, setLanguage] = useState<string>('en');
+
+  const t = useCallback((key: string): string | undefined => {
+    const keys = key.split('.');
+    let translation: any = translations[language];
+    for (const k of keys) {
+      translation = translation?.[k];
+      if (translation === undefined) {
+        return undefined;
+      }
+    }
+    return translation;
+  }, [language]);
+
+  return (
+    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+      {children}
+    </LanguageContext.Provider>
+  );
+};
 
 export const useLanguage = () => {
   const context = useContext(LanguageContext);
@@ -1086,39 +414,4 @@ export const useLanguage = () => {
     throw new Error('useLanguage must be used within a LanguageProvider');
   }
   return context;
-};
-
-interface LanguageProviderProps {
-  children: React.ReactNode;
-}
-
-export const LanguageProvider: React.FC<LanguageProviderProps> = ({ children }) => {
-  const [language, setLanguage] = useState<Language>('en');
-
-  const t = (key: string): string => {
-    const translation = translations[language][key as keyof typeof translations['en']];
-    console.log(`Translation for ${key}:`, translation);
-    return translation || key;
-  };
-
-  const isRTL = language === 'ar';
-
-  useEffect(() => {
-    // Apply RTL direction to document
-    document.documentElement.dir = isRTL ? 'rtl' : 'ltr';
-    document.documentElement.lang = language;
-  }, [isRTL, language]);
-
-  const value = {
-    language,
-    setLanguage,
-    t,
-    isRTL,
-  };
-
-  return (
-    <LanguageContext.Provider value={value}>
-      {children}
-    </LanguageContext.Provider>
-  );
 };
