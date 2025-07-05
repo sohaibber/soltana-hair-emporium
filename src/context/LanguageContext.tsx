@@ -1,9 +1,13 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
+
+export type Language = 'en' | 'fr' | 'ar';
 
 interface LanguageContextProps {
   language: string;
   setLanguage: (language: string) => void;
   t: (key: string) => string | undefined;
+  isRTL: boolean;
 }
 
 const LanguageContext = createContext<LanguageContextProps | undefined>(undefined);
@@ -401,8 +405,10 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     return translation;
   }, [language]);
 
+  const isRTL = language === 'ar';
+
   return (
-    <LanguageContext.Provider value={{ language, setLanguage, t }}>
+    <LanguageContext.Provider value={{ language, setLanguage, t, isRTL }}>
       {children}
     </LanguageContext.Provider>
   );
