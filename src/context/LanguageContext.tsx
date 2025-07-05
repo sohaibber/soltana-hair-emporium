@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -46,6 +45,53 @@ interface Translations {
         description: string;
         shopNow: string;
         ourStory: string;
+      };
+      whyChooseUs: {
+        title: string;
+        titleHighlight: string;
+        subtitle: string;
+        premiumQuality: {
+          title: string;
+          description: string;
+        };
+        ethicallySourced: {
+          title: string;
+          description: string;
+        };
+        expertCraftsmanship: {
+          title: string;
+          description: string;
+        };
+        fastShipping: {
+          title: string;
+          description: string;
+        };
+        colorPerfection: {
+          title: string;
+          description: string;
+        };
+        expertSupport: {
+          title: string;
+          description: string;
+        };
+        cta: {
+          title: string;
+          description: string;
+          shopExtensions: string;
+          learnMore: string;
+        };
+      };
+      testimonials: {
+        title: string;
+        subtitle: string;
+      };
+      newsletter: {
+        title: string;
+        description: string;
+        placeholder: string;
+        subscribe: string;
+        subscribing: string;
+        success: string;
       };
     };
     shop: {
@@ -106,6 +152,44 @@ interface Translations {
       joinFamilyTitle: string;
       joinFamilyDesc: string;
       shopCollection: string;
+    };
+    contact: {
+      title: string;
+      getInTouch: string;
+      getInTouchDesc: string;
+      phone: string;
+      phoneHours: string;
+      email: string;
+      emailDesc: string;
+      address: string;
+      businessHours: string;
+      businessDay: string;
+      businessSat: string;
+      businessSun: string;
+      sendMessage: string;
+      yourName: string;
+      yourNamePlaceholder: string;
+      emailLabel: string;
+      emailPlaceholder: string;
+      subject: string;
+      subjectPlaceholder: string;
+      message: string;
+      messagePlaceholder: string;
+      sending: string;
+      sendButton: string;
+      faqTitle: string;
+      faq1q: string;
+      faq1a: string;
+      faq2q: string;
+      faq2a: string;
+      faq3q: string;
+      faq3a: string;
+      faq4q: string;
+      faq4a: string;
+    };
+    instagram: {
+      followUs: string;
+      handle: string;
     };
     footer: {
       aboutUs: string;
@@ -234,6 +318,53 @@ const translations: Translations = {
         shopNow: "Shop Now",
         ourStory: "Our Story",
       },
+      whyChooseUs: {
+        title: "Why Choose",
+        titleHighlight: "SoltanaHair",
+        subtitle: "We're committed to providing you with the highest quality hair extensions and exceptional service that exceeds your expectations.",
+        premiumQuality: {
+          title: "Premium Quality",
+          description: "Our extensions are made with 100% Remy human hair, ensuring natural look and feel that blends seamlessly with your own hair.",
+        },
+        ethicallySourced: {
+          title: "Ethically Sourced",
+          description: "We work directly with suppliers who follow ethical practices, ensuring fair compensation for hair donors.",
+        },
+        expertCraftsmanship: {
+          title: "Expert Craftsmanship",
+          description: "Each extension is carefully crafted by skilled artisans with years of experience in hair extension manufacturing.",
+        },
+        fastShipping: {
+          title: "Fast Shipping",
+          description: "Get your extensions quickly with our expedited shipping options and reliable delivery partners.",
+        },
+        colorPerfection: {
+          title: "Color Perfection",
+          description: "Our advanced color-matching system ensures your extensions perfectly match your natural hair color.",
+        },
+        expertSupport: {
+          title: "Expert Support",
+          description: "Our hair extension specialists are here to help you choose the perfect extensions and provide styling tips.",
+        },
+        cta: {
+          title: "Ready to Transform Your Look?",
+          description: "Join thousands of satisfied customers who trust SoltanaHair for their hair extension needs.",
+          shopExtensions: "Shop Extensions",
+          learnMore: "Learn More",
+        },
+      },
+      testimonials: {
+        title: "What Our Customers Say",
+        subtitle: "Don't just take our word for it - hear from our satisfied customers who've transformed their look with SoltanaHair extensions.",
+      },
+      newsletter: {
+        title: "Stay in the Loop",
+        description: "Subscribe to our newsletter for exclusive offers, styling tips, and new product announcements.",
+        placeholder: "Enter your email address",
+        subscribe: "Subscribe",
+        subscribing: "Subscribing...",
+        success: "Thank you for subscribing! Welcome to the SoltanaHair family.",
+      },
     },
     shop: {
       title: "Shop",
@@ -293,6 +424,44 @@ const translations: Translations = {
       joinFamilyTitle: "Join Our Family",
       joinFamilyDesc: "Become part of our community and discover the difference that quality and care can make.",
       shopCollection: "Shop Our Collection",
+    },
+    contact: {
+      title: "Contact Us",
+      getInTouch: "Get In Touch",
+      getInTouchDesc: "We'd love to hear from you. Send us a message and we'll respond as soon as possible.",
+      phone: "Phone",
+      phoneHours: "Monday to Friday, 9AM to 6PM EST",
+      email: "Email",
+      emailDesc: "We'll respond within 24 hours",
+      address: "Address",
+      businessHours: "Business Hours",
+      businessDay: "Monday - Friday: 9:00 AM - 6:00 PM",
+      businessSat: "Saturday: 10:00 AM - 4:00 PM",
+      businessSun: "Sunday: Closed",
+      sendMessage: "Send us a Message",
+      yourName: "Your Name",
+      yourNamePlaceholder: "Enter your full name",
+      emailLabel: "Email Address",
+      emailPlaceholder: "Enter your email address",
+      subject: "Subject",
+      subjectPlaceholder: "What's this about?",
+      message: "Message",
+      messagePlaceholder: "Tell us how we can help you...",
+      sending: "Sending...",
+      sendButton: "Send Message",
+      faqTitle: "Frequently Asked Questions",
+      faq1q: "How long do hair extensions last?",
+      faq1a: "With proper care, our premium hair extensions can last 6-12 months depending on usage and maintenance.",
+      faq2q: "How do I choose the right color?",
+      faq2a: "We recommend using our color matching guide or contacting our experts for personalized color consultation.",
+      faq3q: "Can I style the extensions with heat?",
+      faq3a: "Yes! Our human hair extensions can be styled with heat tools just like your natural hair. We recommend using heat protectant.",
+      faq4q: "What's your return policy?",
+      faq4a: "We offer a 30-day return policy for unused products in original packaging. Custom colored items are final sale.",
+    },
+    instagram: {
+      followUs: "Follow Us on Instagram",
+      handle: "@soltanahair",
     },
     footer: {
       aboutUs: "About Us",
@@ -418,6 +587,53 @@ const translations: Translations = {
         shopNow: "Achetez Maintenant",
         ourStory: "Notre Histoire",
       },
+      whyChooseUs: {
+        title: "Pourquoi Choisir",
+        titleHighlight: "SoltanaHair",
+        subtitle: "Nous nous engageons à vous fournir des extensions de cheveux de la plus haute qualité et un service exceptionnel qui dépasse vos attentes.",
+        premiumQuality: {
+          title: "Qualité Premium",
+          description: "Nos extensions sont faites avec des cheveux humains Remy 100%, garantissant un aspect et une sensation naturels qui se mélangent parfaitement avec vos propres cheveux.",
+        },
+        ethicallySourced: {
+          title: "Source Éthique",
+          description: "Nous travaillons directement avec des fournisseurs qui suivent des pratiques éthiques, garantissant une compensation équitable pour les donateurs de cheveux.",
+        },
+        expertCraftsmanship: {
+          title: "Artisanat Expert",
+          description: "Chaque extension est soigneusement fabriquée par des artisans qualifiés avec des années d'expérience dans la fabrication d'extensions de cheveux.",
+        },
+        fastShipping: {
+          title: "Expédition Rapide",
+          description: "Obtenez rapidement vos extensions avec nos options d'expédition accélérée et nos partenaires de livraison fiables.",
+        },
+        colorPerfection: {
+          title: "Perfection Couleur",
+          description: "Notre système avancé d'assortiment des couleurs garantit que vos extensions correspondent parfaitement à votre couleur de cheveux naturelle.",
+        },
+        expertSupport: {
+          title: "Support Expert",
+          description: "Nos spécialistes en extensions de cheveux sont là pour vous aider à choisir les extensions parfaites et fournir des conseils de coiffure.",
+        },
+        cta: {
+          title: "Prêt à Transformer Votre Look?",
+          description: "Rejoignez des milliers de clients satisfaits qui font confiance à SoltanaHair pour leurs besoins d'extensions de cheveux.",
+          shopExtensions: "Acheter Extensions",
+          learnMore: "En Savoir Plus",
+        },
+      },
+      testimonials: {
+        title: "Ce Que Disent Nos Clients",
+        subtitle: "Ne nous croyez pas sur parole - écoutez nos clients satisfaits qui ont transformé leur look avec les extensions SoltanaHair.",
+      },
+      newsletter: {
+        title: "Restez Dans La Boucle",
+        description: "Abonnez-vous à notre newsletter pour des offres exclusives, des conseils de coiffure et des annonces de nouveaux produits.",
+        placeholder: "Entrez votre adresse e-mail",
+        subscribe: "S'abonner",
+        subscribing: "Abonnement...",
+        success: "Merci de vous être abonné! Bienvenue dans la famille SoltanaHair.",
+      },
     },
     shop: {
       title: "Boutique",
@@ -477,6 +693,44 @@ const translations: Translations = {
       joinFamilyTitle: "Rejoignez Notre Famille",
       joinFamilyDesc: "Faites partie de notre communauté et découvrez la différence que la qualité et les soins peuvent apporter.",
       shopCollection: "Achetez Notre Collection",
+    },
+    contact: {
+      title: "Contactez-Nous",
+      getInTouch: "Entrez en Contact",
+      getInTouchDesc: "Nous aimerions avoir de vos nouvelles. Envoyez-nous un message et nous vous répondrons dès que possible.",
+      phone: "Téléphone",
+      phoneHours: "Lundi au vendredi, 9h à 18h EST",
+      email: "E-mail",
+      emailDesc: "Nous répondrons dans les 24 heures",
+      address: "Adresse",
+      businessHours: "Heures d'Ouverture",
+      businessDay: "Lundi - Vendredi: 9h00 - 18h00",
+      businessSat: "Samedi: 10h00 - 16h00",
+      businessSun: "Dimanche: Fermé",
+      sendMessage: "Envoyez-nous un Message",
+      yourName: "Votre Nom",
+      yourNamePlaceholder: "Entrez votre nom complet",
+      emailLabel: "Adresse E-mail",
+      emailPlaceholder: "Entrez votre adresse e-mail",
+      subject: "Sujet",
+      subjectPlaceholder: "De quoi s'agit-il?",
+      message: "Message",
+      messagePlaceholder: "Dites-nous comment nous pouvons vous aider...",
+      sending: "Envoi...",
+      sendButton: "Envoyer le Message",
+      faqTitle: "Questions Fréquemment Posées",
+      faq1q: "Combien de temps durent les extensions de cheveux?",
+      faq1a: "Avec des soins appropriés, nos extensions de cheveux premium peuvent durer 6-12 mois selon l'utilisation et l'entretien.",
+      faq2q: "Comment choisir la bonne couleur?",
+      faq2a: "Nous recommandons d'utiliser notre guide d'assortiment des couleurs ou de contacter nos experts pour une consultation couleur personnalisée.",
+      faq3q: "Puis-je coiffer les extensions avec de la chaleur?",
+      faq3a: "Oui! Nos extensions de cheveux humains peuvent être coiffées avec des outils chauffants tout comme vos cheveux naturels. Nous recommandons d'utiliser un protecteur de chaleur.",
+      faq4q: "Quelle est votre politique de retour?",
+      faq4a: "Nous offrons une politique de retour de 30 jours pour les produits non utilisés dans leur emballage d'origine. Les articles de couleur personnalisée sont en vente finale.",
+    },
+    instagram: {
+      followUs: "Suivez-Nous sur Instagram",
+      handle: "@soltanahair",
     },
     footer: {
       aboutUs: "À Propos de Nous",
@@ -602,6 +856,53 @@ const translations: Translations = {
         shopNow: "تسوق الآن",
         ourStory: "قصتنا",
       },
+      whyChooseUs: {
+        title: "لماذا تختارين",
+        titleHighlight: "سلطانة هير",
+        subtitle: "نحن ملتزمون بتقديم أعلى جودة من وصلات الشعر وخدمة استثنائية تتجاوز توقعاتك.",
+        premiumQuality: {
+          title: "جودة فاخرة",
+          description: "وصلاتنا مصنوعة من شعر بشري ريمي 100%، مما يضمن مظهراً وملمساً طبيعياً ينسجم بسلاسة مع شعرك الطبيعي.",
+        },
+        ethicallySourced: {
+          title: "مصدر أخلاقي",
+          description: "نعمل مباشرة مع الموردين الذين يتبعون الممارسات الأخلاقية، مما يضمن تعويضاً عادلاً لمتبرعي الشعر.",
+        },
+        expertCraftsmanship: {
+          title: "حرفية خبيرة",
+          description: "كل وصلة مصنوعة بعناية من قبل حرفيين مهرة لديهم سنوات من الخبرة في تصنيع وصلات الشعر.",
+        },
+        fastShipping: {
+          title: "شحن سريع",
+          description: "احصلي على وصلاتك بسرعة مع خيارات الشحن السريع وشركاء التوصيل الموثوقين لدينا.",
+        },
+        colorPerfection: {
+          title: "كمال اللون",
+          description: "نظام مطابقة الألوان المتقدم لدينا يضمن أن وصلاتك تتطابق تماماً مع لون شعرك الطبيعي.",
+        },
+        expertSupport: {
+          title: "دعم خبير",
+          description: "متخصصو وصلات الشعر لدينا هنا لمساعدتك في اختيار الوصلات المثالية وتقديم نصائح التصفيف.",
+        },
+        cta: {
+          title: "مستعدة لتغيير إطلالتك؟",
+          description: "انضمي إلى آلاف العملاء الراضين الذين يثقون في سلطانة هير لاحتياجات وصلات الشعر.",
+          shopExtensions: "تسوق الوصلات",
+          learnMore: "اعرف المزيد",
+        },
+      },
+      testimonials: {
+        title: "ما يقوله عملاؤنا",
+        subtitle: "لا تأخذي كلامنا فقط - اسمعي من عملائنا الراضين الذين غيروا إطلالتهم مع وصلات سلطانة هير.",
+      },
+      newsletter: {
+        title: "ابقي على اطلاع",
+        description: "اشتركي في نشرتنا الإخبارية للحصول على عروض حصرية ونصائح التصفيف وإعلانات المنتجات الجديدة.",
+        placeholder: "أدخلي عنوان بريدك الإلكتروني",
+        subscribe: "اشتراك",
+        subscribing: "جاري الاشتراك...",
+        success: "شكراً لك على الاشتراك! مرحباً بك في عائلة سلطانة هير.",
+      },
     },
     shop: {
       title: "المتجر",
@@ -661,6 +962,44 @@ const translations: Translations = {
       joinFamilyTitle: "انضمي إلى عائلتنا",
       joinFamilyDesc: "كوني جزءاً من مجتمعنا واكتشفي الفرق الذي يمكن أن تحدثه الجودة والعناية.",
       shopCollection: "تسوقي مجموعتنا",
+    },
+    contact: {
+      title: "اتصل بنا",
+      getInTouch: "تواصل معنا",
+      getInTouchDesc: "نحب أن نسمع منك. أرسل لنا رسالة وسنرد عليك في أقرب وقت ممكن.",
+      phone: "الهاتف",
+      phoneHours: "الاثنين إلى الجمعة، 9 صباحاً إلى 6 مساءً بتوقيت شرق الولايات المتحدة",
+      email: "البريد الإلكتروني",
+      emailDesc: "سنرد خلال 24 ساعة",
+      address: "العنوان",
+      businessHours: "ساعات العمل",
+      businessDay: "الاثنين - الجمعة: 9:00 صباحاً - 6:00 مساءً",
+      businessSat: "السبت: 10:00 صباحاً - 4:00 مساءً",
+      businessSun: "الأحد: مغلق",
+      sendMessage: "أرسل لنا رسالة",
+      yourName: "اسمك",
+      yourNamePlaceholder: "أدخل اسمك الكامل",
+      emailLabel: "عنوان البريد الإلكتروني",
+      emailPlaceholder: "أدخل عنوان بريدك الإلكتروني",
+      subject: "الموضوع",
+      subjectPlaceholder: "ما هو موضوع رسالتك؟",
+      message: "الرسالة",
+      messagePlaceholder: "أخبرنا كيف يمكننا مساعدتك...",
+      sending: "جاري الإرسال...",
+      sendButton: "إرسال الرسالة",
+      faqTitle: "الأسئلة الشائعة",
+      faq1q: "كم تدوم وصلات الشعر؟",
+      faq1a: "مع العناية المناسبة، يمكن أن تدوم وصلات الشعر المتميزة لدينا من 6-12 شهراً حسب الاستخدام والصيانة.",
+      faq2q: "كيف أختار اللون المناسب؟",
+      faq2a: "نوصي باستخدام دليل مطابقة الألوان الخاص بنا أو الاتصال بخبرائنا للحصول على استشارة ألوان شخصية.",
+      faq3q: "هل يمكنني تصفيف الوصلات بالحرارة؟",
+      faq3a: "نعم! يمكن تصفيف وصلات الشعر البشري الخاصة بنا بأدوات الحرارة تماماً مثل شعرك الطبيعي. نوصي باستخدام واقي الحرارة.",
+      faq4q: "ما هي سياسة الإرجاع الخاصة بكم؟",
+      faq4a: "نقدم سياسة إرجاع لمدة 30 يوماً للمنتجات غير المستخدمة في العبوة الأصلية. المنتجات ذات الألوان المخصصة للبيع النهائي.",
+    },
+    instagram: {
+      followUs: "تابعونا على إنستغرام",
+      handle: "@soltanahair",
     },
     footer: {
       aboutUs: "معلومات عنا",
@@ -767,7 +1106,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     for (const k of keys) {
       translation = translation?.[k];
       if (translation === undefined) {
-        return undefined;
+        return key; // Return the key itself if translation is not found
       }
     }
     return translation;
