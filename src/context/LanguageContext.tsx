@@ -27,6 +27,10 @@ interface Translations {
       register: string;
       logout: string;
       account: string;
+      admin: string;
+      adminDashboard: string;
+      orders: string;
+      wishlist: string;
     };
     home: {
       title: string;
@@ -36,6 +40,13 @@ interface Translations {
       featuredProducts: string;
       newArrivals: string;
       bestSellers: string;
+      hero: {
+        title: string;
+        subtitle: string;
+        description: string;
+        shopNow: string;
+        ourStory: string;
+      };
     };
     shop: {
       title: string;
@@ -74,6 +85,28 @@ interface Translations {
       viewMore: string;
       sale: string;
     };
+    about: {
+      title: string;
+      storyAlt: string;
+      ourStory: string;
+      ourStoryParagraph1: string;
+      ourStoryParagraph2: string;
+      ourStoryParagraph3: string;
+      ourValues: string;
+      value: {
+        quality: string;
+        qualityDesc: string;
+        ethics: string;
+        ethicsDesc: string;
+        innovation: string;
+        innovationDesc: string;
+      };
+      commitmentTitle: string;
+      commitmentDesc: string;
+      joinFamilyTitle: string;
+      joinFamilyDesc: string;
+      shopCollection: string;
+    };
     footer: {
       aboutUs: string;
       contactUs: string;
@@ -93,6 +126,62 @@ interface Translations {
       forgotPassword: string;
       resetPassword: string;
     };
+    login: {
+      title: string;
+      emailLabel: string;
+      emailPlaceholder: string;
+      passwordLabel: string;
+      passwordPlaceholder: string;
+      forgotPassword: string;
+      submitButton: string;
+      loggingIn: string;
+      or: string;
+      noAccount: string;
+      signupLink: string;
+    };
+    register: {
+      title: string;
+      firstName: string;
+      firstNamePlaceholder: string;
+      lastName: string;
+      lastNamePlaceholder: string;
+      emailLabel: string;
+      emailPlaceholder: string;
+      passwordLabel: string;
+      passwordPlaceholder: string;
+      confirmPasswordLabel: string;
+      confirmPasswordPlaceholder: string;
+      termsPrefix: string;
+      termsLink: string;
+      and: string;
+      privacyLink: string;
+      submitButton: string;
+      creatingAccount: string;
+      or: string;
+      alreadyAccount: string;
+      loginLink: string;
+      errors: {
+        passwordMismatch: string;
+        acceptTerms: string;
+        default: string;
+      };
+    };
+    wishlist: {
+      title: string;
+      loginToSave: string;
+      createAccount: string;
+      login: string;
+      createAccountBtn: string;
+      empty: string;
+      emptyDesc: string;
+      browseProducts: string;
+      itemsCount: string;
+      itemsCountPlural: string;
+      inYourWishlist: string;
+      clearWishlist: string;
+      addToCart: string;
+      continueShopping: string;
+    };
     checkout: {
       title: string;
       shippingAddress: string;
@@ -108,6 +197,9 @@ interface Translations {
       settings: string;
       logout: string;
     };
+    common: {
+      language: string;
+    };
   };
 }
 
@@ -122,6 +214,10 @@ const translations: Translations = {
       register: "Register",
       logout: "Logout",
       account: "Account",
+      admin: "Admin",
+      adminDashboard: "Admin Dashboard",
+      orders: "Orders",
+      wishlist: "Wishlist",
     },
     home: {
       title: "Welcome to Our Store",
@@ -131,6 +227,13 @@ const translations: Translations = {
       featuredProducts: "Featured Products",
       newArrivals: "New Arrivals",
       bestSellers: "Best Sellers",
+      hero: {
+        title: "Transform Your Look",
+        subtitle: "Premium Hair Extensions",
+        description: "Discover our collection of premium hair extensions designed to enhance your natural beauty with luxurious quality and unmatched comfort.",
+        shopNow: "Shop Now",
+        ourStory: "Our Story",
+      },
     },
     shop: {
       title: "Shop",
@@ -169,6 +272,28 @@ const translations: Translations = {
       viewMore: "View More Products",
       sale: "Sale"
     },
+    about: {
+      title: "About Us",
+      storyAlt: "Our Story",
+      ourStory: "Our Story",
+      ourStoryParagraph1: "Founded with a passion for beauty and quality, we've been dedicated to providing premium hair extensions that enhance your natural beauty.",
+      ourStoryParagraph2: "Our commitment to excellence drives us to source only the finest materials and work with skilled artisans to create products that exceed expectations.",
+      ourStoryParagraph3: "We believe that everyone deserves to feel confident and beautiful, and our products are designed to help you achieve that effortlessly.",
+      ourValues: "Our Values",
+      value: {
+        quality: "Quality",
+        qualityDesc: "We use only the finest materials and craftsmanship to ensure our products meet the highest standards.",
+        ethics: "Ethics",
+        ethicsDesc: "We are committed to ethical sourcing and sustainable practices in all aspects of our business.",
+        innovation: "Innovation",
+        innovationDesc: "We continuously innovate to bring you the latest in hair extension technology and design.",
+      },
+      commitmentTitle: "Our Commitment to You",
+      commitmentDesc: "We are dedicated to providing exceptional customer service and products that help you look and feel your best every day.",
+      joinFamilyTitle: "Join Our Family",
+      joinFamilyDesc: "Become part of our community and discover the difference that quality and care can make.",
+      shopCollection: "Shop Our Collection",
+    },
     footer: {
       aboutUs: "About Us",
       contactUs: "Contact Us",
@@ -188,6 +313,62 @@ const translations: Translations = {
       forgotPassword: "Forgot Password?",
       resetPassword: "Reset Password",
     },
+    login: {
+      title: "Sign In",
+      emailLabel: "Email Address",
+      emailPlaceholder: "Enter your email",
+      passwordLabel: "Password",
+      passwordPlaceholder: "Enter your password",
+      forgotPassword: "Forgot Password?",
+      submitButton: "Sign In",
+      loggingIn: "Signing In...",
+      or: "Or",
+      noAccount: "Don't have an account?",
+      signupLink: "Sign up",
+    },
+    register: {
+      title: "Create Account",
+      firstName: "First Name",
+      firstNamePlaceholder: "Enter your first name",
+      lastName: "Last Name",
+      lastNamePlaceholder: "Enter your last name",
+      emailLabel: "Email Address",
+      emailPlaceholder: "Enter your email",
+      passwordLabel: "Password",
+      passwordPlaceholder: "Create a password",
+      confirmPasswordLabel: "Confirm Password",
+      confirmPasswordPlaceholder: "Confirm your password",
+      termsPrefix: "I agree to the",
+      termsLink: "Terms of Service",
+      and: "and",
+      privacyLink: "Privacy Policy",
+      submitButton: "Create Account",
+      creatingAccount: "Creating Account...",
+      or: "Or",
+      alreadyAccount: "Already have an account?",
+      loginLink: "Sign in",
+      errors: {
+        passwordMismatch: "Passwords do not match",
+        acceptTerms: "You must accept the terms and privacy policy",
+        default: "Registration failed. Please try again.",
+      },
+    },
+    wishlist: {
+      title: "My Wishlist",
+      loginToSave: "Login to Save Your Favorites",
+      createAccount: "Create an account or sign in to save products to your wishlist.",
+      login: "Login",
+      createAccountBtn: "Create Account",
+      empty: "Your Wishlist is Empty",
+      emptyDesc: "Start adding products you love to your wishlist.",
+      browseProducts: "Browse Products",
+      itemsCount: "item",
+      itemsCountPlural: "items",
+      inYourWishlist: "in your wishlist",
+      clearWishlist: "Clear Wishlist",
+      addToCart: "Add to Cart",
+      continueShopping: "Continue Shopping",
+    },
     checkout: {
       title: "Checkout",
       shippingAddress: "Shipping Address",
@@ -203,6 +384,9 @@ const translations: Translations = {
       settings: "Settings",
       logout: "Logout",
     },
+    common: {
+      language: "Language",
+    },
   },
   fr: {
     nav: {
@@ -214,6 +398,10 @@ const translations: Translations = {
       register: "S'inscrire",
       logout: "Déconnexion",
       account: "Compte",
+      admin: "Admin",
+      adminDashboard: "Tableau de Bord Admin",
+      orders: "Commandes",
+      wishlist: "Liste de Souhaits",
     },
     home: {
       title: "Bienvenue dans Notre Magasin",
@@ -223,6 +411,13 @@ const translations: Translations = {
       featuredProducts: "Produits Phares",
       newArrivals: "Nouveaux Arrivages",
       bestSellers: "Meilleures Ventes",
+      hero: {
+        title: "Transformez Votre Look",
+        subtitle: "Extensions de Cheveux Premium",
+        description: "Découvrez notre collection d'extensions de cheveux premium conçues pour sublimer votre beauté naturelle avec une qualité luxueuse et un confort inégalé.",
+        shopNow: "Achetez Maintenant",
+        ourStory: "Notre Histoire",
+      },
     },
     shop: {
       title: "Boutique",
@@ -261,6 +456,28 @@ const translations: Translations = {
       viewMore: "Voir Plus de Produits",
       sale: "Solde"
     },
+    about: {
+      title: "À Propos de Nous",
+      storyAlt: "Notre Histoire",
+      ourStory: "Notre Histoire",
+      ourStoryParagraph1: "Fondée avec une passion pour la beauté et la qualité, nous nous sommes consacrés à fournir des extensions de cheveux premium qui subliment votre beauté naturelle.",
+      ourStoryParagraph2: "Notre engagement envers l'excellence nous pousse à ne rechercher que les meilleurs matériaux et à travailler avec des artisans qualifiés pour créer des produits qui dépassent les attentes.",
+      ourStoryParagraph3: "Nous croyons que tout le monde mérite de se sentir confiant et beau, et nos produits sont conçus pour vous aider à y parvenir sans effort.",
+      ourValues: "Nos Valeurs",
+      value: {
+        quality: "Qualité",
+        qualityDesc: "Nous utilisons seulement les meilleurs matériaux et artisanat pour garantir que nos produits répondent aux plus hauts standards.",
+        ethics: "Éthique",
+        ethicsDesc: "Nous nous engageons à un approvisionnement éthique et à des pratiques durables dans tous les aspects de notre entreprise.",
+        innovation: "Innovation",
+        innovationDesc: "Nous innovons continuellement pour vous apporter les dernières technologies et designs d'extensions de cheveux.",
+      },
+      commitmentTitle: "Notre Engagement Envers Vous",
+      commitmentDesc: "Nous nous consacrons à fournir un service client exceptionnel et des produits qui vous aident à paraître et à vous sentir au mieux chaque jour.",
+      joinFamilyTitle: "Rejoignez Notre Famille",
+      joinFamilyDesc: "Faites partie de notre communauté et découvrez la différence que la qualité et les soins peuvent apporter.",
+      shopCollection: "Achetez Notre Collection",
+    },
     footer: {
       aboutUs: "À Propos de Nous",
       contactUs: "Contactez-Nous",
@@ -280,6 +497,62 @@ const translations: Translations = {
       forgotPassword: "Mot de Passe Oublié?",
       resetPassword: "Réinitialiser le Mot de Passe",
     },
+    login: {
+      title: "Se Connecter",
+      emailLabel: "Adresse Courriel",
+      emailPlaceholder: "Entrez votre courriel",
+      passwordLabel: "Mot de Passe",
+      passwordPlaceholder: "Entrez votre mot de passe",
+      forgotPassword: "Mot de Passe Oublié?",
+      submitButton: "Se Connecter",
+      loggingIn: "Connexion...",
+      or: "Ou",
+      noAccount: "Vous n'avez pas de compte?",
+      signupLink: "S'inscrire",
+    },
+    register: {
+      title: "Créer un Compte",
+      firstName: "Prénom",
+      firstNamePlaceholder: "Entrez votre prénom",
+      lastName: "Nom de Famille",
+      lastNamePlaceholder: "Entrez votre nom de famille",
+      emailLabel: "Adresse Courriel",
+      emailPlaceholder: "Entrez votre courriel",
+      passwordLabel: "Mot de Passe",
+      passwordPlaceholder: "Créez un mot de passe",
+      confirmPasswordLabel: "Confirmer le Mot de Passe",
+      confirmPasswordPlaceholder: "Confirmez votre mot de passe",
+      termsPrefix: "J'accepte les",
+      termsLink: "Conditions d'Utilisation",
+      and: "et",
+      privacyLink: "Politique de Confidentialité",
+      submitButton: "Créer un Compte",
+      creatingAccount: "Création du Compte...",
+      or: "Ou",
+      alreadyAccount: "Vous avez déjà un compte?",
+      loginLink: "Se connecter",
+      errors: {
+        passwordMismatch: "Les mots de passe ne correspondent pas",
+        acceptTerms: "Vous devez accepter les conditions et la politique de confidentialité",
+        default: "L'inscription a échoué. Veuillez réessayer.",
+      },
+    },
+    wishlist: {
+      title: "Ma Liste de Souhaits",
+      loginToSave: "Connectez-vous pour Sauvegarder Vos Favoris",
+      createAccount: "Créez un compte ou connectez-vous pour sauvegarder des produits dans votre liste de souhaits.",
+      login: "Se Connecter",
+      createAccountBtn: "Créer un Compte",
+      empty: "Votre Liste de Souhaits est Vide",
+      emptyDesc: "Commencez à ajouter des produits que vous aimez à votre liste de souhaits.",
+      browseProducts: "Parcourir les Produits",
+      itemsCount: "article",
+      itemsCountPlural: "articles",
+      inYourWishlist: "dans votre liste de souhaits",
+      clearWishlist: "Vider la Liste de Souhaits",
+      addToCart: "Ajouter au Panier",
+      continueShopping: "Continuer les Achats",
+    },
     checkout: {
       title: "Paiement",
       shippingAddress: "Adresse de Livraison",
@@ -295,6 +568,9 @@ const translations: Translations = {
       settings: "Paramètres",
       logout: "Déconnexion",
     },
+    common: {
+      language: "Langue",
+    },
   },
   ar: {
     nav: {
@@ -306,6 +582,10 @@ const translations: Translations = {
       register: "تسجيل",
       logout: "تسجيل الخروج",
       account: "الحساب",
+      admin: "المدير",
+      adminDashboard: "لوحة تحكم المدير",
+      orders: "الطلبات",
+      wishlist: "قائمة الأمنيات",
     },
     home: {
       title: "مرحباً بكم في متجرنا",
@@ -315,6 +595,13 @@ const translations: Translations = {
       featuredProducts: "المنتجات المميزة",
       newArrivals: "الوافدين الجدد",
       bestSellers: "الأكثر مبيعاً",
+      hero: {
+        title: "غيري إطلالتك",
+        subtitle: "وصلات شعر فاخرة",
+        description: "اكتشفي مجموعتنا من وصلات الشعر الفاخرة المصممة لتعزيز جمالك الطبيعي بجودة فاخرة وراحة لا مثيل لها.",
+        shopNow: "تسوق الآن",
+        ourStory: "قصتنا",
+      },
     },
     shop: {
       title: "المتجر",
@@ -353,6 +640,28 @@ const translations: Translations = {
       viewMore: "عرض المزيد من المنتجات",
       sale: "تخفيض"
     },
+    about: {
+      title: "معلومات عنا",
+      storyAlt: "قصتنا",
+      ourStory: "قصتنا",
+      ourStoryParagraph1: "تأسست بشغف للجمال والجودة، وقد كرسنا أنفسنا لتوفير وصلات الشعر المتميزة التي تعزز جمالك الطبيعي.",
+      ourStoryParagraph2: "التزامنا بالتميز يدفعنا للبحث عن أفضل المواد فقط والعمل مع حرفيين مهرة لإنشاء منتجات تتجاوز التوقعات.",
+      ourStoryParagraph3: "نحن نؤمن أن كل شخص يستحق أن يشعر بالثقة والجمال، ومنتجاتنا مصممة لمساعدتك في تحقيق ذلك بسهولة.",
+      ourValues: "قيمنا",
+      value: {
+        quality: "الجودة",
+        qualityDesc: "نستخدم فقط أفضل المواد والحرفية لضمان أن منتجاتنا تلبي أعلى المعايير.",
+        ethics: "الأخلاق",
+        ethicsDesc: "نحن ملتزمون بالمصادر الأخلاقية والممارسات المستدامة في جميع جوانب أعمالنا.",
+        innovation: "الابتكار",
+        innovationDesc: "نبتكر باستمرار لنجلب لك أحدث تقنيات وتصاميم وصلات الشعر.",
+      },
+      commitmentTitle: "التزامنا تجاهك",
+      commitmentDesc: "نحن مكرسون لتقديم خدمة عملاء استثنائية ومنتجات تساعدك على أن تبدي وتشعري بأفضل حال كل يوم.",
+      joinFamilyTitle: "انضمي إلى عائلتنا",
+      joinFamilyDesc: "كوني جزءاً من مجتمعنا واكتشفي الفرق الذي يمكن أن تحدثه الجودة والعناية.",
+      shopCollection: "تسوقي مجموعتنا",
+    },
     footer: {
       aboutUs: "معلومات عنا",
       contactUs: "اتصل بنا",
@@ -372,6 +681,62 @@ const translations: Translations = {
       forgotPassword: "هل نسيت كلمة المرور؟",
       resetPassword: "إعادة تعيين كلمة المرور",
     },
+    login: {
+      title: "تسجيل الدخول",
+      emailLabel: "عنوان البريد الإلكتروني",
+      emailPlaceholder: "أدخل بريدك الإلكتروني",
+      passwordLabel: "كلمة المرور",
+      passwordPlaceholder: "أدخل كلمة المرور",
+      forgotPassword: "هل نسيت كلمة المرور؟",
+      submitButton: "تسجيل الدخول",
+      loggingIn: "جاري تسجيل الدخول...",
+      or: "أو",
+      noAccount: "ليس لديك حساب؟",
+      signupLink: "سجل",
+    },
+    register: {
+      title: "إنشاء حساب",
+      firstName: "الاسم الأول",
+      firstNamePlaceholder: "أدخل اسمك الأول",
+      lastName: "اسم العائلة",
+      lastNamePlaceholder: "أدخل اسم العائلة",
+      emailLabel: "عنوان البريد الإلكتروني",
+      emailPlaceholder: "أدخل بريدك الإلكتروني",
+      passwordLabel: "كلمة المرور",
+      passwordPlaceholder: "إنشاء كلمة مرور",
+      confirmPasswordLabel: "تأكيد كلمة المرور",
+      confirmPasswordPlaceholder: "تأكيد كلمة المرور",
+      termsPrefix: "أوافق على",
+      termsLink: "شروط الخدمة",
+      and: "و",
+      privacyLink: "سياسة الخصوصية",
+      submitButton: "إنشاء حساب",
+      creatingAccount: "جاري إنشاء الحساب...",
+      or: "أو",
+      alreadyAccount: "لديك حساب بالفعل؟",
+      loginLink: "تسجيل الدخول",
+      errors: {
+        passwordMismatch: "كلمات المرور غير متطابقة",
+        acceptTerms: "يجب قبول الشروط وسياسة الخصوصية",
+        default: "فشل في التسجيل. يرجى المحاولة مرة أخرى.",
+      },
+    },
+    wishlist: {
+      title: "قائمة أمنياتي",
+      loginToSave: "سجل الدخول لحفظ المفضلة",
+      createAccount: "أنشئ حساباً أو سجل الدخول لحفظ المنتجات في قائمة أمنياتك.",
+      login: "تسجيل الدخول",
+      createAccountBtn: "إنشاء حساب",
+      empty: "قائمة أمنياتك فارغة",
+      emptyDesc: "ابدأ بإضافة المنتجات التي تحبها إلى قائمة أمنياتك.",
+      browseProducts: "تصفح المنتجات",
+      itemsCount: "عنصر",
+      itemsCountPlural: "عناصر",
+      inYourWishlist: "في قائمة أمنياتك",
+      clearWishlist: "مسح قائمة الأمنيات",
+      addToCart: "أضف إلى السلة",
+      continueShopping: "متابعة التسوق",
+    },
     checkout: {
       title: "الدفع",
       shippingAddress: "عنوان الشحن",
@@ -386,6 +751,9 @@ const translations: Translations = {
       orders: "الطلبات",
       settings: "الإعدادات",
       logout: "تسجيل الخروج",
+    },
+    common: {
+      language: "اللغة",
     },
   },
 };
