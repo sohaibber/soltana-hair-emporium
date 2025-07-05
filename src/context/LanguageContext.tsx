@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useCallback } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -103,6 +104,7 @@ interface Translations {
       oldest: string;
       addToCart: string;
       items: string;
+      filters: string;
     };
     product: {
       price: string;
@@ -192,10 +194,26 @@ interface Translations {
       handle: string;
     };
     footer: {
+      brand: {
+        description: string;
+      };
+      shop: string;
+      allProducts: string;
+      clipIns: string;
+      tapeIns: string;
+      ponytails: string;
+      wigs: string;
+      company: string;
       aboutUs: string;
-      contactUs: string;
+      contact: string;
+      careers: string;
+      press: string;
+      help: string;
+      shipping: string;
+      returns: string;
+      faq: string;
       privacyPolicy: string;
-      termsOfService: string;
+      terms: string;
       copyright: string;
     };
     auth: {
@@ -375,6 +393,7 @@ const translations: Translations = {
       oldest: "Oldest",
       addToCart: "Add to Cart",
       items: "items",
+      filters: "Filters",
     },
     product: {
       price: "Price",
@@ -464,11 +483,27 @@ const translations: Translations = {
       handle: "@soltanahair",
     },
     footer: {
+      brand: {
+        description: "Premium hair extensions designed to enhance your natural beauty with luxurious quality and unmatched comfort.",
+      },
+      shop: "Shop",
+      allProducts: "All Products",
+      clipIns: "Clip-In Extensions",
+      tapeIns: "Tape-In Extensions",
+      ponytails: "Ponytails",
+      wigs: "Wigs",
+      company: "Company",
       aboutUs: "About Us",
-      contactUs: "Contact Us",
+      contact: "Contact",
+      careers: "Careers",
+      press: "Press",
+      help: "Help",
+      shipping: "Shipping Info",
+      returns: "Returns",
+      faq: "FAQ",
       privacyPolicy: "Privacy Policy",
-      termsOfService: "Terms of Service",
-      copyright: "© 2023 Our Store. All rights reserved.",
+      terms: "Terms of Service",
+      copyright: "All rights reserved.",
     },
     auth: {
       loginTitle: "Login",
@@ -644,6 +679,7 @@ const translations: Translations = {
       oldest: "Le Plus Ancien",
       addToCart: "Ajouter au Panier",
       items: "articles",
+      filters: "Filtres",
     },
     product: {
       price: "Prix",
@@ -733,11 +769,27 @@ const translations: Translations = {
       handle: "@soltanahair",
     },
     footer: {
+      brand: {
+        description: "Extensions de cheveux premium conçues pour sublimer votre beauté naturelle avec une qualité luxueuse et un confort inégalé.",
+      },
+      shop: "Boutique",
+      allProducts: "Tous les Produits",
+      clipIns: "Extensions à Clips",
+      tapeIns: "Extensions Adhésives",
+      ponytails: "Queues de Cheval",
+      wigs: "Perruques",
+      company: "Entreprise",
       aboutUs: "À Propos de Nous",
-      contactUs: "Contactez-Nous",
+      contact: "Contact",
+      careers: "Carrières",
+      press: "Presse",
+      help: "Aide",
+      shipping: "Informations de Livraison",
+      returns: "Retours",
+      faq: "FAQ",
       privacyPolicy: "Politique de Confidentialité",
-      termsOfService: "Conditions d'Utilisation",
-      copyright: "© 2023 Notre Magasin. Tous droits réservés.",
+      terms: "Conditions d'Utilisation",
+      copyright: "Tous droits réservés.",
     },
     auth: {
       loginTitle: "Se Connecter",
@@ -913,6 +965,7 @@ const translations: Translations = {
       oldest: "الأقدم",
       addToCart: "أضف إلى السلة",
       items: "العناصر",
+      filters: "المرشحات",
     },
     product: {
       price: "السعر",
@@ -1002,11 +1055,27 @@ const translations: Translations = {
       handle: "@soltanahair",
     },
     footer: {
+      brand: {
+        description: "وصلات شعر فاخرة مصممة لتعزيز جمالك الطبيعي بجودة فاخرة وراحة لا مثيل لها.",
+      },
+      shop: "المتجر",
+      allProducts: "جميع المنتجات",
+      clipIns: "وصلات بالكليبس",
+      tapeIns: "وصلات لاصقة",
+      ponytails: "ذيل الحصان",
+      wigs: "الباروكات",
+      company: "الشركة",
       aboutUs: "معلومات عنا",
-      contactUs: "اتصل بنا",
+      contact: "اتصل بنا",
+      careers: "الوظائف",
+      press: "الصحافة",
+      help: "المساعدة",
+      shipping: "معلومات الشحن",
+      returns: "الإرجاع",
+      faq: "الأسئلة الشائعة",
       privacyPolicy: "سياسة الخصوصية",
-      termsOfService: "شروط الخدمة",
-      copyright: "حقوق الطبع والنشر © 2023 متجرنا. جميع الحقوق محفوظة.",
+      terms: "شروط الخدمة",
+      copyright: "جميع الحقوق محفوظة.",
     },
     auth: {
       loginTitle: "تسجيل الدخول",
