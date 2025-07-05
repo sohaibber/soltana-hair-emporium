@@ -141,12 +141,12 @@ const FeaturedProducts: React.FC = () => {
       <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4">
           <div className="flex justify-between items-center mb-8">
-            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
+            <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featuredProducts')}</h2>
             <Link 
               to="/shop" 
               className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors"
             >
-              {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
+              {t('product.viewAllProducts')} <ArrowRight size={16} className="ml-1" />
             </Link>
           </div>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
@@ -170,7 +170,7 @@ const FeaturedProducts: React.FC = () => {
     return (
       <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
         <div className="container mx-auto px-4 text-center">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4 text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold mb-4 text-gray-900 dark:text-white">{t('home.featuredProducts')}</h2>
           <p className="text-gray-600 dark:text-gray-400 mb-6">{t('product.noProducts')}</p>
           <Link 
             to="/shop" 
@@ -187,12 +187,12 @@ const FeaturedProducts: React.FC = () => {
     <section className="py-12 md:py-16 bg-white dark:bg-gray-900 transition-colors duration-300">
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center mb-8">
-          <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featured.title')}</h2>
+          <h2 className="font-serif text-2xl md:text-3xl font-semibold text-gray-900 dark:text-white">{t('home.featuredProducts')}</h2>
           <Link 
             to="/shop" 
             className="flex items-center text-sm font-medium text-gray-700 dark:text-gray-300 hover:text-primary transition-colors"
           >
-            {t('home.featured.viewAll')} <ArrowRight size={16} className="ml-1" />
+            {t('product.viewAllProducts')} <ArrowRight size={16} className="ml-1" />
           </Link>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6">
