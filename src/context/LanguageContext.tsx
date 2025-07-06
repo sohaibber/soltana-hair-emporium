@@ -20,6 +20,20 @@ export interface Translations {
   common: {
     search: string;
     noProductsFound: string;
+    language: string;
+  };
+  home: {
+    hero: {
+      title: string;
+      subtitle: string;
+      description: string;
+      shopNow: string;
+      ourStory: string;
+    };
+    featuredProducts: string;
+    whyChooseUs: {
+      title: string;
+    };
   };
   product: {
     addToCart: string;
@@ -27,6 +41,10 @@ export interface Translations {
     description: string;
     details: string;
     reviews: string;
+    youMayLike: string;
+    viewMore: string;
+    viewAllProducts: string;
+    noProducts: string;
   };
   cart: {
     title: string;
@@ -43,10 +61,33 @@ export interface Translations {
     paymentDetails: string;
     confirmOrder: string;
   };
+  shop: {
+    filters: string;
+  };
   footer: {
     aboutUs: string;
     contactUs: string;
     followUs: string;
+    brand: {
+      description: string;
+    };
+    shop: string;
+    allProducts: string;
+    clipIns: string;
+    tapeIns: string;
+    ponytails: string;
+    wigs: string;
+    company: string;
+    contact: string;
+    careers: string;
+    press: string;
+    help: string;
+    shipping: string;
+    returns: string;
+    faq: string;
+    privacyPolicy: string;
+    terms: string;
+    copyright: string;
   };
 }
 
@@ -69,6 +110,20 @@ const translations: Record<Language, Translations> = {
     common: {
       search: "Search",
       noProductsFound: "No products found.",
+      language: "Language",
+    },
+    home: {
+      hero: {
+        title: "Transform Your Look",
+        subtitle: "Beautiful Hair",
+        description: "Premium quality hair extensions that blend seamlessly with your natural hair. Experience luxury and confidence with every strand.",
+        shopNow: "Shop Now",
+        ourStory: "Our Story",
+      },
+      featuredProducts: "Featured Products",
+      whyChooseUs: {
+        title: "Why Choose Us",
+      },
     },
     product: {
       addToCart: "Add to Cart",
@@ -76,6 +131,10 @@ const translations: Record<Language, Translations> = {
       description: "Description",
       details: "Details",
       reviews: "Reviews",
+      youMayLike: "You May Also Like",
+      viewMore: "View More",
+      viewAllProducts: "View All Products",
+      noProducts: "No products available at the moment.",
     },
     cart: {
       title: "Shopping Cart",
@@ -92,10 +151,33 @@ const translations: Record<Language, Translations> = {
       paymentDetails: "Payment Details",
       confirmOrder: "Confirm Order",
     },
+    shop: {
+      filters: "Filters",
+    },
     footer: {
       aboutUs: "About Us",
       contactUs: "Contact Us",
       followUs: "Follow Us",
+      brand: {
+        description: "Premium hair extensions and wigs for the modern woman. Transform your look with our luxury collection.",
+      },
+      shop: "Shop",
+      allProducts: "All Products",
+      clipIns: "Clip-in Extensions",
+      tapeIns: "Tape-in Extensions",
+      ponytails: "Ponytail Extensions",
+      wigs: "Luxury Wigs",
+      company: "Company",
+      contact: "Contact",
+      careers: "Careers",
+      press: "Press",
+      help: "Help",
+      shipping: "Shipping & Returns",
+      returns: "Returns",
+      faq: "FAQ",
+      privacyPolicy: "Privacy Policy",
+      terms: "Terms of Service",
+      copyright: "All rights reserved.",
     },
   },
   fr: {
@@ -116,6 +198,20 @@ const translations: Record<Language, Translations> = {
     common: {
       search: "Rechercher",
       noProductsFound: "Aucun produit trouvé.",
+      language: "Langue",
+    },
+    home: {
+      hero: {
+        title: "Transformez Votre Look",
+        subtitle: "Beaux Cheveux",
+        description: "Extensions de cheveux de qualité premium qui se fondent parfaitement avec vos cheveux naturels. Découvrez le luxe et la confiance à chaque mèche.",
+        shopNow: "Acheter Maintenant",
+        ourStory: "Notre Histoire",
+      },
+      featuredProducts: "Produits Vedettes",
+      whyChooseUs: {
+        title: "Pourquoi Nous Choisir",
+      },
     },
     product: {
       addToCart: "Ajouter au panier",
@@ -123,6 +219,10 @@ const translations: Record<Language, Translations> = {
       description: "Description",
       details: "Détails",
       reviews: "Avis",
+      youMayLike: "Vous Pourriez Aussi Aimer",
+      viewMore: "Voir Plus",
+      viewAllProducts: "Voir Tous les Produits",
+      noProducts: "Aucun produit disponible pour le moment.",
     },
     cart: {
       title: "Panier",
@@ -139,10 +239,33 @@ const translations: Record<Language, Translations> = {
       paymentDetails: "Détails de paiement",
       confirmOrder: "Confirmer la commande",
     },
+    shop: {
+      filters: "Filtres",
+    },
     footer: {
       aboutUs: "À Propos de Nous",
       contactUs: "Contactez-Nous",
       followUs: "Suivez-Nous",
+      brand: {
+        description: "Extensions de cheveux et perruques premium pour la femme moderne. Transformez votre look avec notre collection de luxe.",
+      },
+      shop: "Boutique",
+      allProducts: "Tous les Produits",
+      clipIns: "Extensions à Clips",
+      tapeIns: "Extensions à Bandes",
+      ponytails: "Extensions Queue de Cheval",
+      wigs: "Perruques de Luxe",
+      company: "Entreprise",
+      contact: "Contact",
+      careers: "Carrières",
+      press: "Presse",
+      help: "Aide",
+      shipping: "Livraison et Retours",
+      returns: "Retours",
+      faq: "FAQ",
+      privacyPolicy: "Politique de Confidentialité",
+      terms: "Conditions de Service",
+      copyright: "Tous droits réservés.",
     },
   },
   ar: {
@@ -163,6 +286,20 @@ const translations: Record<Language, Translations> = {
     common: {
       search: "بحث",
       noProductsFound: "لم يتم العثور على منتجات.",
+      language: "اللغة",
+    },
+    home: {
+      hero: {
+        title: "اكتشفي إطلالتك الجديدة",
+        subtitle: "شعر جميل",
+        description: "وصلات شعر عالية الجودة تمتزج بسلاسة مع شعرك الطبيعي. اختبري الفخامة والثقة مع كل خصلة.",
+        shopNow: "تسوقي الآن",
+        ourStory: "قصتنا",
+      },
+      featuredProducts: "المنتجات المميزة",
+      whyChooseUs: {
+        title: "لماذا تختارينا",
+      },
     },
     product: {
       addToCart: "أضف إلى السلة",
@@ -170,6 +307,10 @@ const translations: Record<Language, Translations> = {
       description: "الوصف",
       details: "التفاصيل",
       reviews: "المراجعات",
+      youMayLike: "قد يعجبك أيضاً",
+      viewMore: "عرض المزيد",
+      viewAllProducts: "عرض جميع المنتجات",
+      noProducts: "لا توجد منتجات متاحة في الوقت الحالي.",
     },
     cart: {
       title: "سلة التسوق",
@@ -186,10 +327,33 @@ const translations: Record<Language, Translations> = {
       paymentDetails: "تفاصيل الدفع",
       confirmOrder: "تأكيد الطلب",
     },
+    shop: {
+      filters: "المرشحات",
+    },
     footer: {
       aboutUs: "معلومات عنا",
       contactUs: "اتصل بنا",
       followUs: "تابعنا",
+      brand: {
+        description: "وصلات شعر وشعر مستعار عالي الجودة للمرأة العصرية. اكتشفي إطلالتك الجديدة مع مجموعتنا الفاخرة.",
+      },
+      shop: "المتجر",
+      allProducts: "جميع المنتجات",
+      clipIns: "وصلات الكليب",
+      tapeIns: "وصلات الشريط",
+      ponytails: "وصلات ذيل الحصان",
+      wigs: "شعر مستعار فاخر",
+      company: "الشركة",
+      contact: "اتصل بنا",
+      careers: "الوظائف",
+      press: "الصحافة",
+      help: "المساعدة",
+      shipping: "الشحن والإرجاع",
+      returns: "الإرجاع",
+      faq: "الأسئلة الشائعة",
+      privacyPolicy: "سياسة الخصوصية",
+      terms: "شروط الخدمة",
+      copyright: "جميع الحقوق محفوظة.",
     },
   },
 };
