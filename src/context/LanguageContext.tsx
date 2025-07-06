@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -94,6 +93,26 @@ export interface Translations {
     viewMore: string;
     viewAllProducts: string;
     noProducts: string;
+    price: string;
+    color: string;
+    length: string;
+    quantity: string;
+    inStock: string;
+    freeShipping: string;
+    returns: string;
+    notFound: string;
+    notFoundDesc: string;
+    detailsTab: string;
+    specificationsTab: string;
+    reviewsTab: string;
+    aboutThisProduct: string;
+    customerReviews: string;
+    writeReview: string;
+    loginToReview: string;
+    toWriteReview: string;
+    loadingReviews: string;
+    noReviews: string;
+    rating: string;
   };
   cart: {
     title: string;
@@ -112,6 +131,15 @@ export interface Translations {
   };
   shop: {
     filters: string;
+    title: string;
+    filter: string;
+    filterProducts: string;
+    applyFilters: string;
+    gridView: string;
+    listView: string;
+    noProductsFound: string;
+    tryAdjustingFilters: string;
+    addToCart: string;
   };
   footer: {
     aboutUs: string;
@@ -232,6 +260,26 @@ const translations: Record<Language, Translations> = {
       viewMore: "View More",
       viewAllProducts: "View All Products",
       noProducts: "No products available at the moment.",
+      price: "Price",
+      color: "Color",
+      length: "Length",
+      quantity: "Quantity",
+      inStock: "In Stock & Ready to Ship",
+      freeShipping: "Free Shipping on Orders Over $100",
+      returns: "30-Day Returns",
+      notFound: "Product Not Found",
+      notFoundDesc: "The product you're looking for doesn't exist or has been removed.",
+      detailsTab: "Product Details",
+      specificationsTab: "Specifications",
+      reviewsTab: "Reviews",
+      aboutThisProduct: "About this Product",
+      customerReviews: "Customer Reviews",
+      writeReview: "Write a Review",
+      loginToReview: "Please",
+      toWriteReview: "to write a review.",
+      loadingReviews: "Loading reviews...",
+      noReviews: "No reviews yet. Be the first to review this product!",
+      rating: "Reviews",
     },
     cart: {
       title: "Shopping Cart",
@@ -250,6 +298,15 @@ const translations: Record<Language, Translations> = {
     },
     shop: {
       filters: "Filters",
+      title: "Shop",
+      filter: "Filter",
+      filterProducts: "Filter Products",
+      applyFilters: "Apply Filters",
+      gridView: "Grid View",
+      listView: "List View",
+      noProductsFound: "No products found",
+      tryAdjustingFilters: "Try adjusting your filters to see more results.",
+      addToCart: "Add to Cart",
     },
     footer: {
       aboutUs: "About Us",
@@ -368,6 +425,26 @@ const translations: Record<Language, Translations> = {
       viewMore: "Voir Plus",
       viewAllProducts: "Voir Tous les Produits",
       noProducts: "Aucun produit disponible pour le moment.",
+      price: "Prix",
+      color: "Couleur",
+      length: "Longueur",
+      quantity: "Quantité",
+      inStock: "En Stock & Prêt à Expédier",
+      freeShipping: "Livraison Gratuite sur Commandes Plus de 100$",
+      returns: "Retours 30 Jours",
+      notFound: "Produit Non Trouvé",
+      notFoundDesc: "Le produit que vous cherchez n'existe pas ou a été supprimé.",
+      detailsTab: "Détails du Produit",
+      specificationsTab: "Spécifications",
+      reviewsTab: "Avis",
+      aboutThisProduct: "À Propos de ce Produit",
+      customerReviews: "Avis des Clientes",
+      writeReview: "Écrire un Avis",
+      loginToReview: "Veuillez",
+      toWriteReview: "pour écrire un avis.",
+      loadingReviews: "Chargement des avis...",
+      noReviews: "Aucun avis pour le moment. Soyez la première à évaluer ce produit!",
+      rating: "Avis",
     },
     cart: {
       title: "Panier",
@@ -386,6 +463,15 @@ const translations: Record<Language, Translations> = {
     },
     shop: {
       filters: "Filtres",
+      title: "Boutique",
+      filter: "Filtre",
+      filterProducts: "Filtrer les Produits",
+      applyFilters: "Appliquer les Filtres",
+      gridView: "Vue Grille",
+      listView: "Vue Liste",
+      noProductsFound: "Aucun produit trouvé",
+      tryAdjustingFilters: "Essayez d'ajuster vos filtres pour voir plus de résultats.",
+      addToCart: "Ajouter au Panier",
     },
     footer: {
       aboutUs: "À Propos de Nous",
@@ -504,6 +590,26 @@ const translations: Record<Language, Translations> = {
       viewMore: "عرض المزيد",
       viewAllProducts: "عرض جميع المنتجات",
       noProducts: "لا توجد منتجات متاحة في الوقت الحالي.",
+      price: "السعر",
+      color: "اللون",
+      length: "الطول",
+      quantity: "الكمية",
+      inStock: "متوفر في المخزون وجاهز للشحن",
+      freeShipping: "شحن مجاني على الطلبات أكثر من 100$",
+      returns: "إرجاع خلال 30 يوماً",
+      notFound: "المنتج غير موجود",
+      notFoundDesc: "المنتج الذي تبحثين عنه غير موجود أو تم حذفه.",
+      detailsTab: "تفاصيل المنتج",
+      specificationsTab: "المواصفات",
+      reviewsTab: "المراجعات",
+      aboutThisProduct: "عن هذا المنتج",
+      customerReviews: "مراجعات العميلات",
+      writeReview: "اكتبي مراجعة",
+      loginToReview: "يرجى",
+      toWriteReview: "لكتابة مراجعة.",
+      loadingReviews: "جاري تحميل المراجعات...",
+      noReviews: "لا توجد مراجعات بعد. كوني أول من يراجع هذا المنتج!",
+      rating: "المراجعات",
     },
     cart: {
       title: "سلة التسوق",
@@ -522,6 +628,15 @@ const translations: Record<Language, Translations> = {
     },
     shop: {
       filters: "المرشحات",
+      title: "المتجر",
+      filter: "تصفية",
+      filterProducts: "تصفية المنتجات",
+      applyFilters: "تطبيق المرشحات",
+      gridView: "عرض الشبكة",
+      listView: "عرض القائمة",
+      noProductsFound: "لم يتم العثور على منتجات",
+      tryAdjustingFilters: "جربي تعديل المرشحات لرؤية المزيد من النتائج.",
+      addToCart: "أضف إلى السلة",
     },
     footer: {
       aboutUs: "معلومات عنا",
