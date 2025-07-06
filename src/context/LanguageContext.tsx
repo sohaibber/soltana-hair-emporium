@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 
 export type Language = 'en' | 'fr' | 'ar';
@@ -33,7 +34,55 @@ export interface Translations {
     featuredProducts: string;
     whyChooseUs: {
       title: string;
+      titleHighlight: string;
+      subtitle: string;
+      premiumQuality: {
+        title: string;
+        description: string;
+      };
+      ethicallySourced: {
+        title: string;
+        description: string;
+      };
+      expertCraftsmanship: {
+        title: string;
+        description: string;
+      };
+      fastShipping: {
+        title: string;
+        description: string;
+      };
+      colorPerfection: {
+        title: string;
+        description: string;
+      };
+      expertSupport: {
+        title: string;
+        description: string;
+      };
+      cta: {
+        title: string;
+        description: string;
+        shopExtensions: string;
+        learnMore: string;
+      };
     };
+    testimonials: {
+      title: string;
+      subtitle: string;
+    };
+    newsletter: {
+      title: string;
+      description: string;
+      placeholder: string;
+      subscribe: string;
+      subscribing: string;
+      success: string;
+    };
+  };
+  instagram: {
+    followUs: string;
+    handle: string;
   };
   product: {
     addToCart: string;
@@ -122,8 +171,56 @@ const translations: Record<Language, Translations> = {
       },
       featuredProducts: "Featured Products",
       whyChooseUs: {
-        title: "Why Choose Us",
+        title: "Why Choose",
+        titleHighlight: "SoltanaHair",
+        subtitle: "Discover what makes our hair extensions stand out from the rest. Quality, ethics, and customer satisfaction are at the heart of everything we do.",
+        premiumQuality: {
+          title: "Premium Quality",
+          description: "100% human hair extensions that look and feel completely natural. Ethically sourced and professionally processed for maximum durability."
+        },
+        ethicallySourced: {
+          title: "Ethically Sourced",
+          description: "We work directly with suppliers who maintain the highest ethical standards, ensuring fair treatment and compensation throughout our supply chain."
+        },
+        expertCraftsmanship: {
+          title: "Expert Craftsmanship",
+          description: "Each piece is carefully crafted by skilled artisans with years of experience, ensuring consistent quality and perfect finishing."
+        },
+        fastShipping: {
+          title: "Fast Shipping",
+          description: "Get your extensions quickly with our expedited shipping options. Most orders are processed and shipped within 24-48 hours."
+        },
+        colorPerfection: {
+          title: "Color Perfection",
+          description: "Our advanced color-matching technology ensures your extensions blend perfectly with your natural hair color."
+        },
+        expertSupport: {
+          title: "Expert Support",
+          description: "Our hair extension experts are here to help you choose the perfect match and provide styling tips for the best results."
+        },
+        cta: {
+          title: "Ready to Transform Your Look?",
+          description: "Join thousands of satisfied customers who have discovered the perfect hair extensions for their lifestyle.",
+          shopExtensions: "Shop Extensions",
+          learnMore: "Learn More"
+        }
       },
+      testimonials: {
+        title: "What Our Customers Say",
+        subtitle: "Don't just take our word for it - hear from the women who have transformed their looks with SoltanaHair extensions."
+      },
+      newsletter: {
+        title: "Stay Updated",
+        description: "Subscribe to get exclusive offers, styling tips, and be the first to know about new arrivals.",
+        placeholder: "Enter your email address",
+        subscribe: "Subscribe",
+        subscribing: "Subscribing...",
+        success: "Thank you for subscribing! You'll receive exclusive offers and styling tips."
+      }
+    },
+    instagram: {
+      followUs: "Follow Us on Instagram",
+      handle: "@soltanahair"
     },
     product: {
       addToCart: "Add to Cart",
@@ -210,8 +307,56 @@ const translations: Record<Language, Translations> = {
       },
       featuredProducts: "Produits Vedettes",
       whyChooseUs: {
-        title: "Pourquoi Nous Choisir",
+        title: "Pourquoi Choisir",
+        titleHighlight: "SoltanaHair",
+        subtitle: "Découvrez ce qui rend nos extensions de cheveux uniques. La qualité, l'éthique et la satisfaction client sont au cœur de tout ce que nous faisons.",
+        premiumQuality: {
+          title: "Qualité Premium",
+          description: "Extensions de cheveux 100% humains qui paraissent et se sentent complètement naturelles. Sourcées éthiquement et traitées professionnellement pour une durabilité maximale."
+        },
+        ethicallySourced: {
+          title: "Sourcées Éthiquement",
+          description: "Nous travaillons directement avec des fournisseurs qui maintiennent les plus hauts standards éthiques, garantissant un traitement équitable tout au long de notre chaîne d'approvisionnement."
+        },
+        expertCraftsmanship: {
+          title: "Artisanat Expert",
+          description: "Chaque pièce est soigneusement fabriquée par des artisans qualifiés avec des années d'expérience, garantissant une qualité constante et une finition parfaite."
+        },
+        fastShipping: {
+          title: "Livraison Rapide",
+          description: "Obtenez vos extensions rapidement avec nos options de livraison express. La plupart des commandes sont traitées et expédiées dans les 24-48 heures."
+        },
+        colorPerfection: {
+          title: "Perfection des Couleurs",
+          description: "Notre technologie avancée de correspondance des couleurs garantit que vos extensions se fondent parfaitement avec votre couleur de cheveux naturelle."
+        },
+        expertSupport: {
+          title: "Support Expert",
+          description: "Nos experts en extensions de cheveux sont là pour vous aider à choisir la correspondance parfaite et fournir des conseils de coiffure pour les meilleurs résultats."
+        },
+        cta: {
+          title: "Prête à Transformer Votre Look?",
+          description: "Rejoignez des milliers de clientes satisfaites qui ont découvert les extensions de cheveux parfaites pour leur style de vie.",
+          shopExtensions: "Acheter Extensions",
+          learnMore: "En Savoir Plus"
+        }
       },
+      testimonials: {
+        title: "Ce Que Disent Nos Clientes",
+        subtitle: "Ne nous croyez pas sur parole - écoutez les femmes qui ont transformé leur look avec les extensions SoltanaHair."
+      },
+      newsletter: {
+        title: "Restez Informée",
+        description: "Abonnez-vous pour recevoir des offres exclusives, des conseils de coiffure et être la première à connaître les nouvelles arrivées.",
+        placeholder: "Entrez votre adresse email",
+        subscribe: "S'abonner",
+        subscribing: "Abonnement en cours...",
+        success: "Merci de vous être abonnée! Vous recevrez des offres exclusives et des conseils de coiffure."
+      }
+    },
+    instagram: {
+      followUs: "Suivez-nous sur Instagram",
+      handle: "@soltanahair"
     },
     product: {
       addToCart: "Ajouter au panier",
@@ -298,8 +443,56 @@ const translations: Record<Language, Translations> = {
       },
       featuredProducts: "المنتجات المميزة",
       whyChooseUs: {
-        title: "لماذا تختارينا",
+        title: "لماذا تختارين",
+        titleHighlight: "سلطانة هير",
+        subtitle: "اكتشفي ما يجعل وصلات الشعر لدينا مميزة. الجودة والأخلاق ورضا العملاء هي في قلب كل ما نقوم به.",
+        premiumQuality: {
+          title: "جودة عالية",
+          description: "وصلات شعر بشري 100% تبدو وتشعر طبيعية تماماً. مصدرة أخلاقياً ومعالجة مهنياً لأقصى درجات المتانة."
+        },
+        ethicallySourced: {
+          title: "مصدرة أخلاقياً",
+          description: "نعمل مباشرة مع موردين يحافظون على أعلى المعايير الأخلاقية، مما يضمن المعاملة العادلة والتعويض في جميع أنحاء سلسلة التوريد."
+        },
+        expertCraftsmanship: {
+          title: "حرفية خبيرة",
+          description: "كل قطعة مصنوعة بعناية من قبل حرفيين ماهرين بسنوات من الخبرة، مما يضمن الجودة المستمرة والتشطيب المثالي."
+        },
+        fastShipping: {
+          title: "شحن سريع",
+          description: "احصلي على وصلاتك بسرعة مع خيارات الشحن السريع لدينا. معظم الطلبات تتم معالجتها وشحنها خلال 24-48 ساعة."
+        },
+        colorPerfection: {
+          title: "مطابقة الألوان المثالية",
+          description: "تقنيتنا المتقدمة لمطابقة الألوان تضمن امتزاج وصلاتك بشكل مثالي مع لون شعرك الطبيعي."
+        },
+        expertSupport: {
+          title: "دعم خبير",
+          description: "خبراء وصلات الشعر لدينا هنا لمساعدتك في اختيار المطابقة المثالية وتقديم نصائح التصفيف للحصول على أفضل النتائج."
+        },
+        cta: {
+          title: "هل أنت مستعدة لتغيير إطلالتك؟",
+          description: "انضمي إلى آلاف العميلات الراضيات اللواتي اكتشفن وصلات الشعر المثالية لأسلوب حياتهن.",
+          shopExtensions: "تسوقي الوصلات",
+          learnMore: "اعرفي المزيد"
+        }
       },
+      testimonials: {
+        title: "ما تقوله عميلاتنا",
+        subtitle: "لا تصدقي كلامنا فقط - استمعي للنساء اللواتي غيرن إطلالتهن مع وصلات سلطانة هير."
+      },
+      newsletter: {
+        title: "ابقي على اطلاع",
+        description: "اشتركي للحصول على عروض حصرية ونصائح التصفيف وكوني أول من يعرف عن الوصولات الجديدة.",
+        placeholder: "أدخلي عنوان بريدك الإلكتروني",
+        subscribe: "اشتراك",
+        subscribing: "جاري الاشتراك...",
+        success: "شكراً لاشتراكك! ستحصلين على عروض حصرية ونصائح التصفيف."
+      }
+    },
+    instagram: {
+      followUs: "تابعونا على إنستغرام",
+      handle: "@soltanahair"
     },
     product: {
       addToCart: "أضف إلى السلة",
